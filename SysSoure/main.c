@@ -950,7 +950,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MD1_CellAgvTemps = ModRegs.MDCellAgvTemps[0];
                    CANARegs.MD1Staue.all     = ModRegs.MDstatusbit[0];
                    CANARegs.PackID =0X608;
-                   CANATX(CANARegs.PackID,8,CANARegs.MD1_TotalVolt,CANARegs.MD1_CellAgvVolt,CANARegs.MD1_CellAgvTemps ,CANARegs.MD1Staue.all);
+                   CANATX(CANARegs.PackID,8,CANARegs.MD1_TotalVolt,CANARegs.MD1_CellAgvVolt,CANARegs.MD1_CellAgvTemps,CANARegs.MD1Staue.all);
 
                }
             #endif
@@ -1139,7 +1139,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MD5_CellAgvTemps = ModRegs.MDCellAgvTemps[4];
                    CANARegs.MD5Staue.all     = ModRegs.MDstatusbit[4];
                    CANARegs.PackID =0X60C;
-                   CANATX(CANARegs.PackID,8,CANARegs.MD4_TotalVolt,CANARegs.MD4_CellAgvVolt,CANARegs.MD2_CellAgvTemps ,CANARegs.MD2Staue.all);
+                   CANATX(CANARegs.PackID,8,CANARegs.MD5_TotalVolt,CANARegs.MD5_CellAgvVolt,CANARegs.MD5_CellAgvTemps ,CANARegs.MD5Staue.all);
                }
             #endif
             #if(PackNum==2)
@@ -1185,7 +1185,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MD6_CellAgvTemps = ModRegs.MDCellAgvTemps[5];
                    CANARegs.MD6Staue.all     = ModRegs.MDstatusbit[5];
                    CANARegs.PackID =0X60D;
-                   CANATX(CANARegs.PackID,8,CANARegs.MD4_TotalVolt,CANARegs.MD4_CellAgvVolt,CANARegs.MD2_CellAgvTemps ,CANARegs.MD2Staue.all);
+                   CANATX(CANARegs.PackID,8,CANARegs.MD6_TotalVolt,CANARegs.MD6_CellAgvVolt,CANARegs.MD6_CellAgvTemps ,CANARegs.MD6Staue.all);
                }
             #endif
             #if(PackNum==2)
@@ -1231,7 +1231,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MD7_CellAgvTemps = ModRegs.MDCellAgvTemps[6];
                    CANARegs.MD7Staue.all     = ModRegs.MDstatusbit[6];
                    CANARegs.PackID =0X60E;
-                   CANATX(CANARegs.PackID,8,CANARegs.MD4_TotalVolt,CANARegs.MD4_CellAgvVolt,CANARegs.MD2_CellAgvTemps ,CANARegs.MD2Staue.all);
+                   CANATX(CANARegs.PackID,8,CANARegs.MD7_TotalVolt,CANARegs.MD7_CellAgvVolt,CANARegs.MD7_CellAgvTemps ,CANARegs.MD7Staue.all);
                }
             #endif
             #if(PackNum==2)
