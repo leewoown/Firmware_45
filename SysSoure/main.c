@@ -67,13 +67,12 @@ void DigitalOutput(SystemReg *sys);
 /*
  *
  */
-void ProtectRlySateCheck(PrtectRelayReg *P);
+//void ProtectRlySateCheck(PrtectRelayReg *P);
 void ProtectRlyVarINIT(PrtectRelayReg *P);
+void ProtectRelayHandle(PrtectRelayReg *P);
 void ProtectRlyOnInit(PrtectRelayReg *P);
-void ProtectRlyOnHandle(PrtectRelayReg *P);
 void ProtectRlyOffInit(PrtectRelayReg *P);
-void ProtectRlyOffHandle(PrtectRelayReg *P);
-void ProtectRlyEMSHandle(PrtectRelayReg *P);
+
 
 
 void CalKokam100AhRegsInit(SocReg *P);
@@ -206,7 +205,7 @@ void main(void)
     EINT;   // Enable Global interrupt INTM
     ERTM;   // Enable Global realtime interrupt DBGM
     SysRegs.SysMachine =System_STATE_INIT;
-    PrtectRelayRegs.StateMachine=STATE_INIT;
+    PrtectRelayRegs.StateMachine=STATERly_INIT;
     SysRegs.PackStateReg.bit.CANCOMEnable=0;
     SysRegs.PackStateReg.bit.INITOK=0;
     while(1)
@@ -224,52 +223,42 @@ void main(void)
                   ProtectRlyVarINIT(&PrtectRelayRegs);
                   CalKokam100AhRegsInit(&Kam100AHSocRegs);
                   // Function SysMachine
-                  SysRegs.SysMachine=System_STATE_STANDBY;
                   Kam100AHSocRegs.state=SOC_STATE_IDLE;
-                  PrtectRelayRegs.StateMachine=STATE_STANDBY;
+                  PrtectRelayRegs.StateMachine=STATERly_INIT;
+                  SysRegs.SysMachine=System_STATE_STANDBY;
                   if(SysRegs.PackStateReg.bit.SysProtect==1)
                   {
-                   //   SysRegs.SysMachine=System_STATE_PROTECTER;
+                    //SysRegs.SysMachine=System_STATE_PROTECTER;
                   }
                   SysRegs.PackStateReg.bit.SysSTATE=1;
             break;
             case System_STATE_STANDBY:
-                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
                   SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=0;
+                  PrtectRelayRegs.StateMachine=STATERly_STANDBY;
                   SysRegs.PackStateReg.bit.INITOK=1;
-                  delay_ms(1000);
-                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
-                  // Function SysMachine
-                  SysRegs.SysMachine=System_STATE_READY;
-                  Kam100AHSocRegs.state= SOC_STATE_RUNNING;
-                  PrtectRelayRegs.StateMachine=STATE_WakeUpReady;
                   if(SysRegs.PackStateReg.bit.SysProtect==1)
                   {
-                  //    SysRegs.SysMachine=System_STATE_PROTECTER;
+                    //  SysRegs.PackStateReg.bit.INITOK=1;
                   }
+                  delay_ms(1000);
+                  // Function SysMachine
+                  Kam100AHSocRegs.state= SOC_STATE_RUNNING;
+                  PrtectRelayRegs.StateMachine=STATERly_OnSeqReady;
+                  SysRegs.SysMachine=System_STATE_READY;
+                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
                   SysRegs.PackStateReg.bit.SysSTATE =2;
             break;
             case System_STATE_READY:
                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
                  SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=0;
-
-                 if(SysRegs.PackStateReg.bit.SysProtect==1)
-                 {
-                    PrtectRelayRegs.State.bit.SysFaultState=1;
-                 }
                  if(CANARegs.PMSCMDRegs.bit.RUNStatus01==1)
                  {
                      PrtectRelayRegs.State.bit.WakeUpEN=1;
                  }
                  // Function SysMachine
-
                  if(PrtectRelayRegs.State.bit.WakeuPOnEND==1)
                  {
                      SysRegs.SysMachine=System_STATE_RUNING;
-                 }
-                 if(SysRegs.PackStateReg.bit.SysProtect==1)
-                 {
-                  //   SysRegs.SysMachine=System_STATE_PROTECTER;
                  }
                  SysRegs.PackStateReg.bit.SysSTATE = 3;
             break;
@@ -284,17 +273,13 @@ void main(void)
                  if(PrtectRelayRegs.State.bit.WakeuPOffEND==1)
                  {
                      SysRegs.SysMachine=System_STATE_STANDBY;
-                 }
-                 if(SysRegs.PackStateReg.bit.SysProtect==1)
-                 {
-                //   SysRegs.SysMachine=System_STATE_PROTECTER;
+
                  }
                  SysRegs.PackStateReg.bit.SysSTATE = 4;
             break;
             case System_STATE_PROTECTER:
                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
                  CANARegs.PMSCMDRegs.all=0;
-                 PrtectRelayRegs.StateMachine=STATE_ProtectpOFF;
                  if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
                  {
                      CANARegs.PMSCMDRegs.bit.PrtctReset01=0;
@@ -306,7 +291,7 @@ void main(void)
                      ProtectRlyVarINIT(&PrtectRelayRegs);
                      CalKokam100AhRegsInit(&Kam100AHSocRegs);
                      delay_ms(200);
-                   //  SysRegs.SysMachine=System_STATE_INIT;
+                     SysRegs.SysMachine=System_STATE_INIT;
                  }
                  SysRegs.PackStateReg.bit.SysSTATE =5;
             break;
@@ -373,7 +358,8 @@ interrupt void cpu_timer0_isr(void)
 
    PrtectRelayRegs.State.bit.NRlyDI=SysRegs.DigitalInputReg.bit.NAUX;
    PrtectRelayRegs.State.bit.PRlyDI=SysRegs.DigitalInputReg.bit.PAUX;
-   ProtectRlySateCheck(&PrtectRelayRegs);
+  // ProtectRlySateCheck(&PrtectRelayRegs);
+   ProtectRelayHandle(&PrtectRelayRegs);
    SysRegs.DigitalOutPutReg.bit.NRlyOUT=PrtectRelayRegs.State.bit.NRlyDO;
    SysRegs.DigitalOutPutReg.bit.PRlyOUT=PrtectRelayRegs.State.bit.PRlyDO;
    SysRegs.DigitalOutPutReg.bit.ProRlyOUT=PrtectRelayRegs.State.bit.PreRlyDO;

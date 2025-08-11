@@ -1,10 +1,10 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Mon Aug 11 17:28:56 2025
+>> Linked Tue Aug 12 00:08:43 2025
 
 OUTPUT FILE NAME:   <F28069PackBMS.out>
-ENTRY POINT SYMBOL: "_c_int00"  address: 003f6b60
+ENTRY POINT SYMBOL: "_c_int00"  address: 003f6b35
 
 
 MEMORY CONFIGURATION
@@ -21,7 +21,7 @@ PAGE 0:
   FLASHE                003e4000   00004000  00000000  00004000  RWIX
   FLASHD                003e8000   00004000  0000001f  00003fe1  RWIX
   FLASHC                003ec000   00004000  00000000  00004000  RWIX
-  FLASHA                003f4000   00003f80  00002e17  00001169  RWIX
+  FLASHA                003f4000   00003f80  00002dec  00001194  RWIX
   CSM_RSVD              003f7f80   00000076  00000076  00000000  RWIX
   BEGIN                 003f7ff6   00000002  00000002  00000000  RWIX
   CSM_PWL_P0            003f7ff8   00000008  00000008  00000000  RWIX
@@ -106,13 +106,13 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
-.cinit     0    003f6de6    00000032     
-                  003f6de6    00000011     main.obj (.cinit)
-                  003f6df7    0000000e     rts2800_fpu32.lib : exit.c.obj (.cinit)
-                  003f6e05    00000005     F2806x_CpuTimers.obj (.cinit)
-                  003f6e0a    00000005     rts2800_fpu32.lib : _lock.c.obj (.cinit:__lock)
-                  003f6e0f    00000005                       : _lock.c.obj (.cinit:__unlock)
-                  003f6e14    00000004     DSP28x_Project.obj (.cinit)
+.cinit     0    003f6dba    00000032     
+                  003f6dba    00000011     main.obj (.cinit)
+                  003f6dcb    0000000e     rts2800_fpu32.lib : exit.c.obj (.cinit)
+                  003f6dd9    00000005     F2806x_CpuTimers.obj (.cinit)
+                  003f6dde    00000005     rts2800_fpu32.lib : _lock.c.obj (.cinit:__lock)
+                  003f6de3    00000005                       : _lock.c.obj (.cinit:__unlock)
+                  003f6de8    00000004     DSP28x_Project.obj (.cinit)
 
 .pinit     0    003f4000    00000000     UNINITIALIZED
 
@@ -120,35 +120,35 @@ ramfuncs   0    003e8000    0000001f     RUN ADDR = 00008000
                   003e8000    0000001b     F2806x_SysCtrl.obj (ramfuncs)
                   003e801b    00000004     F2806x_usDelay.obj (ramfuncs)
 
-.text      0    003f4000    00002ce3     
+.text      0    003f4000    00002cb8     
                   003f4000    00000ca3     main.obj (.text:retain)
                   003f4ca3    000009e4     DSP28x_Project.obj (.text)
                   003f5687    000003e3     F2806x_ECan.obj (.text)
                   003f5a6a    0000039b     F2806x_DefaultIsr.obj (.text:retain)
                   003f5e05    000002b2     BATCalc.obj (.text)
                   003f60b7    00000266     BATAlgorithm.obj (.text)
-                  003f631d    0000020f     ProtectRelay.obj (.text)
-                  003f652c    00000190     F2806x_SysCtrl.obj (.text)
-                  003f66bc    00000163     main.obj (.text)
-                  003f681f    0000011b     F2806x_Gpio.obj (.text)
-                  003f693a    000000cc     F2806x_Spi.obj (.text)
-                  003f6a06    00000088     rts2800_fpu32.lib : fs_div28.asm.obj (.text)
-                  003f6a8e    00000079     F2806x_CpuTimers.obj (.text)
-                  003f6b07    00000059     rts2800_fpu32.lib : s_floorf.c.obj (.text)
-                  003f6b60    00000056                       : boot28.asm.obj (.text)
-                  003f6bb6    00000039                       : s_roundf.c.obj (.text)
-                  003f6bef    00000029                       : exit.c.obj (.text)
-                  003f6c18    00000028     F2806x_PieCtrl.obj (.text)
-                  003f6c40    00000026     F2806x_PieVect.obj (.text)
-                  003f6c66    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
-                  003f6c8a    0000001d                       : memcpy.c.obj (.text)
-                  003f6ca7    00000013     F2806x_MemCopy.obj (.text)
-                  003f6cba    00000012     rts2800_fpu32.lib : args_main.c.obj (.text)
-                  003f6ccc    00000009                       : _lock.c.obj (.text)
-                  003f6cd5    00000008     F2806x_CodeStartBranch.obj (.text)
-                  003f6cdd    00000003     F2806x_DBGIER.obj (.text)
-                  003f6ce0    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
-                  003f6ce2    00000001                       : startup.c.obj (.text)
+                  003f631d    000001f1     ProtectRelay.obj (.text)
+                  003f650e    00000190     F2806x_SysCtrl.obj (.text)
+                  003f669e    00000156     main.obj (.text)
+                  003f67f4    0000011b     F2806x_Gpio.obj (.text)
+                  003f690f    000000cc     F2806x_Spi.obj (.text)
+                  003f69db    00000088     rts2800_fpu32.lib : fs_div28.asm.obj (.text)
+                  003f6a63    00000079     F2806x_CpuTimers.obj (.text)
+                  003f6adc    00000059     rts2800_fpu32.lib : s_floorf.c.obj (.text)
+                  003f6b35    00000056                       : boot28.asm.obj (.text)
+                  003f6b8b    00000039                       : s_roundf.c.obj (.text)
+                  003f6bc4    00000029                       : exit.c.obj (.text)
+                  003f6bed    00000028     F2806x_PieCtrl.obj (.text)
+                  003f6c15    00000026     F2806x_PieVect.obj (.text)
+                  003f6c3b    00000024     rts2800_fpu32.lib : cpy_tbl.c.obj (.text)
+                  003f6c5f    0000001d                       : memcpy.c.obj (.text)
+                  003f6c7c    00000013     F2806x_MemCopy.obj (.text)
+                  003f6c8f    00000012     rts2800_fpu32.lib : args_main.c.obj (.text)
+                  003f6ca1    00000009                       : _lock.c.obj (.text)
+                  003f6caa    00000008     F2806x_CodeStartBranch.obj (.text)
+                  003f6cb2    00000003     F2806x_DBGIER.obj (.text)
+                  003f6cb5    00000002     rts2800_fpu32.lib : pre_init.c.obj (.text)
+                  003f6cb7    00000001                       : startup.c.obj (.text)
 
 csm_rsvd   0    003f7f80    00000076     
                   003f7f80    00000076     F2806x_CSMPasswords.obj (csm_rsvd)
@@ -172,9 +172,9 @@ csmpasswds
                   0000a46e    00000002                       : _lock.c.obj (.ebss:__unlock)
                   0000a470    00000001     DSP28x_Project.obj (.ebss)
 
-.econst    0    003f6ce4    00000102     
-                  003f6ce4    00000100     F2806x_PieVect.obj (.econst:_PieVectTableInit)
-                  003f6de4    00000002     rts2800_fpu32.lib : s_floorf.c.obj (.econst)
+.econst    0    003f6cb8    00000102     
+                  003f6cb8    00000100     F2806x_PieVect.obj (.econst:_PieVectTableInit)
+                  003f6db8    00000002     rts2800_fpu32.lib : s_floorf.c.obj (.econst)
 
 .reset     0    003fffc0    00000002     DSECT
                   003fffc0    00000002     rts2800_fpu32.lib : boot28.asm.obj (.reset)
@@ -432,13 +432,13 @@ MODULE SUMMARY
        Total:                          3098    387                3576              
                                                                                     
     .\SysSoure\
-       main.obj                        3590    17                 1100              
+       main.obj                        3577    17                 1100              
        DSP28x_Project.obj              2532    4                  1                 
        BATCalc.obj                     690     0                  0                 
        BATAlgorithm.obj                614     0                  0                 
-       ProtectRelay.obj                527     0                  0                 
+       ProtectRelay.obj                497     0                  0                 
     +--+-------------------------------+-------+------------------+--------------------+
-       Total:                          7953    21                 1101              
+       Total:                          7910    21                 1101              
                                                                                     
     C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib/rts2800_fpu32.lib
        fs_div28.asm.obj                136     0                  0                 
@@ -457,7 +457,7 @@ MODULE SUMMARY
                                                                                     
        Stack:                          0       0                  80                
     +--+-------------------------------+-------+------------------+--------------------+
-       Grand Total:                    11555   434                4767              
+       Grand Total:                    11512   434                4767              
 
 
 GLOBAL DATA SYMBOLS: SORTED BY DATA PAGE
@@ -592,7 +592,7 @@ address     data page           name
 
 003d7e80    f5fa (003d7e80)     _PartIdRegs
 
-003f6ce4    fdb3 (003f6cc0)     _PieVectTableInit
+003f6cb8    fdb2 (003f6c80)     _PieVectTableInit
 
 003f7ff8    fdff (003f7fc0)     _CsmPwl
 
@@ -602,8 +602,8 @@ GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name
 page  address   name                            
 ----  -------   ----                            
 0     003f4000  .text                           
-0     003f6bef  C$$EXIT                         
-0     003f6a06  FS$$DIV                         
+0     003f6bc4  C$$EXIT                         
+0     003f69db  FS$$DIV                         
 0     003f5b28  _ADCINT1_ISR                    
 0     003f5b32  _ADCINT2_ISR                    
 0     003f5d3a  _ADCINT3_ISR                    
@@ -644,7 +644,7 @@ page  address   name
 1     00006400  _Comp1Regs                      
 1     00006420  _Comp2Regs                      
 1     00006440  _Comp3Regs                      
-0     003f6ac9  _ConfigCpuTimer                 
+0     003f6a9e  _ConfigCpuTimer                 
 1     0000a44e  _CpuTimer0                      
 1     00000c00  _CpuTimer0Regs                  
 1     0000a456  _CpuTimer1                      
@@ -653,7 +653,7 @@ page  address   name
 1     00000c10  _CpuTimer2Regs                  
 1     003f7ff8  _CsmPwl                         
 1     00000ae0  _CsmRegs                        
-0     003f6630  _CsmUnlock                      
+0     003f6612  _CsmUnlock                      
 0     003f5a7e  _DATALOG_ISR                    
 0     003f5cae  _DINTCH1_ISR                    
 0     003f5cb8  _DINTCH2_ISR                    
@@ -665,7 +665,7 @@ page  address   name
 1     00000880  _DevEmuRegs                     
 0     003f54e8  _DigitalInput                   
 0     003f5568  _DigitalOutput                  
-0     003f6550  _DisableDog                     
+0     003f6532  _DisableDog                     
 1     00001000  _DmaRegs                        
 0     003f5d26  _ECAN0INTA_ISR                  
 0     003f5d30  _ECAN1INTA_ISR                  
@@ -712,8 +712,8 @@ page  address   name
 1     00006b40  _EQep2Regs                      
 1     00000d01  _EmuBMode                       
 1     00000d00  _EmuKey                         
-0     003f6c37  _EnableInterrupts               
-0     003f66a6  _ExtOscSel                      
+0     003f6c0c  _EnableInterrupts               
+0     003f6688  _ExtOscSel                      
 1     00000a80  _FlashRegs                      
 1     00000d04  _Flash_CPUScaleFactor           
 1     00000d02  _Flash_CallbackPtr              
@@ -735,33 +735,33 @@ page  address   name
 0     003f5a6a  _INT13_ISR                      
 0     003f5a74  _INT14_ISR                      
 0     003f4659  _ISR_CANRXINTA                  
-0     003f6a8e  _InitCpuTimers                  
+0     003f6a63  _InitCpuTimers                  
 0     003f5687  _InitECan                       
 0     003f5a51  _InitECanGpio                   
 0     003f568a  _InitECana                      
 0     003f5a54  _InitECanaGpio                  
 0     00008000  _InitFlash                      
-0     003f681f  _InitGpio                       
-0     003f65da  _InitPeripheralClocks           
-0     003f6c18  _InitPieCtrl                    
-0     003f6c40  _InitPieVectTable               
-0     003f6558  _InitPll                        
-0     003f65ac  _InitPll2                       
-0     003f693a  _InitSpiBATIC                   
-0     003f6955  _InitSpiCAN                     
-0     003f6970  _InitSpiGpio                    
-0     003f69ab  _InitSpiaGpio                   
-0     003f652c  _InitSysCtrl                    
-0     003f6661  _IntOsc1Sel                     
-0     003f6671  _IntOsc2Sel                     
+0     003f67f4  _InitGpio                       
+0     003f65bc  _InitPeripheralClocks           
+0     003f6bed  _InitPieCtrl                    
+0     003f6c15  _InitPieVectTable               
+0     003f653a  _InitPll                        
+0     003f658e  _InitPll2                       
+0     003f690f  _InitSpiBATIC                   
+0     003f692a  _InitSpiCAN                     
+0     003f6945  _InitSpiGpio                    
+0     003f6980  _InitSpiaGpio                   
+0     003f650e  _InitSysCtrl                    
+0     003f6643  _IntOsc1Sel                     
+0     003f6653  _IntOsc2Sel                     
 1     0000a140  _Kam100AHSocRegs                
 0     003f5dda  _LUF_ISR                        
 0     003f5dd0  _LVF_ISR                        
 0     003f5c9a  _MRINTA_ISR                     
 0     003f5ca4  _MXINTA_ISR                     
 1     00005000  _McbspaRegs                     
-0     003f6973  _MeasureSPISpeedHandle          
-0     003f6ca7  _MemCopy                        
+0     003f6948  _MeasureSPISpeedHandle          
+0     003f6c7c  _MemCopy                        
 1     0000a240  _ModRegs                        
 0     003f4f90  _ModuleInit                     
 1     0000a004  _NCMsocTestVoltAGV              
@@ -771,15 +771,11 @@ page  address   name
 1     003d7e80  _PartIdRegs                     
 1     00000ce0  _PieCtrlRegs                    
 1     00000d00  _PieVectTable                   
-0     003f6ce4  _PieVectTableInit               
-0     003f6528  _ProtectRelayHandle             
+0     003f6cb8  _PieVectTableInit               
+0     003f6349  _ProtectRelayHandle             
 0     003f564d  _ProtectRelayTimerHandle        
-0     003f64f6  _ProtectRlyEMSHandle            
-0     003f64c3  _ProtectRlyOffHandle            
-0     003f64b3  _ProtectRlyOffInit              
-0     003f6413  _ProtectRlyOnHandle             
-0     003f6401  _ProtectRlyOnInit               
-0     003f634a  _ProtectRlySateCheck            
+0     003f64fe  _ProtectRlyOffInit              
+0     003f64ec  _ProtectRlyOnInit               
 0     003f631d  _ProtectRlyVarINIT              
 1     0000a006  _PrtectRelayRegs                
 0     003f5a88  _RTOSINT_ISR                    
@@ -795,12 +791,12 @@ abs   0000001f  _RamfuncsLoadSize
 0     003f5c86  _SPIRXINTB_ISR                  
 0     003f5c7c  _SPITXINTA_ISR                  
 0     003f5c90  _SPITXINTB_ISR                  
-0     003f69ec  _SPI_Read                       
-0     003f69d3  _SPI_Write                      
+0     003f69c1  _SPI_Read                       
+0     003f69a8  _SPI_Write                      
 1     00007050  _SciaRegs                       
 1     00007750  _ScibRegs                       
-0     003f6546  _ServiceDog                     
-0     003f6cdd  _SetDBGIER                      
+0     003f6528  _ServiceDog                     
+0     003f6cb2  _SetDBGIER                      
 1     00007040  _SpiaRegs                       
 1     00007740  _SpibRegs                       
 0     003f5260  _SysCommErrHandle               
@@ -834,7 +830,7 @@ abs   0000001f  _RamfuncsLoadSize
 0     003f5b46  _XINT2_ISR                      
 0     003f5dc6  _XINT3_ISR                      
 1     00007070  _XIntruptRegs                   
-0     003f668b  _XtalOscSel                     
+0     003f666d  _XtalOscSel                     
 1     000000a0  __STACK_END                     
 abs   00000050  __STACK_SIZE                    
 1     0000a468  ___TI_cleanup_ptr               
@@ -845,37 +841,37 @@ abs   ffffffff  ___TI_prof_data_size
 abs   ffffffff  ___TI_prof_data_start           
 abs   ffffffff  ___binit__                      
 abs   ffffffff  ___c_args__                     
-0     003f6de6  ___cinit__                      
-0     003f6ce3  ___etext__                      
+0     003f6dba  ___cinit__                      
+0     003f6cb8  ___etext__                      
 abs   ffffffff  ___pinit__                      
 0     003f4000  ___text__                       
-0     003f6cba  __args_main                     
+0     003f6c8f  __args_main                     
 1     0000a46c  __lock                          
-0     003f6cd4  __nop                           
-0     003f6cd0  __register_lock                 
-0     003f6ccc  __register_unlock               
+0     003f6ca9  __nop                           
+0     003f6ca5  __register_lock                 
+0     003f6ca1  __register_unlock               
 1     00000050  __stack                         
-0     003f6ce2  __system_post_cinit             
-0     003f6ce0  __system_pre_init               
+0     003f6cb7  __system_post_cinit             
+0     003f6cb5  __system_pre_init               
 1     0000a46e  __unlock                        
-0     003f6bef  _abort                          
-0     003f6b60  _c_int00                        
-0     003f6c66  _copy_in                        
+0     003f6bc4  _abort                          
+0     003f6b35  _c_int00                        
+0     003f6c3b  _copy_in                        
 0     003f4000  _cpu_timer0_isr                 
-0     003f6bf1  _exit                           
+0     003f6bc6  _exit                           
 0     003f54d2  _float32ToInt                   
-0     003f6b07  _floor                          
-0     003f6b07  _floorf                         
-0     003f66bc  _main                           
-0     003f6c8a  _memcpy                         
-0     003f6bb6  _round                          
-0     003f6bb6  _roundf                         
+0     003f6adc  _floor                          
+0     003f6adc  _floorf                         
+0     003f669e  _main                           
+0     003f6c5f  _memcpy                         
+0     003f6b8b  _round                          
+0     003f6b8b  _roundf                         
 0     003f5dfb  _rsvd_ISR                       
 1     0000a44c  _test                           
 abs   ffffffff  binit                           
-0     003f6de6  cinit                           
+0     003f6dba  cinit                           
 0     003f7ff6  code_start                      
-0     003f6ce3  etext                           
+0     003f6cb8  etext                           
 abs   ffffffff  pinit                           
 
 
@@ -1012,62 +1008,58 @@ page  address   name
 0     003f612d  _CalKokam100AhSocInit           
 0     003f61b0  _Calkokam100AhSocHandle         
 0     003f631d  _ProtectRlyVarINIT              
-0     003f634a  _ProtectRlySateCheck            
-0     003f6401  _ProtectRlyOnInit               
-0     003f6413  _ProtectRlyOnHandle             
-0     003f64b3  _ProtectRlyOffInit              
-0     003f64c3  _ProtectRlyOffHandle            
-0     003f64f6  _ProtectRlyEMSHandle            
-0     003f6528  _ProtectRelayHandle             
-0     003f652c  _InitSysCtrl                    
-0     003f6546  _ServiceDog                     
-0     003f6550  _DisableDog                     
-0     003f6558  _InitPll                        
-0     003f65ac  _InitPll2                       
-0     003f65da  _InitPeripheralClocks           
-0     003f6630  _CsmUnlock                      
-0     003f6661  _IntOsc1Sel                     
-0     003f6671  _IntOsc2Sel                     
-0     003f668b  _XtalOscSel                     
-0     003f66a6  _ExtOscSel                      
-0     003f66bc  _main                           
-0     003f681f  _InitGpio                       
-0     003f693a  _InitSpiBATIC                   
-0     003f6955  _InitSpiCAN                     
-0     003f6970  _InitSpiGpio                    
-0     003f6973  _MeasureSPISpeedHandle          
-0     003f69ab  _InitSpiaGpio                   
-0     003f69d3  _SPI_Write                      
-0     003f69ec  _SPI_Read                       
-0     003f6a06  FS$$DIV                         
-0     003f6a8e  _InitCpuTimers                  
-0     003f6ac9  _ConfigCpuTimer                 
-0     003f6b07  _floor                          
-0     003f6b07  _floorf                         
-0     003f6b60  _c_int00                        
-0     003f6bb6  _round                          
-0     003f6bb6  _roundf                         
-0     003f6bef  C$$EXIT                         
-0     003f6bef  _abort                          
-0     003f6bf1  _exit                           
-0     003f6c18  _InitPieCtrl                    
-0     003f6c37  _EnableInterrupts               
-0     003f6c40  _InitPieVectTable               
-0     003f6c66  _copy_in                        
-0     003f6c8a  _memcpy                         
-0     003f6ca7  _MemCopy                        
-0     003f6cba  __args_main                     
-0     003f6ccc  __register_unlock               
-0     003f6cd0  __register_lock                 
-0     003f6cd4  __nop                           
-0     003f6cdd  _SetDBGIER                      
-0     003f6ce0  __system_pre_init               
-0     003f6ce2  __system_post_cinit             
-0     003f6ce3  ___etext__                      
-0     003f6ce3  etext                           
-0     003f6ce4  _PieVectTableInit               
-0     003f6de6  ___cinit__                      
-0     003f6de6  cinit                           
+0     003f6349  _ProtectRelayHandle             
+0     003f64ec  _ProtectRlyOnInit               
+0     003f64fe  _ProtectRlyOffInit              
+0     003f650e  _InitSysCtrl                    
+0     003f6528  _ServiceDog                     
+0     003f6532  _DisableDog                     
+0     003f653a  _InitPll                        
+0     003f658e  _InitPll2                       
+0     003f65bc  _InitPeripheralClocks           
+0     003f6612  _CsmUnlock                      
+0     003f6643  _IntOsc1Sel                     
+0     003f6653  _IntOsc2Sel                     
+0     003f666d  _XtalOscSel                     
+0     003f6688  _ExtOscSel                      
+0     003f669e  _main                           
+0     003f67f4  _InitGpio                       
+0     003f690f  _InitSpiBATIC                   
+0     003f692a  _InitSpiCAN                     
+0     003f6945  _InitSpiGpio                    
+0     003f6948  _MeasureSPISpeedHandle          
+0     003f6980  _InitSpiaGpio                   
+0     003f69a8  _SPI_Write                      
+0     003f69c1  _SPI_Read                       
+0     003f69db  FS$$DIV                         
+0     003f6a63  _InitCpuTimers                  
+0     003f6a9e  _ConfigCpuTimer                 
+0     003f6adc  _floor                          
+0     003f6adc  _floorf                         
+0     003f6b35  _c_int00                        
+0     003f6b8b  _round                          
+0     003f6b8b  _roundf                         
+0     003f6bc4  C$$EXIT                         
+0     003f6bc4  _abort                          
+0     003f6bc6  _exit                           
+0     003f6bed  _InitPieCtrl                    
+0     003f6c0c  _EnableInterrupts               
+0     003f6c15  _InitPieVectTable               
+0     003f6c3b  _copy_in                        
+0     003f6c5f  _memcpy                         
+0     003f6c7c  _MemCopy                        
+0     003f6c8f  __args_main                     
+0     003f6ca1  __register_unlock               
+0     003f6ca5  __register_lock                 
+0     003f6ca9  __nop                           
+0     003f6cb2  _SetDBGIER                      
+0     003f6cb5  __system_pre_init               
+0     003f6cb7  __system_post_cinit             
+0     003f6cb8  _PieVectTableInit               
+0     003f6cb8  ___etext__                      
+0     003f6cb8  etext                           
+0     003f6dba  ___cinit__                      
+0     003f6dba  cinit                           
 0     003f7ff6  code_start                      
 1     00000050  __stack                         
 1     000000a0  __STACK_END                     
@@ -1160,4 +1152,4 @@ abs   ffffffff  ___pinit__
 abs   ffffffff  binit                           
 abs   ffffffff  pinit                           
 
-[276 symbols]
+[272 symbols]

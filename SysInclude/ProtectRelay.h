@@ -57,13 +57,18 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
 //#define ProtectNRelayOFFTime          5 // 250msec
 typedef enum
 {
-  STATE_INIT,
-  STATE_STANDBY,
-  STATE_WakeUpReady,
-  STATE_WakeUpON,
-  STATE_WakeUpOFF,
-  STATE_ProtectpOFF,
-  STATE_CLEAR
+  STATERly_INIT,
+  STATERly_STANDBY,
+  STATERly_OnSeqReady,
+  STATERly_OnSeqNRlyOn,
+  STATERly_OnSeqPreRlyOn,
+  STATERly_OnSeqPRlyOn,
+  STATERly_OnSeqPreRlyOff,
+  STATERly_OffSeqReady,
+  STATERly_OffSeqPRlyOff,
+  STATERly_OffSeqNRlyOff,
+  STATERly_ProtectRlyOff,
+  STATERly_ProtectReset
 }ProtectRelayState;
 
 struct ProtectRelayState_BIT
