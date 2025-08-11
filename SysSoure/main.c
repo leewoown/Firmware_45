@@ -2554,7 +2554,7 @@ interrupt void ISR_CANRXINTA(void)
             {
                 SysRegs.MasterRxCount=0;
                if(CANARegs.MailBox1RxCount>3000){CANARegs.MailBox1RxCount=0;}
-               CANARegs.PMSCMDRegs.all = (ECanaMboxes.MBOX30.MDL.byte.BYTE0<<8)|(ECanaMboxes.MBOX30.MDL.byte.BYTE1);
+               CANARegs.PMSCMDRegs.all = (ECanaMboxes.MBOX30.MDL.byte.BYTE1<<8)|(ECanaMboxes.MBOX30.MDL.byte.BYTE0);
               if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
               {
                 //   CANARegs.PMSCMDRegs.bit.RUNStatus01=0;
