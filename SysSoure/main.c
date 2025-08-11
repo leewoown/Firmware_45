@@ -328,7 +328,7 @@ void main(void)
         if(SysRegs.Maincount>3000){SysRegs.Maincount=0;}
         if(CANTXFALAG==1)
         {
-            MCP2515InitHandle(&CANBRegs);
+         //   MCP2515InitHandle(&CANBRegs);
             CANTXFALAG=0;
        }
    //     CANBRegs.SPISpeedHz=MeasureSPISpeedHandle(100);
@@ -945,7 +945,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==1)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0];
+                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0]/10;
                    CANARegs.MD1_CellAgvVolt  = ModRegs.MDCellAgvVolt[0];
                    CANARegs.MD1_CellAgvTemps = ModRegs.MDCellAgvTemps[0];
                    CANARegs.MD1Staue.all     = ModRegs.MDstatusbit[0];
@@ -957,7 +957,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0];
+                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0]/10;
                    CANARegs.MD1_CellAgvVolt  = ModRegs.MDCellAgvVolt[0];
                    CANARegs.MD1_CellAgvTemps = ModRegs.MDCellAgvTemps[0];
                    CANARegs.MD1Staue.all     = ModRegs.MDstatusbit[0];
@@ -969,7 +969,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0];
+                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0]/10;
                    CANARegs.MD1_CellAgvVolt  = ModRegs.MDCellAgvVolt[0];
                    CANARegs.MD1_CellAgvTemps = ModRegs.MDCellAgvTemps[0];
                    CANARegs.MD1Staue.all     = ModRegs.MDstatusbit[0];
@@ -981,7 +981,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==4)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0];
+                   CANARegs.MD1_TotalVolt    = ModRegs.MDTotalVolt[0]/10;
                    CANARegs.MD1_CellAgvVolt  = ModRegs.MDCellAgvVolt[0];
                    CANARegs.MD1_CellAgvTemps = ModRegs.MDCellAgvTemps[0];
                    CANARegs.MD1Staue.all     = ModRegs.MDstatusbit[0];
@@ -995,7 +995,7 @@ interrupt void cpu_timer0_isr(void)
                #if(PackNum==1)
                    if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                    {
-                       CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1];
+                       CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1]/10;
                        CANARegs.MD2_CellAgvVolt  = ModRegs.MDCellAgvVolt[1];
                        CANARegs.MD2_CellAgvTemps = ModRegs.MDCellAgvTemps[1];
                        CANARegs.MD2Staue.all     = ModRegs.MDstatusbit[1];
@@ -1006,7 +1006,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1];
+                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1]/10;
                     CANARegs.MD2_CellAgvVolt  = ModRegs.MDCellAgvVolt[1];
                     CANARegs.MD2_CellAgvTemps = ModRegs.MDCellAgvTemps[1];
                     CANARegs.MD2Staue.all     = ModRegs.MDstatusbit[1];
@@ -1017,7 +1017,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==3)
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1];
+                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1]/10;
                     CANARegs.MD2_CellAgvVolt  = ModRegs.MDCellAgvVolt[1];
                     CANARegs.MD2_CellAgvTemps = ModRegs.MDCellAgvTemps[1];
                     CANARegs.MD2Staue.all     = ModRegs.MDstatusbit[1];
@@ -1028,7 +1028,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==4)
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1];
+                    CANARegs.MD2_TotalVolt    = ModRegs.MDTotalVolt[1]/10;
                     CANARegs.MD2_CellAgvVolt  = ModRegs.MDCellAgvVolt[1];
                     CANARegs.MD2_CellAgvTemps = ModRegs.MDCellAgvTemps[1];
                     CANARegs.MD2Staue.all     = ModRegs.MDstatusbit[1];
@@ -1041,7 +1041,7 @@ interrupt void cpu_timer0_isr(void)
                #if(PackNum==1)
                    if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                    {
-                       CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2];
+                       CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2]/10;
                        CANARegs.MD3_CellAgvVolt  = ModRegs.MDCellAgvVolt[2];
                        CANARegs.MD3_CellAgvTemps = ModRegs.MDCellAgvTemps[2];
                        CANARegs.MD3Staue.all     = ModRegs.MDstatusbit[2];
@@ -1052,7 +1052,7 @@ interrupt void cpu_timer0_isr(void)
                 #if(PackNum==2)
                     if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                     {
-                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2];
+                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2]/10;
                         CANARegs.MD3_CellAgvVolt  = ModRegs.MDCellAgvVolt[2];
                         CANARegs.MD3_CellAgvTemps = ModRegs.MDCellAgvTemps[2];
                         CANARegs.MD3Staue.all     = ModRegs.MDstatusbit[2];
@@ -1063,7 +1063,7 @@ interrupt void cpu_timer0_isr(void)
                 #if(PackNum==3)
                     if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                     {
-                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2];
+                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2]/10;
                         CANARegs.MD3_CellAgvVolt  = ModRegs.MDCellAgvVolt[2];
                         CANARegs.MD3_CellAgvTemps = ModRegs.MDCellAgvTemps[2];
                         CANARegs.MD3Staue.all     = ModRegs.MDstatusbit[2];
@@ -1074,7 +1074,7 @@ interrupt void cpu_timer0_isr(void)
                 #if(PackNum==4)
                     if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                     {
-                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2];
+                        CANARegs.MD3_TotalVolt    = ModRegs.MDTotalVolt[2]/10;
                         CANARegs.MD3_CellAgvVolt  = ModRegs.MDCellAgvVolt[2];
                         CANARegs.MD3_CellAgvTemps = ModRegs.MDCellAgvTemps[2];
                         CANARegs.MD3Staue.all     = ModRegs.MDstatusbit[2];
@@ -1088,7 +1088,7 @@ interrupt void cpu_timer0_isr(void)
                #if(PackNum==1)
                    if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                    {
-                       CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3];
+                       CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3]/10;
                        CANARegs.MD4_CellAgvVolt  = ModRegs.MDCellAgvVolt[3];
                        CANARegs.MD4_CellAgvTemps = ModRegs.MDCellAgvTemps[3];
                        CANARegs.MD4Staue.all     = ModRegs.MDstatusbit[3];
@@ -1099,7 +1099,7 @@ interrupt void cpu_timer0_isr(void)
                #if(PackNum==2)
                     if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                     {
-                        CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3];
+                        CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3]/10;
                         CANARegs.MD4_CellAgvVolt  = ModRegs.MDCellAgvVolt[3];
                         CANARegs.MD4_CellAgvTemps = ModRegs.MDCellAgvTemps[3];
                         CANARegs.MD4Staue.all     = ModRegs.MDstatusbit[3];
@@ -1110,7 +1110,7 @@ interrupt void cpu_timer0_isr(void)
               #if(PackNum==3)
                      if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                      {
-                         CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3];
+                         CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3]/10;
                          CANARegs.MD4_CellAgvVolt  = ModRegs.MDCellAgvVolt[3];
                          CANARegs.MD4_CellAgvTemps = ModRegs.MDCellAgvTemps[3];
                          CANARegs.MD4Staue.all     = ModRegs.MDstatusbit[3];
@@ -1121,7 +1121,7 @@ interrupt void cpu_timer0_isr(void)
              #if(PackNum==4)
                    if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                    {
-                       CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3];
+                       CANARegs.MD4_TotalVolt    = ModRegs.MDTotalVolt[3]/10;
                        CANARegs.MD4_CellAgvVolt  = ModRegs.MDCellAgvVolt[3];
                        CANARegs.MD4_CellAgvTemps = ModRegs.MDCellAgvTemps[3];
                        CANARegs.MD4Staue.all     = ModRegs.MDstatusbit[3];
@@ -1134,7 +1134,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==1)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4];
+                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4]/10;
                    CANARegs.MD5_CellAgvVolt  = ModRegs.MDCellAgvVolt[4];
                    CANARegs.MD5_CellAgvTemps = ModRegs.MDCellAgvTemps[4];
                    CANARegs.MD5Staue.all     = ModRegs.MDstatusbit[4];
@@ -1145,7 +1145,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4];
+                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4]/10;
                    CANARegs.MD5_CellAgvVolt  = ModRegs.MDCellAgvVolt[4];
                    CANARegs.MD5_CellAgvTemps = ModRegs.MDCellAgvTemps[4];
                    CANARegs.MD5Staue.all     = ModRegs.MDstatusbit[4];
@@ -1156,7 +1156,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==3)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4];
+                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4]/10;
                    CANARegs.MD5_CellAgvVolt  = ModRegs.MDCellAgvVolt[4];
                    CANARegs.MD5_CellAgvTemps = ModRegs.MDCellAgvTemps[4];
                    CANARegs.MD5Staue.all     = ModRegs.MDstatusbit[4];
@@ -1167,7 +1167,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==4)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4];
+                   CANARegs.MD5_TotalVolt    = ModRegs.MDTotalVolt[4]/10;
                    CANARegs.MD5_CellAgvVolt  = ModRegs.MDCellAgvVolt[4];
                    CANARegs.MD5_CellAgvTemps = ModRegs.MDCellAgvTemps[4];
                    CANARegs.MD5Staue.all     = ModRegs.MDstatusbit[4];
@@ -1180,7 +1180,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==1)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5];
+                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5]/10;
                    CANARegs.MD6_CellAgvVolt  = ModRegs.MDCellAgvVolt[5];
                    CANARegs.MD6_CellAgvTemps = ModRegs.MDCellAgvTemps[5];
                    CANARegs.MD6Staue.all     = ModRegs.MDstatusbit[5];
@@ -1191,7 +1191,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5];
+                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5]/10;
                    CANARegs.MD6_CellAgvVolt  = ModRegs.MDCellAgvVolt[5];
                    CANARegs.MD6_CellAgvTemps = ModRegs.MDCellAgvTemps[5];
                    CANARegs.MD6Staue.all     = ModRegs.MDstatusbit[5];
@@ -1202,7 +1202,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==3)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5];
+                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5]/10;
                    CANARegs.MD6_CellAgvVolt  = ModRegs.MDCellAgvVolt[5];
                    CANARegs.MD6_CellAgvTemps = ModRegs.MDCellAgvTemps[5];
                    CANARegs.MD6Staue.all     = ModRegs.MDstatusbit[5];
@@ -1213,7 +1213,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==4)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5];
+                   CANARegs.MD6_TotalVolt    = ModRegs.MDTotalVolt[5]/10;
                    CANARegs.MD6_CellAgvVolt  = ModRegs.MDCellAgvVolt[5];
                    CANARegs.MD6_CellAgvTemps = ModRegs.MDCellAgvTemps[5];
                    CANARegs.MD6Staue.all     = ModRegs.MDstatusbit[5];
@@ -1226,7 +1226,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==1)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6];
+                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6]/10;
                    CANARegs.MD7_CellAgvVolt  = ModRegs.MDCellAgvVolt[6];
                    CANARegs.MD7_CellAgvTemps = ModRegs.MDCellAgvTemps[6];
                    CANARegs.MD7Staue.all     = ModRegs.MDstatusbit[6];
@@ -1237,7 +1237,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==2)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6];
+                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6]/10;
                    CANARegs.MD7_CellAgvVolt  = ModRegs.MDCellAgvVolt[6];
                    CANARegs.MD7_CellAgvTemps = ModRegs.MDCellAgvTemps[6];
                    CANARegs.MD7Staue.all     = ModRegs.MDstatusbit[6];
@@ -1248,7 +1248,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==3)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6];
+                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6]/10;
                    CANARegs.MD7_CellAgvVolt  = ModRegs.MDCellAgvVolt[6];
                    CANARegs.MD7_CellAgvTemps = ModRegs.MDCellAgvTemps[6];
                    CANARegs.MD7Staue.all     = ModRegs.MDstatusbit[6];
@@ -1259,7 +1259,7 @@ interrupt void cpu_timer0_isr(void)
             #if(PackNum==4)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6];
+                   CANARegs.MD7_TotalVolt    = ModRegs.MDTotalVolt[6]/10;
                    CANARegs.MD7_CellAgvVolt  = ModRegs.MDCellAgvVolt[6];
                    CANARegs.MD7_CellAgvTemps = ModRegs.MDCellAgvTemps[6];
                    CANARegs.MD7Staue.all     = ModRegs.MDstatusbit[6];
@@ -1268,7 +1268,8 @@ interrupt void cpu_timer0_isr(void)
                }
             #endif
        break;
-
+               CANARegs.PackID =0X60F;
+               CANATX(CANARegs.PackID,8,CANARegs.MD7_TotalVolt,CANARegs.MD7_CellAgvVolt,CANARegs.MD7_CellAgvTemps ,CANARegs.MD7Staue.all);
        default :
        break;
    }
@@ -2551,10 +2552,10 @@ interrupt void ISR_CANRXINTA(void)
             {
                 SysRegs.MasterRxCount=0;
                if(CANARegs.MailBox1RxCount>3000){CANARegs.MailBox1RxCount=0;}
-               CANARegs.PMSCMDRegs.all = (ECanaMboxes.MBOX30.MDL.byte.BYTE1<<8)|(ECanaMboxes.MBOX30.MDL.byte.BYTE0);
+               CANARegs.PMSCMDRegs.all = (ECanaMboxes.MBOX30.MDL.byte.BYTE0<<8)|(ECanaMboxes.MBOX30.MDL.byte.BYTE1);
               if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
               {
-                   CANARegs.PMSCMDRegs.bit.RUNStatus01=0;
+                //   CANARegs.PMSCMDRegs.bit.RUNStatus01=0;
               }
                SysRegs.SysCanRxCount=0;
             }
