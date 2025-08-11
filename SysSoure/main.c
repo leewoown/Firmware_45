@@ -1268,8 +1268,10 @@ interrupt void cpu_timer0_isr(void)
                }
             #endif
        break;
+       case 65:
                CANARegs.PackID =0X60F;
-               CANATX(CANARegs.PackID,8,CANARegs.MD7_TotalVolt,CANARegs.MD7_CellAgvVolt,CANARegs.MD7_CellAgvTemps ,CANARegs.MD7Staue.all);
+               CANATX(CANARegs.PackID,8,CANARegs.PMSCMDRegs.all,CANARegs.MD7_CellAgvVolt,CANARegs.MD7_CellAgvTemps ,CANARegs.MD7Staue.all);
+       break;
        default :
        break;
    }
