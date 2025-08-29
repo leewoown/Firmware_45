@@ -32,7 +32,7 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
 #if ShipPack_168S1P
 
 #define ModuleEA               7
-#define PackCellEA             168.0
+#define PackCellEA             168
 
 typedef enum
 {

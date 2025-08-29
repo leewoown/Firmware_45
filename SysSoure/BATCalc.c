@@ -121,7 +121,6 @@ void BatCalcVoltHandle(BatCalcReg *P)
     for(Count=0; Count<ModuleEA; Count++)
     {
         BreakCountB++;
-
         PackVoltageBufF = PackVoltageBufF+P->MDTotalVoltF[Count];
         if(BreakCountB>10) {break;}
     }
@@ -145,24 +144,13 @@ void BatCalcVoltHandle(BatCalcReg *P)
             CellMinVoltF=P->MDCellMinVoltF[Count];
             MDCellMinVoltPos = Count+1;
         }
-/*        if(CellMaxTempsF <=P->MDCellMaxTempsF[Count])
-        {
-            CellMaxTempsF=P->MDCellMaxTempsF[Count];
-            MDCellMaxTempsPos = Count+1;
-        }
-        if(CellMinTempsF >=P->MDCellMinTempsF[Count])
-        {
-            CellMinTempsF=P->MDCellMinTempsF[Count];
-            MDCellMinTempsPos = Count+1;
-        }
-*/
         if(BreakCountC>10) {break;}
     }
 
     P->PackPTCANF        = PackVoltageBufF;
     P->PackCellMaxVoltF  = CellMaxVoltF;
     P->PackCellMinVoltF  = CellMinVoltF;
-    P->PackCellAgvVoltF  = P->PackPTCANF/PackCellEA;
+    P->PackCellAgvVoltF  = (float32)(P->PackPTCANF/(float32)PackCellEA);
     P->PackCellDivVoltF  = CellMaxVoltF-CellMinVoltF;
     P->PackCellMaxVoltPos =  (MDCellMaxVoltPos*24)+P->MDMaxVoltPo[MDCellMinVoltPos-1];
     P->PackCellMinVoltPos =  (MDCellMinVoltPos*24)+P->MDMinVoltPo[MDCellMinVoltPos-1];

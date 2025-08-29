@@ -261,6 +261,8 @@ void CANRegVarINIT(CANAReg *P)
 
     P->SwVerProducttype=0;
     P->BatConfParallelSerial=0;
+    memset(&P->MDTotalVolt[0],0,7);
+
 }
 void ModuleInit(ModulemReg *P)
 {
