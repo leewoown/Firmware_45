@@ -326,37 +326,45 @@ Parameter
 */
 
 // Alarm Set Vaule  //
-#define     C_PackOVPackCurrentAlarm                     450.0//450.0//480.0
-#define     C_PackOVPkACKSOCAlarm                        100.0
-#define     C_PackUDPkACKSOCAlarm                        5.0
-#define     C_PackOVPackVoltageAlarm                     108.8   // Cell 4.20V * 24
-#define     C_PackUDPackVoltageAlarm                     72.0   // Cell 3.00V * 24
-#define     C_PackOVPackTemperatureAlarm                 55.0
-#define     C_PackUNPackTemperatureAlarm                -15.0
-#define     C_PackOVCellVoltageAlarm                     4.20
-#define     C_PackUDCellVoltageAlarm                     3.00
-#define     C_PackDIVCellVoltageAlarm                    0.2
+#define     C_PackOVPackCurrentCharAlarm                 70.0
+#define     C_PackOVPackCurrentDisCharAlarm              70.0
+#define     C_PackOVPkACKSOCAlarm                        95.0
+#define     C_PackUDPkACKSOCAlarm                        15.0
+#define     C_PackOVPackVoltageAlarm                     688.8   // Cell 4.20V * 24
+#define     C_PackUDPackVoltageAlarm                     520.8   // Cell 3.00V * 24
+#define     C_PackOVPackTemperatureAlarm                 45.0
+#define     C_PackUNPackCharTemperatureAlarm             5.0
+#define     C_PackUNPackDisCharTemperatureAlarm          10.0
+#define     C_PackOVCellVoltageAlarm                     4.10
+#define     C_PackUDCellVoltageAlarm                     3.10
+#define     C_PackDIVCellVoltageAlarm                    0.1
 #define     C_PackOVCellTemperatureAlarm                 55.0
-#define     C_PackUDCellTemperatureAlarm                -15.0
+#define     C_PackUDCellCharTemperatureAlarm             5.0
+#define     C_PackUDCellDisCharTemperatureAlarm          10.0
 #define     C_PackDIVCellTemperatureAlarm                10.0
 
 //Fault Set Vaule
 #define     C_PackFaultDelayCount                        10
-#define     C_ISOSPICount                                  50
-#define     C_CANCount                                     50
-#define     C_RleyCount                                    1
-#define     C_PackOVPackCurrentFault                     500.0//500.0
-#define     C_PackOVPackSOCFault                         101.0
-#define     C_PackUDPackSOCFault                          -0.1//-0.1
-#define     C_PackOVPackVoltageFault                     102.0  // Cell 4.25V * 24
-#define     C_PackUDPackVoltageFault                     67.2   // Cell 2.80V * 24
-#define     C_PackOVPackTemperatureFault                 60.0
-#define     C_PackUNPackTemperatureFault                -30.0
-#define     C_PackOVCellVoltageFault                     4.25
-#define     C_PackUDCellVoltageFault                     2.50
-#define     C_PackDIVCellVoltageFault                    0.5
-#define     C_PackOVCellTemperatureFault                 60.0
-#define     C_PackUDCellTemperatureFault                -25.0
+#define     C_ISOSPICount                                50
+#define     C_CANCount                                   50
+#define     C_RleyCount                                  1
+#define     C_PackOVPackCurrentFault                     200.0//500.0
+
+#define     C_PackOVPackCurrentCharFault                 80.0
+#define     C_PackOVPackCurrentDisCharFault              80.0
+#define     C_PackOVPackSOCFault                         100.0
+#define     C_PackUDPackSOCFault                         5.0//-0.1
+#define     C_PackOVPackVoltageFault                     697.2  // Cell 4.25V * 24
+#define     C_PackUDPackVoltageFault                     504.0  // Cell 2.80V * 24
+#define     C_PackOVPackTemperatureFault                 50.0
+#define     C_PackUNPackCharTemperatureFalut             0.0
+#define     C_PackUNPackDisCharTemperatureFault          0.0
+#define     C_PackOVCellVoltageFault                     4.15
+#define     C_PackUDCellVoltageFault                     3.00
+#define     C_PackDIVCellVoltageFault                    0.3
+#define     C_PackOVCellTemperatureFault                 50.0
+#define     C_PackUDCellCharTemperatureFault             0.0
+#define     C_PackUDCellDisCharTemperatureFault          0.0
 #define     C_PackDIVCellTemperatureFault                15.0
 #define     C_IOSresistanceFault                         45000
 
@@ -366,19 +374,22 @@ Parameter
 #define     C_ISOSPICount                                  50
 #define     C_CANCount                                     50
 #define     C_RleyCount                                    1
-#define     C_PackOVPackCurrentProtect                     500.0//500.0
-#define     C_PackOVPackSOCProtect                         101.0
+#define     C_PackOVPackCurrentCharProtect                 100.0
+#define     C_PackOVPackCurrentDisCharProtect              100.0
+#define     C_PackOVPackSOCProtect                         103.0
 #define     C_PackUDPackSOCProtect                          -0.1//-0.1
-#define     C_PackOVPackVoltageProtect                     102.0  // Cell 4.25V * 24
-#define     C_PackUDPackVoltageProtect                     67.2   // Cell 2.80V * 24
-#define     C_PackOVPackTemperatureProtect                 60.0
-#define     C_PackUNPackTemperatureProtect                -30.0
-#define     C_PackOVCellVoltageProtect                     4.25
-#define     C_PackUDCellVoltageProtect                     2.50
-#define     C_PackDIVCellVoltageProtect                    0.5
-#define     C_PackOVCellTemperatureProtect                 60.0
-#define     C_PackUDCellTemperatureProtect                -25.0
-#define     C_PackDIVCellTemperatureProtect                15.0
+#define     C_PackOVPackVoltageProtect                     702.2  // Cell 4.25V * 24
+#define     C_PackUDPackVoltageProtect                     478.8   // Cell 2.80V * 24
+#define     C_PackOVPackTemperatureProtect                 54.0
+#define     C_PackUNPackCharTemperatureProtect             -10.0
+#define     C_PackUNPackDisCharTemperatureProtect          -15.0
+#define     C_PackOVCellVoltageProtect                     4.18
+#define     C_PackUDCellVoltageProtect                     2.85
+#define     C_PackDIVCellVoltageProtect                    0.4
+#define     C_PackOVCellTemperatureProtect                 55.0
+#define     C_PackUDCellCharTemperatureProtect             -10.0
+#define     C_PackUDCellDisCharTemperatureProtect          -15.0
+#define     C_PackDIVCellTemperatureProtectt                15.0
 #define     C_IOSresistanceProtect                         45000
 
 

@@ -109,15 +109,11 @@ void BatCalcVoltHandle(BatCalcReg *P)
         BreakCountA++;
         P->MDCellMaxVoltF[Count]=(float32) P->MDCellMaxVolt[Count]*0.001;
         P->MDCellMinVoltF[Count]=(float32) P->MDCellMinVolt[Count]*0.001;
-     //   P->MDCellAgvVoltF[Count]=(float32) P->MDCellAgvVolt[Count]*0.001;
-      //  P->MDCellDivVoltF[Count]=(float32) P->MDCellDivVoltF[Count]*0.001;
+        P->MDCellAgvVoltF[Count]=(float32) P->MDCellAgvVolt[Count]*0.001;
+        P->MDCellDivVoltF[Count]=(float32) P->MDCellDivVoltF[Count]*0.001;
         P->MDTotalVoltF[Count]=(float32)P->MDTotalVolt[Count]*0.01;
         if(BreakCountA>10) {break;}
     }
-    /*
-     *
-     */
-
     for(Count=0; Count<ModuleEA; Count++)
     {
         BreakCountB++;

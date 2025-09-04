@@ -372,19 +372,7 @@ interrupt void cpu_timer0_isr(void)
    /*
     *
     */
-   memcpy(&BatCalcRegs.MDCellMaxVolt[0], &ModRegs.MDCellMaxVolt[0],sizeof(Uint16)*7);
-   memcpy(&BatCalcRegs.MDCellMinVolt[0], &ModRegs.MDCellMinVolt[0],sizeof(Uint16)*7);
-   memcpy(&BatCalcRegs.MDTotalVolt[0],   &ModRegs.MDTotalVolt[0],sizeof(Uint16)*7);
-   memcpy(&BatCalcRegs.MDMaxVoltPo[0],   &ModRegs.MDMaxVoltPo[0],sizeof(Uint16)*7);
-   memcpy(&BatCalcRegs.MDMinVoltPo[0],   &ModRegs.MDMinVoltPo[0],sizeof(Uint16)*7);
-   BatCalcVoltHandle(&BatCalcRegs);
-   SysRegs.PackVoltageF= BatCalcRegs.PackPTCANF;
-   SysRegs.PackCellMaxVoltageF= BatCalcRegs.PackCellMaxVoltF;
-   SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMinVoltF;
-   SysRegs.PackCellAgvVoltageF= BatCalcRegs.PackCellAgvVoltF;
-   SysRegs.PackCellDivVoltageF= BatCalcRegs.PackCellDivVoltF;
-   SysRegs.PackCellMaxVoltPos = BatCalcRegs.PackCellMaxVoltPos;
-   SysRegs.PackCellMinVoltPos = BatCalcRegs.PackCellMinVoltPos;
+
 
    /*
     * SOC Algorithm
@@ -412,17 +400,7 @@ interrupt void cpu_timer0_isr(void)
     * ModRegs.MDMinTempsPo
     * ModRegs.MDMaxTempsPo
     */
-   memcpy(&BatCalcRegs.MDCellMaxTemps[0], &ModRegs.MDCellMaxTemps[0],sizeof(Uint32)*7);
-   memcpy(&BatCalcRegs.MDCellMinTemps[0], &ModRegs.MDCellMinTemps[0],sizeof(Uint32)*7);
-   memcpy(&BatCalcRegs.MDMaxTempsPo[0],   &ModRegs.MDMaxTempsPo[0],sizeof(Uint32)*7);
-   memcpy(&BatCalcRegs.MDMinTempsPo[0],   &ModRegs.MDMinTempsPo[0],sizeof(Uint32)*7);
-   BatCalcTempsHandle(&BatCalcRegs);
-   SysRegs.PackCellMaxTemperatureF= BatCalcRegs.PackCellMaxTempsF;
-   SysRegs.PackCellMinTemperatureF= BatCalcRegs.PackCellMinTempsF;
-   SysRegs.PackCellAgvTemperatureF= BatCalcRegs.PackCellAgvTempsF;
-   SysRegs.PackCellDivTemperatureF= BatCalcRegs.PackCellDivTempsF;
-   SysRegs.PackCellMaxTmepsPos    = BatCalcRegs.PackCellMaxTempsPos;
-   SysRegs.PackCellMinTmepsPos    = BatCalcRegs.PackCellMinTempsPos;
+
 
    /*
     * 에러 검출
@@ -438,13 +416,13 @@ interrupt void cpu_timer0_isr(void)
    }
    if(SysRegs.PackAlarmReg.all != 0)
    {
-    //   SysRegs.PackStateReg.bit.SysAalarm=1;
+     SysRegs.PackStateReg.bit.SysAalarm=1;
    }
    else
    {
      SysRegs.PackStateReg.bit.SysAalarm=0;
    }
-  // Cal80VSysFaultCheck(&SysRegs);
+   CalSysFaultCheck(&SysRegs);
    if(SysRegs.PackFaultReg.all != 0)
    {
 
@@ -454,7 +432,7 @@ interrupt void cpu_timer0_isr(void)
    {
      SysRegs.PackStateReg.bit.SysFault=0;
    }
-
+   CalSysProtectCheck(&SysRegs);
    if(SysRegs.PackProtectReg.all != 0)
    {
        SysRegs.PackStateReg.bit.SysProtect=1;
@@ -466,17 +444,6 @@ interrupt void cpu_timer0_isr(void)
    {
        SysRegs.SysMachine=System_STATE_INIT;
    }
-   /*
-    *
-    */
-
-   //PrtectRelayRegs.State.bit.NRelayDI= SysRegs.PackDigitalInputReg.bit.NAUX;
-  // PrtectRelayRegs.State.bit.PRelayDI= SysRegs.PackDigitalInputReg.bit.PAUX;
-  // PrtectRelayRegs.State.bit.WakeUpEN=1;
-  // WakeUpHandle(&PrtectRelayRegs);
-  // SysRegs.PackDigitalOutPutReg.bit.RRlyOUT=PrtectRelayRegs.State.bit.PRelayDO;
-  // SysRegs.PackDigitalOutPutReg.bit.NRlyOUT=PrtectRelayRegs.State.bit.NRelayDO;
-  // SysRegs.PackDigitalOutPutReg.bit.CHARlyOUT=PrtectRelayRegs.State.bit.PreRelayDO;
 
    switch(SysRegs.SysRegTimer5msecCount)
    {
@@ -493,6 +460,21 @@ interrupt void cpu_timer0_isr(void)
        break;
        case 2:
 
+               memcpy(&BatCalcRegs.MDCellMaxVolt[0], &ModRegs.MDCellMaxVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDCellMinVolt[0], &ModRegs.MDCellMinVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDTotalVolt[0],   &ModRegs.MDTotalVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDMaxVoltPo[0],   &ModRegs.MDMaxVoltPo[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDMinVoltPo[0],   &ModRegs.MDMinVoltPo[0],sizeof(Uint16)*7);
+               BatCalcVoltHandle(&BatCalcRegs);
+               SysRegs.PackVoltageF= BatCalcRegs.PackPTCANF;
+               SysRegs.PackCellMaxVoltageF= BatCalcRegs.PackCellMaxVoltF;
+               SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMinVoltF;
+               SysRegs.PackCellAgvVoltageF= BatCalcRegs.PackCellAgvVoltF;
+               SysRegs.PackCellDivVoltageF= BatCalcRegs.PackCellDivVoltF;
+               SysRegs.PackCellMaxVoltPos = BatCalcRegs.PackCellMaxVoltPos;
+               SysRegs.PackCellMinVoltPos = BatCalcRegs.PackCellMinVoltPos;
+
+
        break;
        case 3:
 
@@ -507,7 +489,17 @@ interrupt void cpu_timer0_isr(void)
 
        break;
        case 5:
-
+               memcpy(&BatCalcRegs.MDCellMaxTemps[0], &ModRegs.MDCellMaxTemps[0],sizeof(Uint32)*7);
+               memcpy(&BatCalcRegs.MDCellMinTemps[0], &ModRegs.MDCellMinTemps[0],sizeof(Uint32)*7);
+               memcpy(&BatCalcRegs.MDMaxTempsPo[0],   &ModRegs.MDMaxTempsPo[0],sizeof(Uint32)*7);
+               memcpy(&BatCalcRegs.MDMinTempsPo[0],   &ModRegs.MDMinTempsPo[0],sizeof(Uint32)*7);
+               BatCalcTempsHandle(&BatCalcRegs);
+               SysRegs.PackCellMaxTemperatureF= BatCalcRegs.PackCellMaxTempsF;
+               SysRegs.PackCellMinTemperatureF= BatCalcRegs.PackCellMinTempsF;
+               SysRegs.PackCellAgvTemperatureF= BatCalcRegs.PackCellAgvTempsF;
+               SysRegs.PackCellDivTemperatureF= BatCalcRegs.PackCellDivTempsF;
+               SysRegs.PackCellMaxTmepsPos    = BatCalcRegs.PackCellMaxTempsPos;
+               SysRegs.PackCellMinTmepsPos    = BatCalcRegs.PackCellMinTempsPos;
 
        break;
        case 10:
@@ -680,7 +672,7 @@ interrupt void cpu_timer0_isr(void)
                {
                 #if(PackNum==1)
                    CANARegs.PackID =0X603;
-                 //  CANATX(CANARegs.PackID,8,SysRegs.PackAlarmReg.Word.DataL,SysRegs.PackFaultReg.Word.DataL,SysRegs.PackProtectReg.Word.DataL,SysRegs.PackProtectReg.Word.DataH);
+                   CANATX(CANARegs.PackID,8,SysRegs.PackAlarmReg.Word.DataL,SysRegs.PackFaultReg.Word.DataL,SysRegs.PackProtectReg.Word.DataL,SysRegs.PackProtectReg.Word.DataH);
                 #endif
                 #if(PackNum==2)
                    CANARegs.PackID =0X613;
