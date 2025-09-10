@@ -440,12 +440,14 @@ interrupt void cpu_timer0_isr(void)
      SysRegs.PackStateReg.bit.SysFault=0;
      SysRegs.PackStateReg.bit.SysProtectSate=0;
    }
+
    CalSysProtectCheck(&SysRegs);
    if(SysRegs.PackProtectReg.all != 0)
    {
        SysRegs.PackStateReg.bit.SysProtect=1;
        SysRegs.PackStateReg.bit.SysProtectSate=3;
    }
+
    /*
     *
     */
@@ -1263,6 +1265,7 @@ interrupt void cpu_timer0_isr(void)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                    CANARegs.PackID =0X60E;
+                   CANARegs.DebugStaueA.all=(unsigned int)(SysRegs.PackCurrentAsbF*10);
                    CANATX(CANARegs.PackID,8,CANARegs.DebugStaueA.all,CANARegs.DebugStaueB.all,CANARegs.DebugStaueC.all,CANARegs.DebugStaueD.all);
                }
             #endif
