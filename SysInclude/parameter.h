@@ -385,8 +385,8 @@ Parameter
 #define     C_PackUNPackDisCharTemperatureProtect          -15.0
 #define     C_PackOVCellVoltageProtect                     4.18
 #define     C_PackUDCellVoltageProtect                     2.85
-#define     C_PackDIVCellVoltageProtect                    0.4
-#define     C_PackOVCellTemperatureProtect                 55.0
+#define     C_PackDIVCellVoltageProtect                    0.5
+#define     C_PackOVCellTemperatureProtect                 54.0
 #define     C_PackUDCellCharTemperatureProtect             -10.0
 #define     C_PackUDCellDisCharTemperatureProtect          -15.0
 #define     C_PackDIVCellTemperatureProtectt                15.0

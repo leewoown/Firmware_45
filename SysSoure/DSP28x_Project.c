@@ -775,7 +775,7 @@ void CalSysAlarmtCheck(SystemReg *s)
           // 팩 저온 Alarm
           if(s->PackCellAgvTemperatureF <= C_PackUNPackCharTemperatureAlarm)
           {
-            s->PackAlarmReg.bit.PackTemp_UN=1;
+            //s->PackAlarmReg.bit.PackTemp_UN=1;
           }
           else
           {
@@ -1230,129 +1230,129 @@ void CalSysFaultCheck(SystemReg *s)
 void CalSysProtectCheck(SystemReg *s)
 {
     // 과전류 FAULT
-  if(s->PackStateReg.bit.DisCharMode==0)
+  if(s->PackStateReg.bit.DisCharMode==0)// 방전
   {
-        if(s->PackCurrentAsbF >= C_PackOVPackCurrentCharProtect)
+        if(s->PackCurrentAsbF >= C_PackOVPackCurrentCharProtect)//100A
         {
             s-> PackProtectReg.bit.PackVCT_OV=1;
         }
         // 과충전 FAULT
         if(s->PackSOCF >=C_PackOVPackSOCProtect)
         {
-            s->PackProtectReg.bit.PackVSOC_OV =1;
+          //  s->PackProtectReg.bit.PackVSOC_OV =1;
         }
         // 저충전 FAULT
         if(s->PackSOCF <= C_PackUDPackSOCProtect)
         {
-            s->PackProtectReg.bit.PackVSOC_UN =1;
+          //  s->PackProtectReg.bit.PackVSOC_UN =1;
         }
         // 팩 과전압 FAULT
-        if(s->PackVoltageF >= C_PackOVPackVoltageProtect)
+        if(s->PackVoltageF >= C_PackOVPackVoltageProtect) //702.2V
         {
             s->PackProtectReg.bit.PackVolt_OV =1;
         }
         // 팩 저전압 FAULT
         if(s->PackVoltageF <= C_PackUDPackVoltageProtect)
         {
-            s->PackProtectReg.bit.PackVolt_UN =1;
+           // s->PackProtectReg.bit.PackVolt_UN =1;
         }
         // 팩 과온도 FAULT
-        if(s->PackCellAgvTemperatureF >= C_PackOVPackTemperatureFault)
+        if(s->PackCellAgvTemperatureF >= C_PackOVPackTemperatureProtect)//54deg
         {
             s->PackProtectReg.bit.PackTemp_OV=1;
         }
         // 팩 저온도 FAULT
         if(s->PackCellAgvTemperatureF <= C_PackUNPackCharTemperatureProtect)
         {
-            s->PackProtectReg.bit.PackTemp_UN=1;
+         //  s->PackProtectReg.bit.PackTemp_UN=1;
         }
         // 셀 과전압 FAULT
-        if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect)
+        if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect) //4.18
         {
-            s->PackProtectReg.bit.CellVolt_OV =1;
+           // s->PackProtectReg.bit.CellVolt_OV =1;
         }
-        if(s->PackCellMinVoltageF <= C_PackUDCellVoltageFault)
+        if(s->PackCellMinVoltageF <= C_PackUDCellVoltageProtect)
         {
-           s->PackProtectReg.bit.CellVolt_UN =1;
+           //s->PackProtectReg.bit.CellVolt_UN =1;
         }
         // 셀 편차 FAULT
         if(s->PackCellDivVoltageF >= C_PackDIVCellVoltageProtect)
         {
-            s->PackProtectReg.bit.CellVolt_BL =1;
+           // s->PackProtectReg.bit.CellVolt_BL =1;
         }
         // 셀 과온 FAULT
-        if(s->PackCellMaxTemperatureF >= C_PackOVCellTemperatureFault)
+        if(s->PackCellMaxTemperatureF >= C_PackOVCellTemperatureProtect) //54deg
         {
             s->PackProtectReg.bit.CellTemp_OV =1;
         }
         // 셀 저온 FAULT
-        if(s->PackCellMinVoltageF <= C_PackUDCellCharTemperatureFault)
+        if(s->PackCellMinVoltageF <= C_PackUDCellCharTemperatureProtect)
         {
-            s->PackProtectReg.bit.CellTemp_UN =1;
+           // s->PackProtectReg.bit.CellTemp_UN =1;
         }
         // 셀 온도 편차 FAULT
-        if(s->PackCellDivVoltageF >= C_PackDIVCellTemperatureFault)
+        if(s->PackCellDivVoltageF >= C_PackDIVCellTemperatureProtectt)
         {
             s->PackProtectReg.bit.CellTemp_BLT =1;
         }
     }
-    if(s->PackStateReg.bit.DisCharMode==1)
+    if(s->PackStateReg.bit.DisCharMode==1) // 충전 모드 시
     {
-        if(s->PackCurrentAsbF >= C_PackOVPackCurrentDisCharProtect)
+        if(s->PackCurrentAsbF >= C_PackOVPackCurrentDisCharProtect) //100A
         {
             s-> PackProtectReg.bit.PackVCT_OV=1;
         }
         // 과충전 FAULT
         if(s->PackSOCF >=C_PackOVPackSOCProtect)
         {
-            s->PackProtectReg.bit.PackVSOC_OV =1;
+          //  s->PackProtectReg.bit.PackVSOC_OV =1;
         }
         // 저충전 FAULT
         if(s->PackSOCF <= C_PackUDPackSOCProtect)
         {
-            s->PackProtectReg.bit.PackVSOC_UN =1;
+           // s->PackProtectReg.bit.PackVSOC_UN =1;
         }
         // 팩 과전압 FAULT
-        if(s->PackVoltageF >= C_PackOVPackVoltageProtect)
+        if(s->PackVoltageF >= C_PackOVPackVoltageProtect) //702.2V
         {
-            s->PackProtectReg.bit.PackVolt_OV =1;
+         //   s->PackProtectReg.bit.PackVolt_OV =1;
         }
         // 팩 저전압 FAULT
         if(s->PackVoltageF <= C_PackUDPackVoltageProtect)
         {
-            s->PackProtectReg.bit.PackVolt_UN =1;
+           // s->PackProtectReg.bit.PackVolt_UN =1;
         }
         // 팩 과온도 FAULT
-        if(s->PackCellAgvTemperatureF >= C_PackOVPackTemperatureFault)
+        if(s->PackCellAgvTemperatureF >= C_PackOVPackTemperatureProtect) //54deg
         {
             s->PackProtectReg.bit.PackTemp_OV=1;
         }
         // 팩 저온도 FAULT
         if(s->PackCellAgvTemperatureF <= C_PackUNPackDisCharTemperatureProtect)
         {
-            s->PackProtectReg.bit.PackTemp_UN=1;
+           // s->PackProtectReg.bit.PackTemp_UN=1;
         }
         // 셀 과전압 FAULT
-        if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect)
+        if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect) //4.18
         {
-            s->PackProtectReg.bit.CellVolt_OV =1;
+          //  s->PackProtectReg.bit.CellVolt_OV =1;
         }
-        if(s->PackCellMinVoltageF <= C_PackUDCellVoltageFault)
+        if(s->PackCellMinVoltageF <= C_PackUDCellVoltageProtect)
         {
-           s->PackProtectReg.bit.CellVolt_UN =1;
+           //s->PackProtectReg.bit.CellVolt_UN =1;
         }
         // 셀 편차 FAULT
         if(s->PackCellDivVoltageF >= C_PackDIVCellVoltageProtect)
         {
-            s->PackProtectReg.bit.CellVolt_BL =1;
+           // s->PackProtectReg.bit.CellVolt_BL =1;
         }
         // 셀 과온 FAULT
-        if(s->PackCellMaxTemperatureF >= C_PackOVCellTemperatureFault)
+        if(s->PackCellMaxTemperatureF >= C_PackOVCellTemperatureProtect)
         {
             s->PackProtectReg.bit.CellTemp_OV =1;
         }
         // 셀 저온 FAULT
-        if(s->PackCellMinVoltageF <= C_PackUDCellDisCharTemperatureProtect)
+        if(s->PackCellMinVoltageF <= C_PackUDCellDisCharTemperatureProtect) //54deg
         {
             s->PackProtectReg.bit.CellTemp_UN =1;
         }
