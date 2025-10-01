@@ -125,6 +125,7 @@ void BatCalcVoltHandle(BatCalcReg *P)
 
     }
 
+
     P->PackPTCANF        = PackVoltageBufF;
     P->PackCellMaxVoltF  = CellMaxVoltF;
     P->PackCellMinVoltF  = CellMinVoltF;
@@ -141,8 +142,9 @@ void BatCalcTempsHandle(BatCalcReg *P)
     Uint16  BreakCountB=0;
 
     float32 CellMaxTempsF=0;
+    float32 CellMaxTempsadF=0;
     float32 CellMinTempsF=0;
-
+    float32 CellMinTempsadF=0;
      Uint16 MDCellMaxTempsPos =0;
      Uint16 MDCellMinTempsPos =0;
 
@@ -176,11 +178,33 @@ void BatCalcTempsHandle(BatCalcReg *P)
         }
         if(BreakCountB>10) {break;}
     }
+    if(BETWEEN(CellMaxTempsF, 20, 25)){CellMaxTempsadF=CellMaxTempsF-4.2f;}
+    if(BETWEEN(CellMaxTempsF, 25, 30)){CellMaxTempsadF=CellMaxTempsF-4.7f;}
+    if(BETWEEN(CellMaxTempsF, 30, 35)){CellMaxTempsadF=CellMaxTempsF-3.8f;}
+    if(BETWEEN(CellMaxTempsF, 35, 40)){CellMaxTempsadF=CellMaxTempsF-4.7f;}
+    if(BETWEEN(CellMaxTempsF, 40, 45)){CellMaxTempsadF=CellMaxTempsF-4.7f;}
+    if(BETWEEN(CellMaxTempsF, 45, 50)){CellMaxTempsadF=CellMaxTempsF-4.7f;}
+    if(BETWEEN(CellMaxTempsF, 50, 55)){CellMaxTempsadF=CellMaxTempsF-4.8f;}
+    if(BETWEEN(CellMaxTempsF, 55, 60)){CellMaxTempsadF=CellMaxTempsF-6.0f;}
+    if(BETWEEN(CellMaxTempsF, 60, 65)){CellMaxTempsadF=CellMaxTempsF-6.0f;}
 
-    P->PackCellMaxTempsF  = CellMaxTempsF;
-    P->PackCellMinTempsF  = CellMinTempsF;
-    P->PackCellAgvTempsF  = (CellMaxTempsF+CellMinTempsF)*0.5;
-    P->PackCellDivTempsF  = CellMaxTempsF-CellMinTempsF;
+    if(BETWEEN(CellMinTempsF, 20, 25)){CellMinTempsadF=CellMinTempsF-4.2f;}
+    if(BETWEEN(CellMinTempsF, 25, 30)){CellMinTempsadF=CellMinTempsF-4.7f;}
+    if(BETWEEN(CellMinTempsF, 30, 35)){CellMinTempsadF=CellMinTempsF-3.8f;}
+    if(BETWEEN(CellMinTempsF, 35, 40)){CellMinTempsadF=CellMinTempsF-4.7f;}
+    if(BETWEEN(CellMinTempsF, 40, 45)){CellMinTempsadF=CellMinTempsF-4.7f;}
+    if(BETWEEN(CellMinTempsF, 45, 50)){CellMinTempsadF=CellMinTempsF-4.7f;}
+    if(BETWEEN(CellMinTempsF, 50, 55)){CellMinTempsadF=CellMinTempsF-4.8f;}
+    if(BETWEEN(CellMinTempsF, 55, 60)){CellMinTempsadF=CellMinTempsF-6.0f;}
+    if(BETWEEN(CellMinTempsF, 60, 65)){CellMinTempsadF=CellMinTempsF-6.0f;}
+
+
+
+
+    P->PackCellMaxTempsF  = CellMaxTempsadF;
+    P->PackCellMinTempsF  = CellMinTempsadF;
+    P->PackCellAgvTempsF  = (CellMaxTempsadF+CellMinTempsadF)*0.5;
+    P->PackCellDivTempsF  = CellMaxTempsadF-CellMinTempsadF;
 
     P->PackCellMaxTempsPos =  (MDCellMaxTempsPos*24)+P->MDMaxTempsPo[MDCellMaxTempsPos];
     P->PackCellMinTempsPos =  (MDCellMinTempsPos*24)+P->MDMinTempsPo[MDCellMinTempsPos];
