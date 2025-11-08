@@ -44,15 +44,15 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
 
 
     EALLOW;
+    ECanaShadow.CANME.all = ECanaRegs.CANME.all;
     ECanaShadow.CANME.bit.ME31=0;
     ECanaRegs.CANME.bit.ME31= ECanaShadow.CANME.bit.ME31;
 
-    ECanaMboxes.MBOX31.MSGID.bit.STDMSGID=ID;
+    ECanaMboxes.MBOX31.MSGID.all = 0UL;
+    ECanaMboxes.MBOX31.MSGID.bit.IDE = 0U;                 // 표준 프레임
+    ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = (Uint16)(ID & 0x07FFU); // 11-bit
 
-    ECanaShadow.CANME.bit.ME31=1;
-    ECanaRegs.CANME.bit.ME31= ECanaShadow.CANME.bit.ME31;
-    EDIS;
-
+    ECanaMboxes.MBOX31.MSGCTRL.bit.RTR = 0U;
     ECanaMboxes.MBOX31.MSGCTRL.bit.DLC=Length;
 
     ECanaMboxes.MBOX31.MDL.byte.BYTE0=Data0Low;
@@ -64,26 +64,24 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     ECanaMboxes.MBOX31.MDH.byte.BYTE6=Data3Low;
     ECanaMboxes.MBOX31.MDH.byte.BYTE7=Data3High;
 
-    //CAN Tx Request
-    ECanaShadow.CANTRS.all=0;
-    ECanaShadow.CANTRS.bit.TRS31= 1;
-    ECanaRegs.CANTRS.all = ECanaShadow.CANTRS.all;
-    do
+    ECanaShadow.CANME.all = ECanaRegs.CANME.all;
+    ECanaShadow.CANME.bit.ME31 = 1U;
+    ECanaRegs.CANME.all = ECanaShadow.CANME.all;
+    EDIS;
+    ECanaRegs.CANTRS.bit.TRS31 = 1U;
+
+    while (ECanaRegs.CANTA.bit.TA31 == 0U)
     {
-       ECanaShadow.CANTA.all = ECanaRegs.CANTA.all;
-       CANWatchDog++;
-       if(CANWatchDog>2000)
-       {
-           ECanaShadow.CANTA.bit.TA31=0;
-
-       }
-    }while(!ECanaShadow.CANTA.bit.TA31);
-
-    //Tx Flag Clear
-    //InitECan();
-    ECanaShadow.CANTA.all = 0;
-    ECanaShadow.CANTA.bit.TA31=1;                   // Clear TA5
-    ECanaRegs.CANTA.all = ECanaShadow.CANTA.all;
+        if (++CANWatchDog > 2000U)
+        {
+            break; // 타임아웃
+        }
+    }
+    // TA31 플래그 클리어
+    if (ECanaRegs.CANTA.bit.TA31 == 1U)
+    {
+        ECanaRegs.CANTA.bit.TA31 = 1U;
+    }
 
 }
 void SysTimerINIT(SystemReg *s)
@@ -775,7 +773,7 @@ void CalSysAlarmtCheck(SystemReg *s)
           // 팩 저온 Alarm
           if(s->PackCellAgvTemperatureF <= C_PackUNPackCharTemperatureAlarm)
           {
-            s->PackAlarmReg.bit.PackTemp_UN=1;
+            //s->PackAlarmReg.bit.PackTemp_UN=1;
           }
           else
           {
@@ -1264,7 +1262,11 @@ void CalSysProtectCheck(SystemReg *s)
         // 팩 저온도 FAULT
         if(s->PackCellAgvTemperatureF <= C_PackUNPackCharTemperatureProtect)
         {
+
          //   s->PackProtectReg.bit.PackTemp_UN=1;
+
+         //  s->PackProtectReg.bit.PackTemp_UN=1;
+
         }
         // 셀 과전압 FAULT
         if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect) //4.18
@@ -1315,7 +1317,11 @@ void CalSysProtectCheck(SystemReg *s)
         // 팩 과전압 FAULT
         if(s->PackVoltageF >= C_PackOVPackVoltageProtect) //702.2V
         {
+
            // s->PackProtectReg.bit.PackVolt_OV =1;
+
+         //   s->PackProtectReg.bit.PackVolt_OV =1;
+
         }
         // 팩 저전압 FAULT
         if(s->PackVoltageF <= C_PackUDPackVoltageProtect)
@@ -1335,7 +1341,11 @@ void CalSysProtectCheck(SystemReg *s)
         // 셀 과전압 FAULT
         if(s->PackCellMaxVoltageF >= C_PackOVCellVoltageProtect) //4.18
         {
+
             //s->PackProtectReg.bit.CellVolt_OV =1;
+
+          //  s->PackProtectReg.bit.CellVolt_OV =1;
+
         }
         if(s->PackCellMinVoltageF <= C_PackUDCellVoltageProtect)
         {
@@ -1374,21 +1384,38 @@ int float32ToInt(float32 Vaule, Uint32 Num)
 }
 void DigitalInput(SystemReg *sys)
 {
-    if((IDSW02==0)&&(IDSW01==0))
+    unsigned int IDVaule=0;
+    if(IDSW00==0)
     {
-        sys->DigitalInputReg.bit.IDSW=0;
+        sys->DigitalInputReg.bit.DipSW00=1;
     }
-    if((IDSW02==0)&&(IDSW01==1))
+    else
     {
-        sys->DigitalInputReg.bit.IDSW=1;
+        sys->DigitalInputReg.bit.DipSW00=0;
     }
-    if((IDSW02==1)&&(IDSW01==0))
+    if(IDSW01==0)
     {
-        sys->DigitalInputReg.bit.IDSW=2;
+        sys->DigitalInputReg.bit.DipSW01=1;
     }
-    if((IDSW01==1)&&(IDSW01==1))
+    else
     {
-        sys->DigitalInputReg.bit.IDSW=3;
+        sys->DigitalInputReg.bit.DipSW01=0;
+    }
+    if(IDSW02==0)
+    {
+        sys->DigitalInputReg.bit.DipSW02=1;
+    }
+    else
+    {
+        sys->DigitalInputReg.bit.DipSW02=0;
+    }
+    if(IDSW03==0)
+    {
+        sys->DigitalInputReg.bit.DipSW03=1;
+    }
+    else
+    {
+        sys->DigitalInputReg.bit.DipSW03=0;
     }
     if(CANRX0INT==0)
     {
@@ -1431,7 +1458,8 @@ void DigitalInput(SystemReg *sys)
     {
         sys->DigitalInputReg.bit.EMGSWStauts=0;
     }
-
+    IDVaule= sys->DigitalInputReg.all& 0x000f;
+    sys-> PackID = IDVaule <<4;
 }
 void DigitalOutput(SystemReg *sys)
 {
@@ -1536,6 +1564,7 @@ void DigitalOutput(SystemReg *sys)
     {
         LEDCANState_H;
     }
+
 }
 
 

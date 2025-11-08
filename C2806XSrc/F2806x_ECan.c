@@ -50,7 +50,7 @@
 
 #define DSP28_ECANASET_HDA      0
 #define DSP28_ECANASET_SHIP     1
-#define CAN_PackNum             1
+#define CAN_PackNum             2
 //CAN LAM MASK BIT SETTING
 #define     _LAM(CANADDR)               (((~(CANADDR) & 0x07FF)<<2) & 0x1FFC)
 #define     _MASK(CANADDR)               (((CANADDR) & 0x07FF)<<2) & 0x1FFC
@@ -70,6 +70,7 @@
 #include "F2806x_Examples.h"   // F2806x Examples Include File
 #include "DSP28x_Project.h"
 extern struct ECAN_REGS ECanaShadow;
+extern SystemReg       SysRegs;
 //
 // InitECan - This function initializes the eCAN module to a known state.
 //
@@ -741,140 +742,140 @@ void InitECana(void)
            ECanaMboxes.MBOX30.MSGID.all    = 0;
            ECanaMboxes.MBOX31.MSGID.all    = 0;
            #if (PackNum==1)
-           ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = 0x110;
-           ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = 0x120;
-           ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = 0x130;
-           ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = 0x140;
-           ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = 0x150;
-           ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = 0x160;
-           ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = 0x170;
-           ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x180;
-           ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x190;
-           ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x1A0;
-           ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x1B0;
-           ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
-           ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
-           ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
-           ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
-           ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
-           ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
-           ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
-           ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
-           ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
-           ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
-           ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
-           ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
-           ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
-           ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
-           ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
-           ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
-           ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
-           ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-           ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;
-           ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x700;
-           ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
-           #endif
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x110);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x120);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x130);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x140);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x150);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x160);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x170);
+               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x180;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x190;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x1A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x1B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x700;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+              #endif
            #if (PackNum==2)
-            ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = 0x210;
-            ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = 0x220;
-            ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = 0x230;
-            ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = 0x240;
-            ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = 0x250;
-            ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = 0x260;
-            ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = 0x270;
-            ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x280;
-            ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x290;
-            ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x2A0;
-            ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x2B0;
-            ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
-            ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
-            ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
-            ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
-            ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
-            ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
-            ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
-            ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
-            ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
-            ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
-            ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
-            ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
-            ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
-            ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
-            ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
-            ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
-            ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
-            ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-            ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;//0X522
-            ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x701;
-            ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x210);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x220);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x230);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x240);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x250);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x260);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x270);
+               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x280;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x290;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x2A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x2B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;//0X522
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x701;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            #endif
            #if (PackNum==3)
-             ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = 0x310;
-             ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = 0x320;
-             ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = 0x330;
-             ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = 0x340;
-             ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = 0x350;
-             ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = 0x360;
-             ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = 0x370;
-             ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x380;
-             ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x390;
-             ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x3A0;
-             ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x3B0;
-             ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
-             ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
-             ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
-             ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
-             ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
-             ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
-             ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
-             ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
-             ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
-             ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
-             ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
-             ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
-             ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
-             ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
-             ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
-             ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
-             ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
-             ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-             ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x532;
-             ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x702;
-             ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x310);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x320);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x330);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x340);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x350);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x360);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x370);
+               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x380;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x390;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x3A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x3B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x532;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x702;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            #endif
            #if (PackNum==4)
-              ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = 0x410;
-              ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = 0x420;
-              ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = 0x430;
-              ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = 0x440;
-              ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = 0x450;
-              ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = 0x460;
-              ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = 0x470;
-              ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x480;
-              ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x490;
-              ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x4A0;
-              ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x4B0;
-              ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
-              ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
-              ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
-              ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
-              ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
-              ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
-              ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
-              ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
-              ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
-              ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
-              ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
-              ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
-              ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
-              ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
-              ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
-              ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
-              ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
-              ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-              ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x542;
-              ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x703;
-              ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x410);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x420);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x430);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x440);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x450);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x460);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x470);
+               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x480;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x490;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x4A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x4B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x542;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x703;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
           #endif
        /* Configure bit timing parameters for eCANA*/
 
@@ -900,66 +901,72 @@ void InitECana(void)
            //AMI = 1 일때 Filtering Criterion must be satisfied on order to receive message
            //ECanaShadow.CANGAM.all = ECanaRegs.CANGAM.all;
 
-
-           ECanaShadow.CANGAM.bit.AMI = 0;
            ECanaShadow.CANGAM.all = 0xFFFFFFFF; //byCHOO
+           ECanaShadow.CANGAM.bit.AMI = 0;
            ECanaRegs.CANGAM.all   = ECanaShadow.CANGAM.all;
 
-           ECanaMboxes.MBOX0.MSGID.bit.AME = 1;//Module 1
-           ECanaMboxes.MBOX1.MSGID.bit.AME = 1;//Module 2
-           ECanaMboxes.MBOX2.MSGID.bit.AME = 1;//Module 3
-           ECanaMboxes.MBOX3.MSGID.bit.AME = 1;//Module 4
-           ECanaMboxes.MBOX4.MSGID.bit.AME = 1;//Module 5
-           ECanaMboxes.MBOX5.MSGID.bit.AME = 1;//Module 6
-           ECanaMboxes.MBOX6.MSGID.bit.AME = 1;//Module 7
-           ECanaMboxes.MBOX29.MSGID.bit.AME = 1;//Module 8
-           ECanaMboxes.MBOX30.MSGID.bit.AME = 1;//Module 9
-
-           ECanaMboxes.MBOX0.MSGID.bit.AME = 1;           //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM0.bit.LAMI = 1;                //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM0.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM0.bit.LAM_L  = 0x0000;
-
-           ECanaMboxes.MBOX1.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM1.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM1.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM1.bit.LAM_L  = 0x0000;
-
-           ECanaMboxes.MBOX2.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM2.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM2.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM2.bit.LAM_L  = 0x0000;
-
-           ECanaMboxes.MBOX3.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM3.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM3.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM3.bit.LAM_L  = 0x0000;
-
-           ECanaMboxes.MBOX4.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM4.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM4.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM4.bit.LAM_L  = 0x0000;
+           ECanaMboxes.MBOX0.MSGID.bit.AME  = 1;//Module 1
+           ECanaMboxes.MBOX1.MSGID.bit.AME  = 1;//Module 2
+           ECanaMboxes.MBOX2.MSGID.bit.AME  = 1;//Module 3
+           ECanaMboxes.MBOX3.MSGID.bit.AME  = 1;//Module 4
+           ECanaMboxes.MBOX4.MSGID.bit.AME  = 1;//Module 5
+           ECanaMboxes.MBOX5.MSGID.bit.AME  = 1;//Module 6
+           ECanaMboxes.MBOX6.MSGID.bit.AME  = 1;//Module 7
 
 
-           ECanaMboxes.MBOX5.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM5.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM5.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM5.bit.LAM_L  = 0x0000;
+           ECanaMboxes.MBOX29.MSGID.bit.AME = 0;
+           ECanaMboxes.MBOX30.MSGID.bit.AME = 0;
 
-           ECanaMboxes. MBOX6.MSGID.bit.AME = 1;                //Acceptance Mask �궗�슜. 洹몃━怨� �굹�꽌 LAM0 �뿉�꽌 紐⑤뱺 bit Don't care
-           ECanaLAMRegs.LAM6.bit.LAMI = 1;                     //Standard Identifier 媛��뒫
-           ECanaLAMRegs.LAM6.bit.LAM_H =_LAM(MASK_1BYTE);    //1 : Don't Care
-           ECanaLAMRegs.LAM6.bit.LAM_L  = 0x0000;
+           ECanaMboxes.MBOX29.MSGID.bit.IDE = 0;
+           ECanaMboxes.MBOX30.MSGID.bit.IDE = 0;
 
-           ECanaMboxes.MBOX0.MSGID.bit.AME = 1;//Module 1
-           ECanaMboxes.MBOX1.MSGID.bit.AME = 1;//Module 2
-           ECanaMboxes.MBOX2.MSGID.bit.AME = 1;//Module 3
-           ECanaMboxes.MBOX3.MSGID.bit.AME = 1;//Module 4
-           ECanaMboxes.MBOX4.MSGID.bit.AME = 1;//Module 5
-           ECanaMboxes.MBOX5.MSGID.bit.AME = 1;//Module 6
-           ECanaMboxes.MBOX6.MSGID.bit.AME = 1;//Module 7
-           ECanaMboxes.MBOX29.MSGID.bit.AME = 1;//Module 8
-           ECanaMboxes.MBOX30.MSGID.bit.AME = 1;//Module 9
+
+           ECanaMboxes.MBOX0.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX0.MSGID.bit.AME  = 1;                //Acceptance Mask,
+           ECanaLAMRegs.LAM0.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM0.bit.LAM_H      = CAN_LAM_1BYTE;     //LSB4 don't-care
+           ECanaLAMRegs.LAM0.bit.LAM_L      = 0x0000;
+
+
+           ECanaMboxes.MBOX1.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX1.MSGID.bit.AME  = 1;                //Acceptance Mask,
+           ECanaLAMRegs.LAM1.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM1.bit.LAM_H      = CAN_LAM_1BYTE;     //LSB4 don't-care
+           ECanaLAMRegs.LAM1.bit.LAM_L      = 0x0000;
+
+           ECanaMboxes.MBOX2.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX2.MSGID.bit.AME  = 1;                //Acceptance Mask,
+           ECanaLAMRegs.LAM2.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM2.bit.LAM_H      = CAN_LAM_1BYTE;    //1 : Don't Care
+           ECanaLAMRegs.LAM2.bit.LAM_L      = 0x0000;
+
+
+           ECanaMboxes.MBOX3.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX3.MSGID.bit.AME  = 1;                //Acceptance Mask
+           ECanaLAMRegs.LAM3.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM3.bit.LAM_H      = CAN_LAM_1BYTE;    //1 : Don't Care
+           ECanaLAMRegs.LAM3.bit.LAM_L      = 0x0000;
+
+           ECanaMboxes.MBOX4.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX4.MSGID.bit.AME  = 1;                //Acceptance Mask
+           ECanaLAMRegs.LAM4.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM4.bit.LAM_H      = CAN_LAM_1BYTE;    //1 : Don't Care
+           ECanaLAMRegs.LAM4.bit.LAM_L      = 0x0000;
+
+
+           ECanaMboxes.MBOX5.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX5.MSGID.bit.AME  = 1;                //Acceptance Mask
+           ECanaLAMRegs.LAM5.bit.LAMI       = 0;                //Standard Identifier
+           ECanaLAMRegs.LAM5.bit.LAM_H      = CAN_LAM_1BYTE;    //1 : Don't Care
+           ECanaLAMRegs.LAM5.bit.LAM_L      = 0x0000;
+
+
+           ECanaMboxes.MBOX6.MSGID.bit.IDE  = 0;                //Standard Identifier
+           ECanaMboxes.MBOX6.MSGID.bit.AME  = 1;                //Acceptance Mask
+           ECanaLAMRegs.LAM6.bit.LAMI       = 0;                //Standard Identifier 媛��뒫
+           ECanaLAMRegs.LAM6.bit.LAM_H      = CAN_LAM_1BYTE;    //1 : Don't Care
+           ECanaLAMRegs.LAM6.bit.LAM_L      = 0x0000;
+
 
            /* The following block is only for 80 MHz SYSCLKOUT. (30 MHz CAN module clock Bit rate = 1 Mbps
               See Note at end of file. */
@@ -1030,25 +1037,25 @@ void InitECana(void)
            ECanaShadow.CANMD.bit.MD7=0;
            ECanaShadow.CANMD.bit.MD8=0;
            ECanaShadow.CANMD.bit.MD9=0;
-           ECanaShadow.CANMD.bit.MD10=1;
-           ECanaShadow.CANMD.bit.MD11=1;
-           ECanaShadow.CANMD.bit.MD12=1;
-           ECanaShadow.CANMD.bit.MD13=1;
-           ECanaShadow.CANMD.bit.MD14=1;
-           ECanaShadow.CANMD.bit.MD15=1;
-           ECanaShadow.CANMD.bit.MD16=1;
-           ECanaShadow.CANMD.bit.MD17=1;
-           ECanaShadow.CANMD.bit.MD18=1;
-           ECanaShadow.CANMD.bit.MD19=1;
-           ECanaShadow.CANMD.bit.MD20=1;
-           ECanaShadow.CANMD.bit.MD21=1;
-           ECanaShadow.CANMD.bit.MD22=1;
-           ECanaShadow.CANMD.bit.MD23=1;
-           ECanaShadow.CANMD.bit.MD24=1;
-           ECanaShadow.CANMD.bit.MD25=1;
-           ECanaShadow.CANMD.bit.MD26=1;
-           ECanaShadow.CANMD.bit.MD27=1;
-           ECanaShadow.CANMD.bit.MD28=1;
+           ECanaShadow.CANMD.bit.MD10=0;
+           ECanaShadow.CANMD.bit.MD11=0;
+           ECanaShadow.CANMD.bit.MD12=0;
+           ECanaShadow.CANMD.bit.MD13=0;
+           ECanaShadow.CANMD.bit.MD14=0;
+           ECanaShadow.CANMD.bit.MD15=0;
+           ECanaShadow.CANMD.bit.MD16=0;
+           ECanaShadow.CANMD.bit.MD17=0;
+           ECanaShadow.CANMD.bit.MD18=0;
+           ECanaShadow.CANMD.bit.MD19=0;
+           ECanaShadow.CANMD.bit.MD20=0;
+           ECanaShadow.CANMD.bit.MD21=0;
+           ECanaShadow.CANMD.bit.MD22=0;
+           ECanaShadow.CANMD.bit.MD23=0;
+           ECanaShadow.CANMD.bit.MD24=0;
+           ECanaShadow.CANMD.bit.MD25=0;
+           ECanaShadow.CANMD.bit.MD26=0;
+           ECanaShadow.CANMD.bit.MD27=0;
+           ECanaShadow.CANMD.bit.MD28=0;
            ECanaShadow.CANMD.bit.MD29=1;
            ECanaShadow.CANMD.bit.MD30=1;
            ECanaShadow.CANMD.bit.MD31=0;
@@ -1099,7 +1106,6 @@ void InitECana(void)
 
            //Mailbox 별로 Interrupt를 Mask 함 Mask 된 것만 인터럽트 발생 가능
            ECanaShadow.CANMIM.all = ECanaRegs.CANMIM.all;
-
            ECanaShadow.CANMIM.bit.MIM0 = 1;
            ECanaShadow.CANMIM.bit.MIM1 = 1;
            ECanaShadow.CANMIM.bit.MIM2 = 1;

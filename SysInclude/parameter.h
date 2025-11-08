@@ -90,8 +90,10 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
 /*
  * DIP SW
  */
-#define IDSW01           GpioDataRegs.GPADAT.bit.GPIO16
-#define IDSW02           GpioDataRegs.GPADAT.bit.GPIO17
+#define IDSW00           GpioDataRegs.GPADAT.bit.GPIO16
+#define IDSW01           GpioDataRegs.GPADAT.bit.GPIO17
+#define IDSW02           GpioDataRegs.GPADAT.bit.GPIO18
+#define IDSW03           GpioDataRegs.GPADAT.bit.GPIO19
 
 /*
  * SPI chip RTC CS, MFP DIO
@@ -271,7 +273,7 @@ Parameter
 
 #define     PackSysVoltMax                     6972 //4.2*24
 #define     PackSysVoltMin                     504  //2.8*2.4
-#define     PackNum                            1
+#define     PackNum                            4
 
 #define     C_PackCellShutdownFault            2.8
 #define     C_PackBalacneLimtVoltage           3.0
@@ -387,6 +389,7 @@ Parameter
 #define     C_PackUDCellVoltageProtect                     2.85
 #define     C_PackDIVCellVoltageProtect                    0.5
 #define     C_PackOVCellTemperatureProtect                 55.0
+//#define     C_PackOVCellTemperatureProtect                 54.0
 #define     C_PackUDCellCharTemperatureProtect             -10.0
 #define     C_PackUDCellDisCharTemperatureProtect          -15.0
 #define     C_PackDIVCellTemperatureProtectt                15.0

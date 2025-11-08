@@ -86,7 +86,7 @@ void BatCalcVoltHandle(BatCalcReg *P)
     /*
      * 정수를 소수점 변환하는 루틴
      */
-    for(Count=0; Count<ModuleEA; Count++)
+    for(Count=0; Count<=ModuleEA; Count++)
     {
 
         P->MDCellMaxVoltF[Count] =(float32) P->MDCellMaxVolt[Count]  *0.001f;
@@ -205,6 +205,12 @@ void BatCalcTempsHandle(BatCalcReg *P)
     P->PackCellMinTempsF  = CellMinTempsadF;
     P->PackCellAgvTempsF  = (CellMaxTempsadF+CellMinTempsadF)*0.5;
     P->PackCellDivTempsF  = CellMaxTempsadF-CellMinTempsadF;
+
+    P->PackCellMaxTempsF  = CellMaxTempsF-4.0;
+    P->PackCellMinTempsF  = CellMinTempsF-4.0;
+    P->PackCellAgvTempsF  = (P->PackCellMaxTempsF+P->PackCellMinTempsF)*0.5;
+    P->PackCellDivTempsF  = CellMaxTempsF-CellMinTempsF;
+
 
     P->PackCellMaxTempsPos =  (MDCellMaxTempsPos*24)+P->MDMaxTempsPo[MDCellMaxTempsPos];
     P->PackCellMinTempsPos =  (MDCellMinTempsPos*24)+P->MDMinTempsPo[MDCellMinTempsPos];
