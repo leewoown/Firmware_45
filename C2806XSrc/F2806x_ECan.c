@@ -707,8 +707,6 @@ void InitECana(void)
            ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
 
        //ID 설정
-
-
            ECanaMboxes.MBOX0.MSGID.all     = 0;
            ECanaMboxes.MBOX1.MSGID.all     = 0;
            ECanaMboxes.MBOX2.MSGID.all     = 0;
@@ -722,7 +720,7 @@ void InitECana(void)
            ECanaMboxes.MBOX10.MSGID.all    = 0;
            ECanaMboxes.MBOX11.MSGID.all    = 0;
            ECanaMboxes.MBOX12.MSGID.all    = 0;
-           ECanaMboxes.MBOX23.MSGID.all    = 0;
+           ECanaMboxes.MBOX13.MSGID.all    = 0;
            ECanaMboxes.MBOX14.MSGID.all    = 0;
            ECanaMboxes.MBOX15.MSGID.all    = 0;
            ECanaMboxes.MBOX16.MSGID.all    = 0;
@@ -741,6 +739,7 @@ void InitECana(void)
            ECanaMboxes.MBOX29.MSGID.all    = 0;
            ECanaMboxes.MBOX30.MSGID.all    = 0;
            ECanaMboxes.MBOX31.MSGID.all    = 0;
+
            #if (PackNum==1)
                ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x110);
                ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x120);
@@ -901,9 +900,12 @@ void InitECana(void)
            //AMI = 1 일때 Filtering Criterion must be satisfied on order to receive message
            //ECanaShadow.CANGAM.all = ECanaRegs.CANGAM.all;
 
-           ECanaShadow.CANGAM.all = 0xFFFFFFFF; //byCHOO
-           ECanaShadow.CANGAM.bit.AMI = 0;
-           ECanaRegs.CANGAM.all   = ECanaShadow.CANGAM.all;
+
+           ECanaShadow.CANGAM.all = 0xFFFFFFFF;   // 기본: 모두 don't-care
+           ECanaShadow.CANGAM.bit.AMI = 0;        // LAM 사용(글로벌 마스크 대신 LAMx 적용)
+           ECanaRegs.CANGAM.all = ECanaShadow.CANGAM.all;
+
+
 
            ECanaMboxes.MBOX0.MSGID.bit.AME  = 1;//Module 1
            ECanaMboxes.MBOX1.MSGID.bit.AME  = 1;//Module 2

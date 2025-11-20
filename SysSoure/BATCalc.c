@@ -88,7 +88,6 @@ void BatCalcVoltHandle(BatCalcReg *P)
      */
     for(Count=0; Count<=ModuleEA; Count++)
     {
-
         P->MDCellMaxVoltF[Count] =(float32) P->MDCellMaxVolt[Count]  *0.001f;
         P->MDCellMinVoltF[Count] =(float32) P->MDCellMinVolt[Count]  *0.001f;
         P->MDCellAgvVoltF[Count] =(float32) P->MDCellAgvVolt[Count]  *0.001f;

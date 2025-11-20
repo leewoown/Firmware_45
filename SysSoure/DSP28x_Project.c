@@ -16,10 +16,12 @@ extern void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, un
 
 extern void SysCommErrHandle(SystemReg *P);
 extern void SysCurrentHandle(SystemReg *s);
+extern void SysUnitBMSStatus(SystemReg *P);
 
 extern void CalSysAlarmtCheck(SystemReg *s);
 extern void CalSysFaultCheck(SystemReg *s);
 extern void CalSysProtectCheck(SystemReg *s);
+
 
 extern int float32ToInt(float32 Vaule, Uint32 Num);
 //extern SystemReg       SysRegs;
@@ -173,13 +175,6 @@ void SysVarINIT(SystemReg *s)
     s->PackAhF=0;
     s->PackISOResisF=0;
 
-    s->PackModule1Regs.all=0;
-    s->PackModule2Regs.all=0;
-    s->PackModule3Regs.all=0;
-    s->PackModule4Regs.all=0;
-    s->PackModule5Regs.all=0;
-    s->PackModule6Regs.all=0;
-    s->PackModule7Regs.all=0;
 
     s->MD1CANRxCount=0;
     s->MD2CANRxCount=0;
@@ -192,10 +187,41 @@ void SysVarINIT(SystemReg *s)
     s->MasterRxCount=0;
 
     s->PackInMDCANrxReg.all=0;
-    s->ModuleWaterLeakReg.all=0;
-    s->ModuleBatICReg.all=0;
-    s->ModuleCTCANErrCReg.all=0;
-    s->ModuleSubCANErrCReg.all=0;
+
+    memset(s->PackModuleRegs, 0, sizeof(s->PackModuleRegs));
+
+/*    s->PackModule1Regs.all=0;
+    s->PackModule2Regs.all=0;
+    s->PackModule3Regs.all=0;
+    s->PackModule4Regs.all=0;
+    s->PackModule5Regs.all=0;
+    s->PackModule6Regs.all=0;
+    s->PackModule7Regs.all=0;
+    s->PackModuleAllRegs.all=0;
+*/
+    s->PackInMDCANrxReg.all=0;
+    s->MDInitok.all=0;
+    s->MDFault.all=0;
+    s->MDBalaMode.all=0;
+    s->MDWaterleak.all=0;
+    s->MDCellVoltFualt.all=0;
+    s->MDCellTempFualt.all=0;
+    s->MDBATICErr.all=0;
+    s->MDCTComErr.all=0;
+    s->MDSBComErr.all=0;
+    s->MDHMIComErr.all=0;
+    s->MDVoltCanTx.all=0;
+    s->MDTempCanTx.all=0;
+    s->HmiModeEn.all=0;
+    s->PackModeEn.all=0;
+
+
+
+
+
+
+
+
     s->PackProtectReg.all=0;
     s->PackFaultReg.all=0;
 
@@ -211,7 +237,7 @@ void CANRegVarINIT(CANAReg *P)
      *
      */
     P->CellNumStart=0;
-    P-> NumberShift=0;;
+    P-> NumberShift=0;
     P->CellVotlageNumber=0;;
     P->CellVotlageMaxNumber=0;;
     P->CellVoltageNum=0;
@@ -299,264 +325,73 @@ void ModuleInit(ModulemReg *P)
 
 
 
-    memset(&P->MD41XRxcount[0],0,7);
-    memset(&P->MD42XRxcount[0],0,7);
-    memset(&P->MD43XRxcount[0],0,7);
-    memset(&P->MD44XRxcount[0],0,7);
-    memset(&P->MD45xRxcount[0],0,7);
-    memset(&P->MD46XRxcount[0],0,7);
-    memset(&P->MD47XRxcount[0],0,7);
-
-  //  P->MDCTComErrStaute.all=0;
-  //  P->MDSubComErrStaute.all=0;
-  //  P->MDBatICCOMErrStaute.all=0;
-  //  P->MDWaterLeakErrStaute.all=0;
-}
-void SysModuleStauteCheckHandle(SystemReg *P)
-{
-    /*
-     * SysRegs.PackModule1Regs = ModRegs.MDstatusbit[0];
-     * SysRegs.PackModule2Regs = ModRegs.MDstatusbit[1];
-     * SysRegs.PackModule3Regs = ModRegs.MDstatusbit[2];
-     * SysRegs.PackModule4Regs = ModRegs.MDstatusbit[3];
-     * SysRegs.PackModule5Regs = ModRegs.MDstatusbit[4];
-     * SysRegs.PackModule6Regs = ModRegs.MDstatusbit[5];
-     * SysRegs.PackModule7Regs = ModRegs.MDstatusbit[6];
-     */
-    //Module 1
-    if(P->PackModule1Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD01=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD01=0;
-    }
-    //Module 2
-    if(P->PackModule2Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD02=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD02=0;
-    }
-    //Module 3
-    if(P->PackModule3Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD03=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD03=0;
-    }
-    //Module 4
-    if(P->PackModule4Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD04=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD04=0;
-    }
-    //Module 5
-    if(P->PackModule5Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD05=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD05=0;
-    }
-    //Module 6
-    if(P->PackModule6Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD06=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD06=0;
-    }
-    //Module 7
-    if(P->PackModule7Regs.bit.INITOK==1)
-    {
-        P->ModuleStatusInitok.bit.MD07=1;
-    }
-    else
-    {
-        P->ModuleStatusInitok.bit.MD07=0;
-    }
-    /*
-     * Module Fault Check
-     */
-    if(P->PackModule1Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD01=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD01=0;
-    }
-    if(P->PackModule2Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD02=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD02=0;
-    }
-    //Module 3
-    if(P->PackModule3Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD03=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD03=0;
-    }
-    //Module 4
-    if(P->PackModule4Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD04=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD04=0;
-    }
-    //Module 5
-    if(P->PackModule5Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD05=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD05=0;
-    }
-    //Module 6
-    if(P->PackModule6Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD06=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD06=0;
-    }
-    //Module 7
-    if(P->PackModule7Regs.bit.Fault==1)
-    {
-        P->ModuleStatusFault.bit.MD07=1;
-    }
-    else
-    {
-        P->ModuleStatusFault.bit.MD07=0;
-    }
-    /*
-     *  Module ModuleStatusWleagErr
-     */
-    if(P->PackModule1Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD01=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD01=0;
-    }
-    //Module 2
-    if(P->PackModule2Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD02=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD02=0;
-    }
-    //Module 3
-    if(P->PackModule3Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD03=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD03=0;
-    }
-    //Module 4
-    if(P->PackModule4Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD04=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD04=0;
-    }
-    //Module 5
-    if(P->PackModule5Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD05=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD05=0;
-    }
-    //Module 6
-    if(P->PackModule6Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD06=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD06=0;
-    }
-    //Module 7
-    if(P->PackModule7Regs.bit.Fault==1)
-    {
-        P->ModuleStatusWleagErr.bit.MD07=1;
-    }
-    else
-    {
-        P->ModuleStatusWleagErr.bit.MD07=0;
-    }
-}
-void SysDIErrHandle(SystemReg *P)
-{
-    /*
-     * SysRegs.PackModule1Regs = ModRegs.MDstatusbit[0];
-     * SysRegs.PackModule2Regs = ModRegs.MDstatusbit[1];
-     * SysRegs.PackModule3Regs = ModRegs.MDstatusbit[2];
-     * SysRegs.PackModule4Regs = ModRegs.MDstatusbit[3];
-     * SysRegs.PackModule5Regs = ModRegs.MDstatusbit[4];
-     * SysRegs.PackModule6Regs = ModRegs.MDstatusbit[5];
-     * SysRegs.PackModule7Regs = ModRegs.MDstatusbit[6];
-     */
-
-   // if(P->PackModule1Regs.bit.BATIC1ErrFault==1){P->ModuleBatICReg.bit.MD01=1;}
-    if(P->PackModule1Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD01=1;}
-    if(P->PackModule2Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD02=1;}
-    if(P->PackModule3Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD03=1;}
-    if(P->PackModule4Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD04=1;}
-    if(P->PackModule5Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD05=1;}
-    if(P->PackModule6Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD06=1;}
-    if(P->PackModule7Regs.bit.WaterleakFault==1){P->ModuleWaterLeakReg.bit.MD07=1;}
-
-    if(P->ModuleWaterLeakReg.all>0)             {P->PackStateReg.bit.WaterLeakERR=1;}
-    if(P->DigitalInputReg.bit.EMGSWStauts==1)   {P->PackStateReg.bit.EMGSWERR=1;}
-
-    if(P->PackStateReg.bit.WaterLeakERR==1|| P->PackStateReg.bit.EMGSWERR==1)
-    {
-        P->PackStateReg.bit.SysFault=1;
-    }
-    if(P->DigitalInputReg.bit.EMGSWStauts==1)
-    {
-        P->DigitalOutPutReg.bit.EMGSWLAMPOUT=1;
-    }
-    else
-    {
-        P->DigitalOutPutReg.bit.EMGSWLAMPOUT=0;
-    }
+    memset(&P->MD1XRxcount[0],0,7);
+    memset(&P->MD2XRxcount[0],0,7);
+    memset(&P->MD3XRxcount[0],0,7);
+    memset(&P->MD4XRxcount[0],0,7);
+    memset(&P->MD5XRxcount[0],0,7);
+    memset(&P->MD6XRxcount[0],0,7);
+    memset(&P->MD7XRxcount[0],0,7);
 
 }
-void SysUnitBMSStaus(SystemReg *P)
-{
 
+
+void SysUnitBMSStatus(SystemReg *P)
+{
+    /*
+     * 하드웨어 인터럽트에서 50msec 마다 아래와 같이 read 있음
+     */
+    //switch(SysRegs.SysRegTimer500msecCount)
+    //SysRegs.PackModule1Regs.all = ModRegs.MDstatusbit[0];
+    //SysRegs.PackModule2Regs.all = ModRegs.MDstatusbit[1];
+    //SysRegs.PackModule3Regs.all = ModRegs.MDstatusbit[2];
+    //SysRegs.PackModule4Regs.all = ModRegs.MDstatusbit[3];
+    //SysRegs.PackModule5Regs.all = ModRegs.MDstatusbit[4];
+    //SysRegs.PackModule6Regs.all = ModRegs.MDstatusbit[5];
+    //SysRegs.PackModule7Regs.all = ModRegs.MDstatusbit[6];
+
+
+    const Uint16 MODULE_CNT = 7u;
+    Uint16 i;
+    /* ANY(OR) 누적용 */
+    Uint16 any_fault=0u, any_leak=0u, any_cellv=0u, any_cellt=0u;
+    Uint16 any_batic=0u, any_ct=0u, any_mb=0u, any_hmi=0u, any_balance=0u;
+    Uint16 all_initok=1u, all_voltcan=1u, all_tempcan=1u, all_hmien=1u, all_packen=1u;
+    for (i = 0u; i < MODULE_CNT; i++)
+    {
+        /* ALL(AND) */
+        all_initok  &= (Uint16)P->PackModuleRegs[i].bit.INITOK;
+        all_voltcan &= (Uint16)P->PackModuleRegs[i].bit.CellVoltCAN;
+        all_tempcan &= (Uint16)P->PackModuleRegs[i].bit.CellTempCAN;
+        all_hmien   &= (Uint16)P->PackModuleRegs[i].bit.HmiEn;
+        all_packen  &= (Uint16)P->PackModuleRegs[i].bit.PackEn;
+
+        /* ANY(OR) */
+        any_fault   |= (Uint16)P->PackModuleRegs[i].bit.Fault;
+        any_leak    |= (Uint16)P->PackModuleRegs[i].bit.WaterleakFault;
+        any_cellv   |= (Uint16)P->PackModuleRegs[i].bit.CellVoltageFault;
+        any_cellt   |= (Uint16)P->PackModuleRegs[i].bit.CellTemperatureFault;
+        any_batic   |= (Uint16)P->PackModuleRegs[i].bit.BATICErrFault;
+        any_ct      |= (Uint16)P->PackModuleRegs[i].bit.CTCOMErrFault;
+        any_mb      |= (Uint16)P->PackModuleRegs[i].bit.MBCOMErrFault;
+        any_hmi     |= (Uint16)P->PackModuleRegs[i].bit.HMICOMErrFault;
+        any_balance |= (Uint16)P->PackModuleRegs[i].bit.BalanceEnable;
+
+    }
+    P->PackModuleAllRegs.bit.INITOK               = all_initok;      /* ALL */
+    P->PackModuleAllRegs.bit.Fault                = any_fault;       /* ANY */
+    P->PackModuleAllRegs.bit.WaterleakFault       = any_leak;        /* ANY */
+    P->PackModuleAllRegs.bit.CellVoltageFault     = any_cellv;       /* ANY */
+    P->PackModuleAllRegs.bit.CellTemperatureFault = any_cellt;       /* ANY */
+    P->PackModuleAllRegs.bit.BATICErrFault        = any_batic;       /* ANY */
+    P->PackModuleAllRegs.bit.CTCOMErrFault        = any_ct;          /* ANY */
+    P->PackModuleAllRegs.bit.MBCOMErrFault        = any_mb;          /* ANY */
+    P->PackModuleAllRegs.bit.HMICOMErrFault       = any_hmi;         /* ANY */
+    P->PackModuleAllRegs.bit.BalanceEnable        = any_balance;     /* ANY */
+    P->PackModuleAllRegs.bit.CellVoltCAN          = all_voltcan;     /* ALL */
+    P->PackModuleAllRegs.bit.CellTempCAN          = all_tempcan;     /* ALL */
+    P->PackModuleAllRegs.bit.HmiEn                = all_hmien;       /* ALL */
+    P->PackModuleAllRegs.bit.PackEn               = all_packen;      /* ALL */
 }
 void SysCommErrHandle(SystemReg *P)
 {
@@ -572,24 +407,20 @@ void SysCommErrHandle(SystemReg *P)
     if(P->MasterRxCount>5000)
     {
         P->MasterRxCount =5100;
-        P->PackStateReg.bit.EXCANCOMERR=1;
+      //  P->PackStateReg.bit.EXCANCOMERR=1;
         P->PackProtectReg.bit.PackExComErr=1;
     }
     if(P->CTRxCount>5000)
     {
         P->CTRxCount=5100;
-        P->PackStateReg.bit.CTCOMErr=1;
-        P->PackProtectReg.bit.PackCTComErr=1;
+      //  P->PackStateReg.bit.CTCOMErr=1;
+      //  P->PackProtectReg.bit.PackCTComErr=1;
     }
     if(P->PackInMDCANrxReg.all>0)
     {
-        P->PackStateReg.bit.INCANCOMERR=1;
+        P->PackStateReg.bit.CANCOMERR=1;
 
     }
-   // if(P->ModuleBatICReg.all>0)     {P->PackStateReg.bit.MDBATICErr=1;}
-   // if(P->ModuleCTCANErrCReg.all>0) {P->PackStateReg.bit.MDCTCANErr=1;}
-   // if(P->ModuleSubCANErrCReg.all>0){P->PackStateReg.bit.MDSUBCANErr=1;}
-
     if(P->MD1CANRxCount>1000)
     {
         P->MD1CANRxCount=1100;
@@ -650,10 +481,10 @@ void SysCommErrHandle(SystemReg *P)
     if(P->PackModule6Regs.bit.MBCOMErrFault==1){P->ModuleSubCANErrCReg.bit.MD06=1;}
     if(P->PackModule7Regs.bit.MBCOMErrFault==1){P->ModuleSubCANErrCReg.bit.MD07=1;}
     */
-    if(P->PackStateReg.bit.EXCANCOMERR==1|| P->PackStateReg.bit.CTCOMErr==1   || P->PackStateReg.bit.INCANCOMERR==1)
-    {
-      //  P->PackStateReg.bit.SysProtect=1;
-    }
+  //  if(P->PackStateReg.bit.EXCANCOMERR==1|| P->PackStateReg.bit.CTCOMErr==1   || P->PackStateReg.bit.INCANCOMERR==1)
+  //  {
+      //  P->PackStateReg.bit.CANCOMERR=1;
+  //  }
 
 }
 void SysCurrentHandle(SystemReg *s)
@@ -687,7 +518,7 @@ void SysCurrentHandle(SystemReg *s)
 void CalSysAlarmtCheck(SystemReg *s)
 {
 
-      if(s->PackStateReg.bit.DisCharMode==0)
+      if(s->PackStateReg.bit.SysDisCharMode==0)
       {
           // 과전류 FAULT
           if(s->PackCurrentAsbF >= C_PackOVPackCurrentCharAlarm)
@@ -808,7 +639,7 @@ void CalSysAlarmtCheck(SystemReg *s)
               s->PackAlarmReg.bit.CellTemp_BLT =0;
           }
       }
-      if(s->PackStateReg.bit.DisCharMode==1)
+      if(s->PackStateReg.bit.SysDisCharMode==1)
       {
           // 과전류 FAULT
           if(s->PackCurrentAsbF >= C_PackOVPackCurrentDisCharAlarm)
@@ -935,7 +766,7 @@ unsigned int    CellVoltUnBalaneFaulCount=0;
 void CalSysFaultCheck(SystemReg *s)
 {
       // 과전류 FAULT
-    if(s->PackStateReg.bit.DisCharMode==0)
+    if(s->PackStateReg.bit.SysDisCharMode==0)
     {
       if(s->PackCurrentAsbF >= C_PackOVPackCurrentCharFault)
       {
@@ -1063,7 +894,7 @@ void CalSysFaultCheck(SystemReg *s)
       if(s->PackFaulBuftReg.all == 0)
        {
            s->PackFaultStatecount =0;
-           s->PackStateReg.bit.SysFault=0;
+        //   s->PackStateReg.bit.SysFault=0;
            s->PackFaulBuftReg.all=0;
            s->PackFaultReg.all=0;
        }
@@ -1079,7 +910,7 @@ void CalSysFaultCheck(SystemReg *s)
        */
     }
     // 과전류 FAULT
-  if(s->PackStateReg.bit.DisCharMode==1)
+  if(s->PackStateReg.bit.SysDisCharMode==1)
   {
     if(s->PackCurrentAsbF >= C_PackOVPackCurrentDisCharFault)
     {
@@ -1207,7 +1038,7 @@ void CalSysFaultCheck(SystemReg *s)
     if(s->PackFaulBuftReg.all == 0)
      {
          s->PackFaultStatecount =0;
-         s->PackStateReg.bit.SysFault=0;
+      //   s->PackStateReg.bit.SysFault=0;
          s->PackFaulBuftReg.all=0;
          s->PackFaultReg.all=0;
      }
@@ -1228,7 +1059,7 @@ void CalSysFaultCheck(SystemReg *s)
 void CalSysProtectCheck(SystemReg *s)
 {
     // 과전류 FAULT
-  if(s->PackStateReg.bit.DisCharMode==0)// 방전
+  if(s->PackStateReg.bit.SysDisCharMode==0)// 방전
   {
         if(s->PackCurrentAsbF >= C_PackOVPackCurrentCharProtect)//100A
         {
@@ -1298,7 +1129,7 @@ void CalSysProtectCheck(SystemReg *s)
             s->PackProtectReg.bit.CellTemp_BLT =1;
         }
     }
-    if(s->PackStateReg.bit.DisCharMode==1) // 충전 모드 시
+    if(s->PackStateReg.bit.SysDisCharMode==1) // 충전 모드 시
     {
         if(s->PackCurrentAsbF >= C_PackOVPackCurrentDisCharProtect) //100A
         {

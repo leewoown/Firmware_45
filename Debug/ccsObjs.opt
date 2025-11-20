@@ -23,6 +23,7 @@
 "./SysSoure/BATAlgorithm.obj"
 "./SysSoure/BATCalc.obj"
 "./SysSoure/DSP28x_Project.obj"
+"./SysSoure/NVRAM.obj"
 "./SysSoure/ProtectRelay.obj"
 "./SysSoure/SpiToCan.obj"
 "./SysSoure/main.obj"

@@ -40,107 +40,76 @@ void ProtectRelayHandle(PrtectRelayReg *P)
     {
         case STATERly_INIT :
               ProtectRlyVarINIT(P);
+              P->StateMachine = STATERly_STANDBY;
         break;
         case STATERly_STANDBY :
              if((P->State.bit.PRlyDI==1)||(P->State.bit.NRlyDI==1))
              {
                     P->State.bit.RlyFaulttSate =1;
-                   // P->StateMachine = STATERly_STANDBY;
+                    P->StateMachine = STATERly_PrtectSeq;
              }
              if((P->State.bit.PRlyDI==0)&&(P->State.bit.NRlyDI==0))
              {
                     P->State.bit.RlyFaulttSate =0;
-                   // P->StateMachine = STATE_Ready;
              }
              P->State.bit.WakeuPOffEND=0;
              P->State.bit.WakeuPOnEND=0;
         break;
-        case STATERly_OnSeqReady :
-             P->WakeupOff_NRlyOffCount=0;
-             P->State.bit.WakeuPOffEND=0;
-             P->State.bit.WakeuPOnEND=0;
-             if(P->State.bit.WakeUpEN==1)
-             {
-                 P->StateMachine = STATERly_OnSeqNRlyOn;
-             }
+        case STATERly_Ready :
+            P->State.bit.WakeuPOffEND=0;
+            P->State.bit.WakeuPOnEND=0;
+            if(P->State.bit.WakeUpEN==1)
+            {
+                P->StateMachine = STATERly_OnSeq;
+            }
         break;
-        case STATERly_OnSeqNRlyOn :
+        case STATERly_OnSeq :
              P->State.bit.NRlyDO=1;
+             delay_ms(100);
              if((P->State.bit.NRlyDI==1)&&(P->State.bit.ProRlyDI==0)&&(P->State.bit.PRlyDI==0))
              {
-                 P->WakeupOn_ProRlyOnCount++;
-                 if(P->WakeupOn_ProRlyOnCount>=WakeUpOnProRlyOnTime)
-                 {
-                     P->StateMachine = STATERly_OnSeqPreRlyOn;
-                     P->WakeupOn_ProRlyOnCount= WakeUpOnProRlyOnTime+10;
-                 }
+                 P->State.bit.PreRlyDO=1;
+                 P->State.bit.ProRlyDI=1;
+                 delay_ms(50);
              }
-        break;
-        case STATERly_OnSeqPreRlyOn:
-             P->State.bit.PreRlyDO=1;
-             P->State.bit.ProRlyDI=1;
              if((P->State.bit.NRlyDI==1)&&(P->State.bit.ProRlyDI==1)&&(P->State.bit.PRlyDI==0))
              {
-                 P->WakeupOn_PRlyOnCount++;
-                 if(P->WakeupOn_PRlyOnCount>=WakeUpOnPRlayOnTime)
-                 {
-                     P->StateMachine = STATERly_OnSeqPRlyOn;
-                     P->WakeupOn_PRlyOnCount=WakeUpOnPRlayOnTime+10;
-                 }
+                 P->State.bit.PRlyDO=1;
+                 delay_ms(100);
              }
-        break;
-        case STATERly_OnSeqPRlyOn:
-              P->State.bit.PRlyDO=1;
-              if((P->State.bit.NRlyDI==1)&&(P->State.bit.ProRlyDI==1)&&(P->State.bit.PRlyDI==1))
-              {
-                  P->WakeupOn_ProRlyOffCount++;
-                  if(P->WakeupOn_ProRlyOffCount>=WakeUpOnProRlyOffTime)
-                  {
-                      P->StateMachine = STATERly_OnSeqPreRlyOff;
-                      P->WakeupOn_ProRlyOffCount=WakeUpOnProRlyOffTime+10;
-                  }
-              }
-        break;
-        case STATERly_OnSeqPreRlyOff:
-             P->State.bit.PreRlyDO=0;
-             P->State.bit.ProRlyDI=0;
+             if((P->State.bit.NRlyDI==1)&&(P->State.bit.ProRlyDI==1)&&(P->State.bit.PRlyDI==1))
+             {
+                 P->State.bit.PreRlyDO=0;
+                 P->State.bit.ProRlyDI=0;
+             }
              if((P->State.bit.NRlyDI==1)&&(P->State.bit.ProRlyDI==0)&&(P->State.bit.PRlyDI==1))
              {
-                 P->State.bit.WakeuPOnEND=1;
                  P->State.bit.WakeuPOffEND=0;
-                 P->StateMachine = STATERly_OffSeqReady;
-             }
-        break;
-        case STATERly_OffSeqReady:
-             P->WakeupOn_ProRlyOnCount=0;
-             P->WakeupOn_PRlyOnCount=0;
-             P->WakeupOn_ProRlyOffCount=0;
-             if(P->State.bit.WakeUpEN==0)
-             {
-                 P->StateMachine = STATERly_OffSeqPRlyOff;
-             }
-        break;
-        case STATERly_OffSeqPRlyOff:
-             P->State.bit.PRlyDO=0;
-             if((P->State.bit.NRlyDI==1)&&(P->State.bit.PRlyDI==0))
-             {
-                 P->WakeupOff_NRlyOffCount++;
-                 if(P->WakeupOff_NRlyOffCount>=WakeUpOFFTNRelayOFFTime)
+                 P->State.bit.WakeuPOnEND=1;
+                 if(P->State.bit.WakeUpEN==0)
                  {
-                     P->StateMachine =  STATERly_OffSeqNRlyOff;
+                     P->StateMachine = STATERly_OffSeq;
                  }
              }
+
         break;
-        case STATERly_OffSeqNRlyOff:
-             P->State.bit.NRlyDO=0;
-             if((P->State.bit.NRlyDI==0)&&(P->State.bit.PRlyDI==0))
-             {
-                 P->StateMachine =  STATERly_OnSeqReady;
-                 P->State.bit.WakeuPOffEND=1;
-                 P->State.bit.WakeuPOnEND=0;
-             }
+        case STATERly_OffSeq:
+     //        P->State.bit.NRlyDO=0;
+    //        delay_ms(100);
+            P->State.bit.PRlyDO=0;
+            delay_ms(10);
+            if((P->State.bit.NRlyDI==0)&&(P->State.bit.ProRlyDI==0)&&(P->State.bit.PRlyDI==0))
+            {
+                P->State.bit.WakeuPOffEND=1;
+                P->State.bit.WakeuPOnEND=0;
+                if(P->State.bit.WakeUpEN==0)
+                 {
+                     P->StateMachine = STATERly_OnSeq;
+                 }
+            }
         break;
-        case STATERly_ProtectRlyOff:
+
+        case STATERly_PrtectSeq:
              P->State.bit.PreRlyDO=1;
              P->State.bit.ProRlyDI=1;
              delay_ms(100);

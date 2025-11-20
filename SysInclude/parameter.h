@@ -105,8 +105,8 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
 /*
  * SPI chip NVRAM CS
  */
-#define NvramCS            GpioDataRegs.GPBCLEAR.bit.GPIO11=1
-#define NvramDS            GpioDataRegs.GPBSET.bit.GPIO11=1
+//#define NvramCS            GpioDataRegs.GPBCLEAR.bit.GPIO11=1
+//#define NvramDS            GpioDataRegs.GPBSET.bit.GPIO11=1
 
 /*
  *  SPI TCP IP CS, REST, RDY, INT
