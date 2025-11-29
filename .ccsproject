@@ -16,4 +16,5 @@
 	<isTargetManual value="false"/>
 	<activeTargetConfiguration value="targetConfigs/TMS320F28069.ccxml"/>
 	<isTargetConfigurationManual value="false"/>
+	<sourceLookupPath value=""/>
 </projectOptions>

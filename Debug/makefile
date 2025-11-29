@@ -154,21 +154,21 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-F28069PackBMS.out 
+F28069PackBMSRack1.out 
 
 EXE_OUTPUTS__QUOTED += \
-"F28069PackBMS.out" 
+"F28069PackBMSRack1.out" 
 
 
 # All Target
 all: $(OBJS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "F28069PackBMS.out"
+	@$(MAKE) --no-print-directory -Onone "F28069PackBMSRack1.out"
 
 # Tool invocations
-F28069PackBMS.out: $(OBJS) $(GEN_CMDS)
+F28069PackBMSRack1.out: $(OBJS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: C2000 Linker'
-	"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla0 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu0 -Ooff --opt_for_speed=2 --fp_mode=strict --fp_reassoc=on --advice:performance=all -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=coffabi -z -m"F28069PackBMS.map" --heap_size=0 --stack_size=0x0050 --warn_sections -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/CMD" -i"D:/45 168S1P_Unit_PackBMSR00/00 C2806X/cmd" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="F28069PackBMS_linkInfo.xml" -o "F28069PackBMS.out" $(ORDERED_OBJS)
+	"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/bin/cl2000" -v28 -ml -mt --cla_support=cla0 --float_support=fpu32 --tmu_support=tmu0 --vcu_support=vcu0 -Ooff --opt_for_speed=2 --fp_mode=strict --fp_reassoc=on --advice:performance=all -g --diag_warning=225 --diag_wrap=off --display_error_number --abi=coffabi -z -m"F28069PackBMS.map" --heap_size=0 --stack_size=0x0050 --warn_sections -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/lib" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include" -i"C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/CMD" -i"D:/45 168S1P_Unit_PackBMSR00/00 C2806X/cmd" --reread_libs --diag_wrap=off --display_error_number --xml_link_info="F28069PackBMS_linkInfo.xml" -o "F28069PackBMSRack1.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 

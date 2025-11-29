@@ -94,25 +94,27 @@ void ProtectRelayHandle(PrtectRelayReg *P)
 
         break;
         case STATERly_OffSeq:
-     //        P->State.bit.NRlyDO=0;
-    //        delay_ms(100);
+            P->State.bit.NRlyDO=0;
+            delay_ms(300);
             P->State.bit.PRlyDO=0;
-            delay_ms(10);
+            delay_ms(50);
             if((P->State.bit.NRlyDI==0)&&(P->State.bit.ProRlyDI==0)&&(P->State.bit.PRlyDI==0))
             {
                 P->State.bit.WakeuPOffEND=1;
                 P->State.bit.WakeuPOnEND=0;
                 if(P->State.bit.WakeUpEN==0)
                  {
-                     P->StateMachine = STATERly_OnSeq;
+
+                     P->StateMachine = STATERly_Ready;
+
                  }
             }
         break;
 
         case STATERly_PrtectSeq:
-             P->State.bit.PreRlyDO=1;
-             P->State.bit.ProRlyDI=1;
-             delay_ms(100);
+       //      P->State.bit.PreRlyDO=1;
+       //      P->State.bit.ProRlyDI=1;
+       //     delay_ms(100);
              P->State.bit.PRlyDO=0;
              delay_ms(50);
              P->State.bit.NRlyDO=0;

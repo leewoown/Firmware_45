@@ -182,12 +182,12 @@ void main(void)
     InitSpiCAN();
     // TEST
     InitECanGpio();
-    InitECan();
+  //  InitECan();
 
     MemCopy(&RamfuncsLoadStart, &RamfuncsLoadEnd, &RamfuncsRunStart);
     InitFlash();
 
-    ConfigCpuTimer(&CpuTimer0, 60, 1000);
+    ConfigCpuTimer(&CpuTimer0, 80, 1000);
     CpuTimer0Regs.PRD.all = 80000;// 90000 is 1msec
     //   ConfigCpuTimer(&CpuTimer1, 80, 1000000);
     //   ConfigCpuTimer(&CpuTimer2, 80, 1000000);
@@ -229,16 +229,23 @@ void main(void)
                   Kam100AHSocRegs.state=SOC_STATE_IDLE;
                   PrtectRelayRegs.StateMachine=STATERly_INIT;
                   SysRegs.SysMachine=System_STATE_STANDBY;
+                  DigitalInput(&SysRegs);
+                  delay_ms(10);
+
+                  delay_ms(100);
                   if(SysRegs.PackStateReg.bit.SysPrtct==1)
                   {
                     //SysRegs.SysMachine=System_STATE_PROTECTER;
                   }
-                //  SysRegs.PackStateReg.bit.SysSTATE=1;
+                  SysRegs.PackStateReg.bit.SysSeqState=1;
+                  InitECan();
+                  delay_ms(10);
+
             break;
             case System_STATE_STANDBY:
                   SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=0;
                   PrtectRelayRegs.StateMachine=STATERly_STANDBY;
-               //   SysRegs.PackStateReg.bit.INITOK=1;
+
                   if(SysRegs.PackStateReg.bit.SysPrtct==1)
                   {
                     //  SysRegs.PackStateReg.bit.INITOK=1;
@@ -249,6 +256,8 @@ void main(void)
                   SysRegs.SysMachine=System_STATE_READY;
                   PrtectRelayRegs.StateMachine=STATERly_Ready;
                   SysRegs.PackStateReg.bit.CANCOMEnable=1;
+                  SysRegs.PackStateReg.bit.INITOK=1;
+                  SysRegs.PackStateReg.bit.SysSeqState=2;
             break;
             case System_STATE_READY:
                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
@@ -262,7 +271,7 @@ void main(void)
                  {
                      SysRegs.SysMachine=System_STATE_RUNING;
                  }
-             //    SysRegs.PackStateReg.bit.SysSTATE = 3;
+                   SysRegs.PackStateReg.bit.SysSeqState = 3;
             break;
             case System_STATE_RUNING:
                  Kam100AHSocRegs.state= SOC_STATE_RUNNING;
@@ -274,9 +283,10 @@ void main(void)
                  }
                  if(PrtectRelayRegs.State.bit.WakeuPOffEND==1)
                  {
-                    // SysRegs.SysMachine=System_STATE_STANDBY;
+                     SysRegs.SysMachine=System_STATE_READY;
 
                  }
+                 SysRegs.PackStateReg.bit.SysSeqState = 4;
                //  SysRegs.PackStateReg.bit.SysSTATE = 4;
             break;
             case System_STATE_PROTECTER:
@@ -295,7 +305,7 @@ void main(void)
                      delay_ms(200);
                      SysRegs.SysMachine=System_STATE_INIT;
                  }
-           //      SysRegs.PackStateReg.bit.SysSTATE =5;
+                 SysRegs.PackStateReg.bit.SysSeqState = 5;
             break;
             case System_STATE_DATALOG:
             //     SysRegs.PackStateReg.bit.CANCOMEnable=1;
@@ -320,7 +330,6 @@ void main(void)
        }
         PrtectRelayRegs.State.bit.NRlyDI=SysRegs.DigitalInputReg.bit.NAUX;
         PrtectRelayRegs.State.bit.PRlyDI=SysRegs.DigitalInputReg.bit.PAUX;
-       // ProtectRlySateCheck(&PrtectRelayRegs);
         ProtectRelayHandle(&PrtectRelayRegs);
         SysRegs.DigitalOutPutReg.bit.NRlyOUT=PrtectRelayRegs.State.bit.NRlyDO;
         SysRegs.DigitalOutPutReg.bit.PRlyOUT=PrtectRelayRegs.State.bit.PRlyDO;
@@ -363,6 +372,7 @@ interrupt void cpu_timer0_isr(void)
     * DigitalInput detection
     */
    DigitalInput(&SysRegs);
+   InitECan();
    /*
     *
     */
@@ -404,35 +414,37 @@ interrupt void cpu_timer0_isr(void)
    {
        SysRegs.PackProtectReg.bit.PackEMSSWErr=0;
    }
+   CANARegs.PackProtetSate=0;
    CalSysAlarmtCheck(&SysRegs);
    if(SysRegs.PackAlarmReg.all != 0)
    {
-     //SysRegs.PackStateReg.bit.SysAalarm=1;
-  //   SysRegs.PackStateReg.bit.SysProtectSate=1;
+       SysRegs.PackStateReg.bit.SysAalarm=1;
+       CANARegs.PackProtetSate=1;
    }
    else
    {
-     //SysRegs.PackStateReg.bit.SysAalarm=0;
-    // SysRegs.PackStateReg.bit.SysProtectSate=0;
+     SysRegs.PackStateReg.bit.SysAalarm=0;
+     CANARegs.PackProtetSate=0;
    }
+   CANARegs.PackProtetSate=0;
    CalSysFaultCheck(&SysRegs);
    if(SysRegs.PackFaultReg.all != 0)
    {
-
-    // SysRegs.PackStateReg.bit.SysFault=1;
-   //  SysRegs.PackStateReg.bit.SysProtectSate=2;
+     SysRegs.PackStateReg.bit.SysFault=1;
+     CANARegs.PackProtetSate=2;
    }
    else
    {
-    // SysRegs.PackStateReg.bit.SysFault=0;
-    // SysRegs.PackStateReg.bit.SysProtectSate=0;
+       SysRegs.PackStateReg.bit.SysFault=0;
+       CANARegs.PackProtetSate=0;
    }
 
    CalSysProtectCheck(&SysRegs);
+   CANARegs.PackProtetSate=0;
    if(SysRegs.PackProtectReg.all != 0)
    {
-      // SysRegs.PackStateReg.bit.SysProtect=1;
-      // SysRegs.PackStateReg.bit.SysProtectSate=3;
+       SysRegs.PackStateReg.bit.SysPrtct=1;
+       CANARegs.PackProtetSate=3;
    }
    switch(SysRegs.SysRegTimer5msecCount)
    {
@@ -457,7 +469,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.PackSOC =(unsigned int)(SysRegs.PackSOCF*10);
                    CANARegs.PackSOH =(unsigned int)(SysRegs.PackSOHF*10);
                    CANARegs.PackID =0X601|SysRegs.PackID;
-                   CANATX(CANARegs.PackID ,8,CANARegs.PackPT,CANARegs.PackCT,CANARegs.PackSOC,CANARegs.PackSOH);
+                  // CANATX(CANARegs.PackID ,8,CANARegs.PackPT,CANARegs.PackCT,CANARegs.PackSOC,CANARegs.PackSOH);
                }
        break;
        case 2:
@@ -494,7 +506,7 @@ interrupt void cpu_timer0_isr(void)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                      CANARegs.PackSate                        = SysRegs.PackStateReg.bit.SysSeqState;
-                 //    CANARegs.PackProtetSate                  = SysRegs.PackStateReg.bit.SysProtectSate;
+                     CANARegs.PackProtetSate                  = 0;
                      CANARegs.PackSateInfo                    = ComBine(CANARegs.PackProtetSate, CANARegs.PackSate);
                      CANARegs.PackStatus.bit.PackNeg_Rly      = PrtectRelayRegs.State.bit.NRlyDI;
                      CANARegs.PackStatus.bit.PackPos_Rly      = PrtectRelayRegs.State.bit.PRlyDI;
@@ -504,7 +516,7 @@ interrupt void cpu_timer0_isr(void)
                     // CANARegs.PackStatus.bit.PackWaterleak    = SysRegs.PackStateReg.bit.WaterLeakERR;
 
                      CANARegs.PackID =0X602|SysRegs.PackID;
-                     CANATX(CANARegs.PackID ,8,CANARegs.PackSateInfo,CANARegs.PackStatus.all,SysRegs.PackStateReg.Word.DataL,SysRegs.PackStateReg.Word.DataH);
+                   //  CANATX(CANARegs.PackID ,8,CANARegs.PackSateInfo,CANARegs.PackStatus.all,SysRegs.PackStateReg.Word.DataL,SysRegs.PackStateReg.Word.DataH);
                }
        break;
        default :
@@ -516,7 +528,7 @@ interrupt void cpu_timer0_isr(void)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                   CANARegs.PackID =0X500|(SysRegs.PackID+0x0010);
-                  CANATX(CANARegs.PackID,8,0X00,0X00,CANARegs.PackTemperatureAVG,CANARegs.PackBalanVolt);
+                  //CANATX(CANARegs.PackID,8,0X00,0X00,CANARegs.PackTemperatureAVG,CANARegs.PackBalanVolt);
                }
        break;
        case 5:
@@ -560,7 +572,7 @@ interrupt void cpu_timer0_isr(void)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                    CANARegs.PackID =0X603|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,SysRegs.PackAlarmReg.Word.DataL,SysRegs.PackFaultReg.Word.DataL,SysRegs.PackProtectReg.Word.DataL,SysRegs.PackProtectReg.Word.DataH);
+                  // CANATX(CANARegs.PackID,8,SysRegs.PackAlarmReg.Word.DataL,SysRegs.PackFaultReg.Word.DataL,SysRegs.PackProtectReg.Word.DataL,SysRegs.PackProtectReg.Word.DataH);
                }
 
        break;
@@ -575,7 +587,7 @@ interrupt void cpu_timer0_isr(void)
                     CANARegs.PackDisCHAPWRContinty = (unsigned int)(SysRegs.PackDisCHAPWRContintyF*10);
                     CANARegs.PackCHAPWRPeak        = (unsigned int)(SysRegs.PackCHAPWRPeakF*10);
                     CANARegs.PackDisCHAPWRPeak     = (unsigned int)(SysRegs.PackDisCHAPWRPeakF*10);
-                    CANARegs.PackID =0X634|SysRegs.PackID;
+                    CANARegs.PackID =0X604|SysRegs.PackID;
                     CANATX(CANARegs.PackID,8,CANARegs.PackCHAPWRContinty,CANARegs.PackDisCHAPWRContinty,CANARegs.PackCHAPWRPeak,CANARegs.PackDisCHAPWRPeak);
                }
        break;
@@ -586,7 +598,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.PackVoltageMin = (unsigned int)(SysRegs.PackCellMinVoltageF*1000);
                    CANARegs.PackVoltageAgv = (unsigned int)(SysRegs.PackCellAgvVoltageF*1000);
                    CANARegs.PackVoltageDiv = (unsigned int)(SysRegs.PackCellDivVoltageF*1000);
-                   CANARegs.PackID =0X635|SysRegs.PackID;
+                   CANARegs.PackID =0X605|SysRegs.PackID;
                    CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMax,CANARegs.PackVoltageMin,CANARegs.PackVoltageAgv,CANARegs.PackVoltageDiv);
                 }
        break;
@@ -610,7 +622,7 @@ interrupt void cpu_timer0_isr(void)
                     CANARegs.PackTemperatureMaxNUM      = SysRegs.PackCellMaxTmepsPos;
                     CANARegs.PackTemperatureMinNUM      = SysRegs.PackCellMinTmepsPos;
                     CANARegs.PackID =0X607|SysRegs.PackID;
-                    CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxNum,CANARegs.PackVoltageMinNum,CANARegs.PackTemperatureMaxNUM ,CANARegs.PackTemperatureMinNUM );
+                    //CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxNum,CANARegs.PackVoltageMinNum,CANARegs.PackTemperatureMaxNUM ,CANARegs.PackTemperatureMinNUM );
                 }
        break;
        case 23:
@@ -640,7 +652,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDstatusbit[CANARegs.MDNumCountA]        = ModRegs.MDstatusbit[CANARegs.MDNumCountA];
                    CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]    = ModRegs.PackMinVolteRec[CANARegs.MDNumCountA];
                    CANARegs.PackID =0X608|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountA,CANARegs.MDTotalVolt[CANARegs.MDNumCountA],CANARegs.MDstatusbit[CANARegs.MDNumCountA],CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]);
+                  // CANATX(CANARegs.PackID,8,CANARegs.MDNumCountA,CANARegs.MDTotalVolt[CANARegs.MDNumCountA],CANARegs.MDstatusbit[CANARegs.MDNumCountA],CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]);
                    if(++CANARegs.MDNumCountA>=7)
                    {
                        CANARegs.MDNumCountA=0;
@@ -660,7 +672,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] = ModRegs.MDCellMinVolt[CANARegs.MDNumCountB];
                    CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB] = ModRegs.MDCellAgvVolt[CANARegs.MDNumCountB];
                    CANARegs.PackID =0X609|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountB,CANARegs.MDCellMaxVolt[CANARegs.MDNumCountB],CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] ,CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB]);
+                   //CANATX(CANARegs.PackID,8,CANARegs.MDNumCountB,CANARegs.MDCellMaxVolt[CANARegs.MDNumCountB],CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] ,CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB]);
                    if(++CANARegs.MDNumCountB>=7)
                    {
                            CANARegs.MDNumCountB=0;
@@ -679,7 +691,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellMinTemps[CANARegs.MDNumCountB] = ModRegs.MDCellMinTemps[CANARegs.MDNumCountB];
                    CANARegs.MDCellAgvTemps[CANARegs.MDNumCountB] = ModRegs.MDCellAgvTemps[CANARegs.MDNumCountB];
                    CANARegs.PackID =0X60A|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountC,CANARegs.MDCellMaxTemps[CANARegs.MDNumCountC],CANARegs.MDCellMinTemps[CANARegs.MDNumCountC] ,CANARegs.MDCellAgvTemps[CANARegs.MDNumCountC]);
+               //    CANATX(CANARegs.PackID,8,CANARegs.MDNumCountC,CANARegs.MDCellMaxTemps[CANARegs.MDNumCountC],CANARegs.MDCellMinTemps[CANARegs.MDNumCountC] ,CANARegs.MDCellAgvTemps[CANARegs.MDNumCountC]);
                    if(++CANARegs.MDNumCountC>=7)
                    {
                       CANARegs.MDNumCountC=0;
@@ -699,7 +711,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellDivTemps[CANARegs.MDNumCountD]   =  ModRegs.MDCellDivTemps[CANARegs.MDNumCountD];
                    CANARegs.MDInResis[CANARegs.MDNumCountD]        =  ModRegs.MDInResis[CANARegs.MDNumCountD];
                    CANARegs.PackID =0X60B|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountD,CANARegs.MDCellDivVolt[CANARegs.MDNumCountD],CANARegs.MDCellDivTemps[CANARegs.MDNumCountD],CANARegs.MDInResis[CANARegs.MDNumCountD]);
+              //     CANATX(CANARegs.PackID,8,CANARegs.MDNumCountD,CANARegs.MDCellDivVolt[CANARegs.MDNumCountD],CANARegs.MDCellDivTemps[CANARegs.MDNumCountD],CANARegs.MDInResis[CANARegs.MDNumCountD]);
                    if(++CANARegs.MDNumCountD>=7)
                    {
                        CANARegs.MDNumCountD=0;
@@ -716,7 +728,7 @@ interrupt void cpu_timer0_isr(void)
                CANARegs.PackID      = 0X60C|SysRegs.PackID;
                CANARegs.PackAh      = (int)(SysRegs.PackAhF*10);
             //   CANARegs.PackISORegs =
-               CANATX(CANARegs.PackID,8,CANARegs.PackAh,CANARegs.PackISORegs,0x00,0x00);
+            //   CANATX(CANARegs.PackID,8,CANARegs.PackAh,CANARegs.PackISORegs,0x00,0x00);
 
        break;
        case 50:
@@ -777,8 +789,7 @@ interrupt void cpu_timer0_isr(void)
    }
    DigitalOutput(&SysRegs);
 
-   //
-
+   InitECan();
    // Acknowledge this interrupt to receive more interrupts from group 1
    if(SysRegs.MainIsr1>3000) {SysRegs.MainIsr1=0;}
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
@@ -793,11 +804,13 @@ interrupt void ISR_CANRXINTA(void)
         if(ECanaRegs.CANRMP.bit.RMP0==1)
         {
             ModRegs.MD1XRxcount[0]++;
+            if(ModRegs.MD1XRxcount[0]>200){ModRegs.MD1XRxcount[0]=0;}
             SysRegs.MD1CANRxCount=0;
             CANARegs.CanMBOX0Mask= (ECanaMboxes.MBOX0.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX0Mask==2)
             {
                 ModRegs.MD1XRxcount[1]++;
+                if(ModRegs.MD1XRxcount[1]>200){ModRegs.MD1XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[0]    = ECanaMboxes.MBOX0.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[0]    = ECanaMboxes.MBOX0.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[0]    = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE3,ECanaMboxes.MBOX0.MDL.byte.BYTE2);
@@ -807,6 +820,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX0Mask==3)
             {
                 ModRegs.MD1XRxcount[2]++;
+                if(ModRegs.MD1XRxcount[2]>200){ModRegs.MD1XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[0] = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE1,ECanaMboxes.MBOX0.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[0] = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE3,ECanaMboxes.MBOX0.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[0] = ComBine(ECanaMboxes.MBOX0.MDH.byte.BYTE5,ECanaMboxes.MBOX0.MDH.byte.BYTE4);
@@ -815,6 +829,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX0Mask==4)
             {
                 ModRegs.MD1XRxcount[3]++;
+                if(ModRegs.MD1XRxcount[3]>200){ModRegs.MD1XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[0] = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE1,ECanaMboxes.MBOX0.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[0] = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE3,ECanaMboxes.MBOX0.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[0] = ComBine(ECanaMboxes.MBOX0.MDH.byte.BYTE5,ECanaMboxes.MBOX0.MDH.byte.BYTE4);
@@ -823,6 +838,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX0Mask==5)
             {
                 ModRegs.MD1XRxcount[4]++;
+                if(ModRegs.MD1XRxcount[4]>200){ModRegs.MD1XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[0]      = ComBine(ECanaMboxes.MBOX0.MDL.byte.BYTE1,ECanaMboxes.MBOX0.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[0]      = ECanaMboxes.MBOX0.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[0]      = ECanaMboxes.MBOX0.MDL.byte.BYTE3;
@@ -837,11 +853,13 @@ interrupt void ISR_CANRXINTA(void)
         if(ECanaRegs.CANRMP.bit.RMP1==1) //0XR2~4 , R1~4)
         {
             ModRegs.MD2XRxcount[0]++;
+            if(ModRegs.MD2XRxcount[0]>200){ModRegs.MD2XRxcount[0]=0;}
             SysRegs.MD2CANRxCount=0;
             CANARegs.CanMBOX1Mask= (ECanaMboxes.MBOX1.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX1Mask==2)
             {
                 ModRegs.MD2XRxcount[1]++;
+                if(ModRegs.MD2XRxcount[1]>200){ModRegs.MD2XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[1]    = ECanaMboxes.MBOX1.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[1]    = ECanaMboxes.MBOX1.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[1]    = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE3,ECanaMboxes.MBOX1.MDL.byte.BYTE2);
@@ -851,6 +869,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX1Mask==3)
             {
                 ModRegs.MD2XRxcount[2]++;
+                if(ModRegs.MD2XRxcount[2]>200){ModRegs.MD2XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[1] = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE1,ECanaMboxes.MBOX1.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[1] = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE3,ECanaMboxes.MBOX1.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[1] = ComBine(ECanaMboxes.MBOX1.MDH.byte.BYTE5,ECanaMboxes.MBOX1.MDH.byte.BYTE4);
@@ -859,6 +878,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX1Mask==4)
             {
                 ModRegs.MD2XRxcount[3]++;
+                if(ModRegs.MD2XRxcount[3]>200){ModRegs.MD2XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[1] = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE1,ECanaMboxes.MBOX1.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[1] = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE3,ECanaMboxes.MBOX1.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[1] = ComBine(ECanaMboxes.MBOX1.MDH.byte.BYTE5,ECanaMboxes.MBOX1.MDH.byte.BYTE4);
@@ -867,6 +887,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX1Mask==5)
             {
                 ModRegs.MD2XRxcount[4]++;
+                if(ModRegs.MD2XRxcount[4]>200){ModRegs.MD2XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[1]      = ComBine(ECanaMboxes.MBOX1.MDL.byte.BYTE1,ECanaMboxes.MBOX1.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[1]      = ECanaMboxes.MBOX1.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[1]      = ECanaMboxes.MBOX1.MDL.byte.BYTE3;
@@ -881,10 +902,12 @@ interrupt void ISR_CANRXINTA(void)
         {
             ModRegs.MD3XRxcount[0]++;
             SysRegs.MD3CANRxCount=0;
+            if(ModRegs.MD3XRxcount[0]>200){ModRegs.MD3XRxcount[0]=0;}
             CANARegs.CanMBOX2Mask=(ECanaMboxes.MBOX2.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX2Mask==2)
             {
                 ModRegs.MD3XRxcount[1]++;
+                if(ModRegs.MD3XRxcount[1]>200){ModRegs.MD3XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[2]    = ECanaMboxes.MBOX2.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[2]    = ECanaMboxes.MBOX2.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[2]    = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE3,ECanaMboxes.MBOX2.MDL.byte.BYTE2);
@@ -894,6 +917,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX2Mask==3)
             {
                 ModRegs.MD3XRxcount[2]++;
+                if(ModRegs.MD3XRxcount[2]>200){ModRegs.MD3XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[2] = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE1,ECanaMboxes.MBOX2.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[2] = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE3,ECanaMboxes.MBOX2.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[2] = ComBine(ECanaMboxes.MBOX2.MDH.byte.BYTE5,ECanaMboxes.MBOX2.MDH.byte.BYTE4);
@@ -902,6 +926,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX2Mask==4)
             {
                 ModRegs.MD3XRxcount[3]++;
+                if(ModRegs.MD3XRxcount[3]>200){ModRegs.MD3XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[2] = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE1,ECanaMboxes.MBOX2.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[2] = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE3,ECanaMboxes.MBOX2.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[2] = ComBine(ECanaMboxes.MBOX2.MDH.byte.BYTE5,ECanaMboxes.MBOX2.MDH.byte.BYTE4);
@@ -910,6 +935,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX2Mask==5)
             {
                 ModRegs.MD3XRxcount[4]++;
+                if(ModRegs.MD3XRxcount[4]>200){ModRegs.MD3XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[2]      = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE1,ECanaMboxes.MBOX2.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[2]      = ECanaMboxes.MBOX2.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[2]      = ECanaMboxes.MBOX2.MDL.byte.BYTE3;
@@ -923,10 +949,12 @@ interrupt void ISR_CANRXINTA(void)
         {
             ModRegs.MD4XRxcount[0]++;
             SysRegs.MD4CANRxCount=0;
+            if(ModRegs.MD4XRxcount[0]>200){ModRegs.MD4XRxcount[0]=0;}
             CANARegs.CanMBOX3Mask=(ECanaMboxes.MBOX3.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX3Mask==2)
             {
                 ModRegs.MD4XRxcount[1]++;
+                if(ModRegs.MD4XRxcount[1]>200){ModRegs.MD4XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[3]    = ECanaMboxes.MBOX3.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[3]    = ECanaMboxes.MBOX3.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[3]    = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE3,ECanaMboxes.MBOX3.MDL.byte.BYTE2);
@@ -936,6 +964,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX3Mask==3)
             {
                 ModRegs.MD4XRxcount[2]++;
+                if(ModRegs.MD4XRxcount[2]>200){ModRegs.MD4XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[3] = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE1,ECanaMboxes.MBOX3.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[3] = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE3,ECanaMboxes.MBOX3.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[3] = ComBine(ECanaMboxes.MBOX3.MDH.byte.BYTE5,ECanaMboxes.MBOX3.MDH.byte.BYTE4);
@@ -944,6 +973,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX3Mask==4)
             {
                 ModRegs.MD4XRxcount[3]++;
+                if(ModRegs.MD4XRxcount[3]>200){ModRegs.MD4XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[3] = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE1,ECanaMboxes.MBOX3.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[3] = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE3,ECanaMboxes.MBOX3.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[3] = ComBine(ECanaMboxes.MBOX3.MDH.byte.BYTE5,ECanaMboxes.MBOX3.MDH.byte.BYTE4);
@@ -952,6 +982,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX3Mask==5)
             {
                 ModRegs.MD4XRxcount[4]++;
+                if(ModRegs.MD4XRxcount[4]>200){ModRegs.MD4XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[3]      = ComBine(ECanaMboxes.MBOX3.MDL.byte.BYTE1,ECanaMboxes.MBOX3.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[3]      = ECanaMboxes.MBOX3.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[3]      = ECanaMboxes.MBOX3.MDL.byte.BYTE3;
@@ -963,12 +994,14 @@ interrupt void ISR_CANRXINTA(void)
         }
         if(ECanaRegs.CANRMP.bit.RMP4==1)
         {
-            ModRegs.MD5XRxcount[0]++;
             SysRegs.MD5CANRxCount=0;
+            ModRegs.MD5XRxcount[0]++;
+            if(ModRegs.MD5XRxcount[0]>200){ModRegs.MD5XRxcount[0]=0;}
             CANARegs.CanMBOX4Mask=(ECanaMboxes.MBOX4.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX4Mask==2)
             {
                 ModRegs.MD5XRxcount[1]++;
+                if(ModRegs.MD5XRxcount[1]>200){ModRegs.MD5XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[4]    = ECanaMboxes.MBOX4.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[4]    = ECanaMboxes.MBOX4.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[4]    = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE3,ECanaMboxes.MBOX4.MDL.byte.BYTE2);
@@ -978,14 +1011,17 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX4Mask==3)
             {
                 ModRegs.MD5XRxcount[2]++;
+                if(ModRegs.MD5XRxcount[2]>200){ModRegs.MD5XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[4] = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE1,ECanaMboxes.MBOX4.MDL.byte.BYTE0);
-                ModRegs.MDCellMinVolt[4] = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE3,ECanaMboxes.MBOX4.MDL.byte.BYTE2);
+                ModRegs.MDCellMinVolt[4] = ModRegs.MDCellMinVolt[3];
+             //   ModRegs.MDCellMinVolt[4] = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE3,ECanaMboxes.MBOX4.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[4] = ComBine(ECanaMboxes.MBOX4.MDH.byte.BYTE5,ECanaMboxes.MBOX4.MDH.byte.BYTE4);
                 ModRegs.MDCellDivVolt[4] = ComBine(ECanaMboxes.MBOX4.MDH.byte.BYTE7,ECanaMboxes.MBOX4.MDH.byte.BYTE6);
             }
             else if(CANARegs.CanMBOX4Mask==4)
             {
                 ModRegs.MD5XRxcount[3]++;
+                if(ModRegs.MD5XRxcount[3]>200){ModRegs.MD5XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[4] = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE1,ECanaMboxes.MBOX4.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[4] = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE3,ECanaMboxes.MBOX4.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[4] = ComBine(ECanaMboxes.MBOX4.MDH.byte.BYTE5,ECanaMboxes.MBOX4.MDH.byte.BYTE4);
@@ -994,6 +1030,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX4Mask==5)
             {
                 ModRegs.MD5XRxcount[4]++;
+                if(ModRegs.MD5XRxcount[4]>200){ModRegs.MD5XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[4]      = ComBine(ECanaMboxes.MBOX4.MDL.byte.BYTE1,ECanaMboxes.MBOX4.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[4]      = ECanaMboxes.MBOX4.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[4]      = ECanaMboxes.MBOX4.MDL.byte.BYTE3;
@@ -1005,12 +1042,14 @@ interrupt void ISR_CANRXINTA(void)
         }
         if(ECanaRegs.CANRMP.bit.RMP5==1)
         {
-            ModRegs.MD6XRxcount[0]++;
             SysRegs.MD6CANRxCount=0;
+            ModRegs.MD6XRxcount[0]++;
+            if(ModRegs.MD6XRxcount[0]>200){ModRegs.MD6XRxcount[0]=0;}
             CANARegs.CanMBOX5Mask= (ECanaMboxes.MBOX5.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX5Mask==2)
             {
                 ModRegs.MD6XRxcount[1]++;
+                if(ModRegs.MD6XRxcount[1]>200){ModRegs.MD6XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[5]    = ECanaMboxes.MBOX5.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[5]    = ECanaMboxes.MBOX5.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[5]    = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE3,ECanaMboxes.MBOX5.MDL.byte.BYTE2);
@@ -1020,6 +1059,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX5Mask==3)
             {
                 ModRegs.MD6XRxcount[2]++;
+                if(ModRegs.MD6XRxcount[2]>200){ModRegs.MD6XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[5] = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE1,ECanaMboxes.MBOX5.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[5] = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE3,ECanaMboxes.MBOX5.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[5] = ComBine(ECanaMboxes.MBOX5.MDH.byte.BYTE5,ECanaMboxes.MBOX5.MDH.byte.BYTE4);
@@ -1028,6 +1068,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX5Mask==4)
             {
                 ModRegs.MD6XRxcount[3]++;
+                if(ModRegs.MD6XRxcount[3]>200){ModRegs.MD6XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[5] = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE1,ECanaMboxes.MBOX5.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[5] = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE3,ECanaMboxes.MBOX5.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[5] = ComBine(ECanaMboxes.MBOX5.MDH.byte.BYTE5,ECanaMboxes.MBOX5.MDH.byte.BYTE4);
@@ -1036,6 +1077,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX5Mask==5)
             {
                 ModRegs.MD6XRxcount[4]++;
+                if(ModRegs.MD6XRxcount[4]>200){ModRegs.MD6XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[5]      = ComBine(ECanaMboxes.MBOX5.MDL.byte.BYTE1,ECanaMboxes.MBOX5.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[5]      = ECanaMboxes.MBOX5.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[5]      = ECanaMboxes.MBOX5.MDL.byte.BYTE3;
@@ -1047,12 +1089,14 @@ interrupt void ISR_CANRXINTA(void)
         }
         if(ECanaRegs.CANRMP.bit.RMP6==1)
         {
-            ModRegs.MD7XRxcount[0]++;
             SysRegs.MD7CANRxCount=0;
+            ModRegs.MD7XRxcount[0]++;
+            if(ModRegs.MD7XRxcount[0]>200){ModRegs.MD7XRxcount[0]=0;}
             CANARegs.CanMBOX6Mask= (ECanaMboxes.MBOX6.MSGID.bit.STDMSGID & 0x000Fu);
             if(CANARegs.CanMBOX6Mask==2)
             {
                 ModRegs.MD7XRxcount[1]++;
+                if(ModRegs.MD7XRxcount[1]>200){ModRegs.MD7XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[6]    = ECanaMboxes.MBOX6.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[6]    = ECanaMboxes.MBOX6.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[6]    = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE3,ECanaMboxes.MBOX6.MDL.byte.BYTE2);
@@ -1062,6 +1106,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX6Mask==3)
             {
                 ModRegs.MD7XRxcount[2]++;
+                if(ModRegs.MD7XRxcount[2]>200){ModRegs.MD7XRxcount[2]=0;}
                 ModRegs.MDCellMaxVolt[6] = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE1,ECanaMboxes.MBOX6.MDL.byte.BYTE0);
                 ModRegs.MDCellMinVolt[6] = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE3,ECanaMboxes.MBOX6.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvVolt[6] = ComBine(ECanaMboxes.MBOX6.MDH.byte.BYTE5,ECanaMboxes.MBOX6.MDH.byte.BYTE4);
@@ -1070,6 +1115,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX6Mask==4)
             {
                 ModRegs.MD7XRxcount[3]++;
+                if(ModRegs.MD7XRxcount[3]>200){ModRegs.MD7XRxcount[3]=0;}
                 ModRegs.MDCellMaxTemps[6] = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE1,ECanaMboxes.MBOX6.MDL.byte.BYTE0);
                 ModRegs.MDCellMinTemps[6] = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE3,ECanaMboxes.MBOX6.MDL.byte.BYTE2);
                 ModRegs.MDCellAgvTemps[6] = ComBine(ECanaMboxes.MBOX6.MDH.byte.BYTE5,ECanaMboxes.MBOX6.MDH.byte.BYTE4);
@@ -1078,6 +1124,7 @@ interrupt void ISR_CANRXINTA(void)
             else if(CANARegs.CanMBOX6Mask==5)
             {
                 ModRegs.MD7XRxcount[4]++;
+                if(ModRegs.MD7XRxcount[4]>200){ModRegs.MD7XRxcount[4]=0;}
                 ModRegs.MDTotalVolt[6]      = ComBine(ECanaMboxes.MBOX6.MDL.byte.BYTE1,ECanaMboxes.MBOX6.MDL.byte.BYTE0);
                 ModRegs.MDMaxVoltPo[6]      = ECanaMboxes.MBOX6.MDL.byte.BYTE2;
                 ModRegs.MDMinVoltPo[6]      = ECanaMboxes.MBOX6.MDL.byte.BYTE3;
@@ -1111,10 +1158,10 @@ interrupt void ISR_CANRXINTA(void)
             ECanaRegs.CANRMP.bit.RMP30 = 1;
         }
     }
-    ECanaRegs.CANGIF0.all = 0xFFFFFFFF;
-    ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
-    //ECanaRegs.CANGIF0.all = ECanaRegs.CANGIF0.all;
-    //ECanaRegs.CANGIF1.all = ECanaRegs.CANGIF1.all;
+   // ECanaRegs.CANGIF0.all = 0xFFFFFFFF;
+   // ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
+    ECanaRegs.CANGIF0.all = ECanaRegs.CANGIF0.all;
+    ECanaRegs.CANGIF1.all = ECanaRegs.CANGIF1.all;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;
 
 }

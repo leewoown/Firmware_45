@@ -273,7 +273,7 @@ Parameter
 
 #define     PackSysVoltMax                     6972 //4.2*24
 #define     PackSysVoltMin                     504  //2.8*2.4
-#define     PackNum                            4
+#define     PackNum                            0
 
 #define     C_PackCellShutdownFault            2.8
 #define     C_PackBalacneLimtVoltage           3.0

@@ -48,9 +48,9 @@
 #define CAN_250KBPS             0
 #define DSP28_ECANA             1
 
-#define DSP28_ECANASET_HDA      0
-#define DSP28_ECANASET_SHIP     1
-#define CAN_PackNum             2
+#define     DSP28_ECANASET_HDA      0
+#define     DSP28_ECANASET_SHIP     1
+#define     CAN_PackNum             2
 //CAN LAM MASK BIT SETTING
 #define     _LAM(CANADDR)               (((~(CANADDR) & 0x07FF)<<2) & 0x1FFC)
 #define     _MASK(CANADDR)               (((CANADDR) & 0x07FF)<<2) & 0x1FFC
@@ -639,7 +639,6 @@ void InitECana(void)
 {
           struct ECAN_REGS ECanaShadow;
           EALLOW;     // EALLOW enables access to protected bits
-
        /* Configure eCAN RX and TX pins for CAN operation using eCAN regs*/
 
            ECanaShadow.CANTIOC.all = ECanaRegs.CANTIOC.all;
@@ -740,6 +739,148 @@ void InitECana(void)
            ECanaMboxes.MBOX30.MSGID.all    = 0;
            ECanaMboxes.MBOX31.MSGID.all    = 0;
 
+           if(SysRegs.PackID==0x0000)
+           {
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x110);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x120);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x130);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x140);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x150);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x160);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x170);
+               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x180;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x190;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x1A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x1B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x700;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+           }
+           if(SysRegs.PackID==0x0010)
+
+           {
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x210);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x220);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x230);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x240);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x250);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x260);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x270);
+
+              /* ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x280;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x290;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x2A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x2B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;*/
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x701;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+           }
+           if(SysRegs.PackID==0x020)
+           {
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x310);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x320);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x330);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x340);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x350);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x360);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x370);
+              /*ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x380;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x390;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x3A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x3B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;*/
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x532;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x702;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+           }
+           if(SysRegs.PackID==0x030)
+           {
+               ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x410);
+               ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x420);
+               ECanaMboxes.MBOX2.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x430);
+               ECanaMboxes.MBOX3.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x440);
+               ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x450);
+               ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x460);
+               ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x470);
+              /* ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x80;
+               ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x490;
+               ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x4A0;
+               ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x4B0;
+               ECanaMboxes.MBOX11.MSGID.bit.STDMSGID = 0x00A;
+               ECanaMboxes.MBOX12.MSGID.bit.STDMSGID = 0x00C;
+               ECanaMboxes.MBOX13.MSGID.bit.STDMSGID = 0x00D;
+               ECanaMboxes.MBOX14.MSGID.bit.STDMSGID = 0x00E;
+               ECanaMboxes.MBOX15.MSGID.bit.STDMSGID = 0x00F;
+               ECanaMboxes.MBOX16.MSGID.bit.STDMSGID = 0x011;
+               ECanaMboxes.MBOX17.MSGID.bit.STDMSGID = 0x012;
+               ECanaMboxes.MBOX18.MSGID.bit.STDMSGID = 0x013;
+               ECanaMboxes.MBOX19.MSGID.bit.STDMSGID = 0x014;
+               ECanaMboxes.MBOX20.MSGID.bit.STDMSGID = 0x015;
+               ECanaMboxes.MBOX21.MSGID.bit.STDMSGID = 0x016;
+               ECanaMboxes.MBOX22.MSGID.bit.STDMSGID = 0x017;
+               ECanaMboxes.MBOX23.MSGID.bit.STDMSGID = 0x018;
+               ECanaMboxes.MBOX24.MSGID.bit.STDMSGID = 0x019;
+               ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
+               ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
+               ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;*/
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x542;
+               ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x703;
+               ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
+           }
            #if (PackNum==1)
                ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x110);
                ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x120);
@@ -770,7 +911,7 @@ void InitECana(void)
                ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
                ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
                ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3c2;
                ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x700;
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
               #endif
@@ -804,7 +945,7 @@ void InitECana(void)
                ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
                ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
                ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;//0X522
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;//0X522
                ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x701;
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            #endif
@@ -850,7 +991,7 @@ void InitECana(void)
                ECanaMboxes.MBOX4.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x450);
                ECanaMboxes.MBOX5.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x460);
                ECanaMboxes.MBOX6.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x470);
-               ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x480;
+              /* ECanaMboxes.MBOX7.MSGID.bit.STDMSGID  = 0x80;
                ECanaMboxes.MBOX8.MSGID.bit.STDMSGID  = 0x490;
                ECanaMboxes.MBOX9.MSGID.bit.STDMSGID  = 0x4A0;
                ECanaMboxes.MBOX10.MSGID.bit.STDMSGID = 0x4B0;
@@ -871,7 +1012,7 @@ void InitECana(void)
                ECanaMboxes.MBOX25.MSGID.bit.STDMSGID = 0x01A;
                ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
                ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
-               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
+               ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;*/
                ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x542;
                ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x703;
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
@@ -981,18 +1122,22 @@ void InitECana(void)
            #endif
 
            #if(CAN_500KBPS)
-           /*
-           ECanaShadow.CANBTC.bit.BRPREG =  3;
-           ECanaShadow.CANBTC.bit.TSEG2REG = 4;
+           //CPU 클럭 80MHz
+           ECanaShadow.CANBTC.bit.BRPREG =   3;
            ECanaShadow.CANBTC.bit.TSEG1REG = 13;
-           ECanaShadow.CANBTC.bit.SAM = 1;  //ByCHOO : SAM : Thripple Sampling. BRP > 4 일 경우만 가능하다고 하는데.. 그러면 BRPREG가 3보다 커야 하는 것 아닌가?
+           ECanaShadow.CANBTC.bit.TSEG2REG = 4;
+           //ECanaShadow.CANBTC.bit.SJWREG   = 1;   // SJW=2 Tq
+           ECanaShadow.CANBTC.bit.SAM = 1;
            ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
-           */
+
+           /*
+           //CPU 클럭 60MHz
            ECanaShadow.CANBTC.bit.BRPREG =  5;
            ECanaShadow.CANBTC.bit.TSEG2REG = 1;
            ECanaShadow.CANBTC.bit.TSEG1REG = 6;
            ECanaShadow.CANBTC.bit.SAM = 1;  //ByCHOO : SAM : Thripple Sampling. BRP > 4 일 경우만 가능하다고 하는데.. 그러면 BRPREG가 3보다 커야 하는 것 아닌가?
            ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
+           */
            #endif
 
            #if(CAN_250KBPS)
