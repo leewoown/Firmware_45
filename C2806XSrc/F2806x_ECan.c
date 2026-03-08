@@ -1123,21 +1123,22 @@ void InitECana(void)
 
            #if(CAN_500KBPS)
            //CPU 클럭 80MHz
-           ECanaShadow.CANBTC.bit.BRPREG =   3;
+           /*           ECanaShadow.CANBTC.bit.BRPREG =   3;
            ECanaShadow.CANBTC.bit.TSEG1REG = 13;
            ECanaShadow.CANBTC.bit.TSEG2REG = 4;
-           //ECanaShadow.CANBTC.bit.SJWREG   = 1;   // SJW=2 Tq
            ECanaShadow.CANBTC.bit.SAM = 1;
            ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
+            */
 
-           /*
            //CPU 클럭 60MHz
            ECanaShadow.CANBTC.bit.BRPREG =  5;
            ECanaShadow.CANBTC.bit.TSEG2REG = 1;
            ECanaShadow.CANBTC.bit.TSEG1REG = 6;
-           ECanaShadow.CANBTC.bit.SAM = 1;  //ByCHOO : SAM : Thripple Sampling. BRP > 4 일 경우만 가능하다고 하는데.. 그러면 BRPREG가 3보다 커야 하는 것 아닌가?
+           ECanaShadow.CANBTC.bit.SJWREG   = 1;   // SJW=2Tq 권장
+           ECanaShadow.CANBTC.bit.SAM      = 0;   // 먼저 single-sample로 운용 권장
+      //     ECanaShadow.CANBTC.bit.SAM = 1;  //ByCHOO : SAM : Thripple Sampling. BRP > 4 일 경우만 가능하다고 하는데.. 그러면 BRPREG가 3보다 커야 하는 것 아닌가?
            ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
-           */
+
            #endif
 
            #if(CAN_250KBPS)

@@ -178,11 +178,11 @@ void main(void)
     InitGpio();
    // GpioCtrlRegs.GPAMUX2.bit.GPIO18 = 3; //enable XCLOCKOUT through GPIO mux
   //  SysCtrlRegs.XCLK.bit.XCLKOUTDIV = 2; //XCLOCKOUT = SYSCLK
-    InitSpiGpio();
-    InitSpiCAN();
+  //  InitSpiGpio();
+  ///  InitSpiCAN();
     // TEST
     InitECanGpio();
-  //  InitECan();
+    InitECan();
 
     MemCopy(&RamfuncsLoadStart, &RamfuncsLoadEnd, &RamfuncsRunStart);
     InitFlash();
@@ -372,7 +372,7 @@ interrupt void cpu_timer0_isr(void)
     * DigitalInput detection
     */
    DigitalInput(&SysRegs);
-   InitECan();
+   //InitECan();
    /*
     *
     */
@@ -469,7 +469,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.PackSOC =(unsigned int)(SysRegs.PackSOCF*10);
                    CANARegs.PackSOH =(unsigned int)(SysRegs.PackSOHF*10);
                    CANARegs.PackID =0X601|SysRegs.PackID;
-                  // CANATX(CANARegs.PackID ,8,CANARegs.PackPT,CANARegs.PackCT,CANARegs.PackSOC,CANARegs.PackSOH);
+                   CANATX(CANARegs.PackID ,8,CANARegs.PackPT,CANARegs.PackCT,CANARegs.PackSOC,CANARegs.PackSOH);
                }
        break;
        case 2:
@@ -481,7 +481,8 @@ interrupt void cpu_timer0_isr(void)
                BatCalcVoltHandle(&BatCalcRegs);
                SysRegs.PackVoltageF= BatCalcRegs.PackPTCANF;
                SysRegs.PackCellMaxVoltageF= BatCalcRegs.PackCellMaxVoltF;
-               SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMinVoltF;
+               // 반드시 수정 필요함
+               SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMaxVoltF-0.005;
                SysRegs.PackCellAgvVoltageF= BatCalcRegs.PackCellAgvVoltF;
                SysRegs.PackCellDivVoltageF= BatCalcRegs.PackCellDivVoltF;
                SysRegs.PackCellMaxVoltPos = BatCalcRegs.PackCellMaxVoltPos;
@@ -514,9 +515,8 @@ interrupt void cpu_timer0_isr(void)
                      CANARegs.PackStatus.bit.PackMSD_AUX      = SysRegs.PackStateReg.bit.MSDERR;
                     // CANARegs.PackStatus.bit.PackEMG_SW       = SysRegs.PackStateReg.bit.EMGSWERR;
                     // CANARegs.PackStatus.bit.PackWaterleak    = SysRegs.PackStateReg.bit.WaterLeakERR;
-
                      CANARegs.PackID =0X602|SysRegs.PackID;
-                   //  CANATX(CANARegs.PackID ,8,CANARegs.PackSateInfo,CANARegs.PackStatus.all,SysRegs.PackStateReg.Word.DataL,SysRegs.PackStateReg.Word.DataH);
+                     CANATX(CANARegs.PackID ,8,CANARegs.PackSateInfo,CANARegs.PackStatus.all,SysRegs.PackStateReg.Word.DataL,SysRegs.PackStateReg.Word.DataH);
                }
        break;
        default :
@@ -622,7 +622,7 @@ interrupt void cpu_timer0_isr(void)
                     CANARegs.PackTemperatureMaxNUM      = SysRegs.PackCellMaxTmepsPos;
                     CANARegs.PackTemperatureMinNUM      = SysRegs.PackCellMinTmepsPos;
                     CANARegs.PackID =0X607|SysRegs.PackID;
-                    //CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxNum,CANARegs.PackVoltageMinNum,CANARegs.PackTemperatureMaxNUM ,CANARegs.PackTemperatureMinNUM );
+                    CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxNum,CANARegs.PackVoltageMinNum,CANARegs.PackTemperatureMaxNUM ,CANARegs.PackTemperatureMinNUM );
                 }
        break;
        case 23:
@@ -652,7 +652,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDstatusbit[CANARegs.MDNumCountA]        = ModRegs.MDstatusbit[CANARegs.MDNumCountA];
                    CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]    = ModRegs.PackMinVolteRec[CANARegs.MDNumCountA];
                    CANARegs.PackID =0X608|SysRegs.PackID;
-                  // CANATX(CANARegs.PackID,8,CANARegs.MDNumCountA,CANARegs.MDTotalVolt[CANARegs.MDNumCountA],CANARegs.MDstatusbit[CANARegs.MDNumCountA],CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]);
+                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountA,CANARegs.MDTotalVolt[CANARegs.MDNumCountA],CANARegs.MDstatusbit[CANARegs.MDNumCountA],CANARegs.PackMinVolteRec[CANARegs.MDNumCountA]);
                    if(++CANARegs.MDNumCountA>=7)
                    {
                        CANARegs.MDNumCountA=0;
@@ -672,7 +672,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] = ModRegs.MDCellMinVolt[CANARegs.MDNumCountB];
                    CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB] = ModRegs.MDCellAgvVolt[CANARegs.MDNumCountB];
                    CANARegs.PackID =0X609|SysRegs.PackID;
-                   //CANATX(CANARegs.PackID,8,CANARegs.MDNumCountB,CANARegs.MDCellMaxVolt[CANARegs.MDNumCountB],CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] ,CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB]);
+                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountB,CANARegs.MDCellMaxVolt[CANARegs.MDNumCountB],CANARegs.MDCellMinVolt[CANARegs.MDNumCountB] ,CANARegs.MDCellAgvVolt[CANARegs.MDNumCountB]);
                    if(++CANARegs.MDNumCountB>=7)
                    {
                            CANARegs.MDNumCountB=0;
@@ -691,7 +691,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellMinTemps[CANARegs.MDNumCountB] = ModRegs.MDCellMinTemps[CANARegs.MDNumCountB];
                    CANARegs.MDCellAgvTemps[CANARegs.MDNumCountB] = ModRegs.MDCellAgvTemps[CANARegs.MDNumCountB];
                    CANARegs.PackID =0X60A|SysRegs.PackID;
-               //    CANATX(CANARegs.PackID,8,CANARegs.MDNumCountC,CANARegs.MDCellMaxTemps[CANARegs.MDNumCountC],CANARegs.MDCellMinTemps[CANARegs.MDNumCountC] ,CANARegs.MDCellAgvTemps[CANARegs.MDNumCountC]);
+                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountC,CANARegs.MDCellMaxTemps[CANARegs.MDNumCountC],CANARegs.MDCellMinTemps[CANARegs.MDNumCountC] ,CANARegs.MDCellAgvTemps[CANARegs.MDNumCountC]);
                    if(++CANARegs.MDNumCountC>=7)
                    {
                       CANARegs.MDNumCountC=0;
@@ -711,7 +711,7 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDCellDivTemps[CANARegs.MDNumCountD]   =  ModRegs.MDCellDivTemps[CANARegs.MDNumCountD];
                    CANARegs.MDInResis[CANARegs.MDNumCountD]        =  ModRegs.MDInResis[CANARegs.MDNumCountD];
                    CANARegs.PackID =0X60B|SysRegs.PackID;
-              //     CANATX(CANARegs.PackID,8,CANARegs.MDNumCountD,CANARegs.MDCellDivVolt[CANARegs.MDNumCountD],CANARegs.MDCellDivTemps[CANARegs.MDNumCountD],CANARegs.MDInResis[CANARegs.MDNumCountD]);
+                   CANATX(CANARegs.PackID,8,CANARegs.MDNumCountD,CANARegs.MDCellDivVolt[CANARegs.MDNumCountD],CANARegs.MDCellDivTemps[CANARegs.MDNumCountD],CANARegs.MDInResis[CANARegs.MDNumCountD]);
                    if(++CANARegs.MDNumCountD>=7)
                    {
                        CANARegs.MDNumCountD=0;
@@ -775,7 +775,6 @@ interrupt void cpu_timer0_isr(void)
    switch(SysRegs.SysRegTimer1000msecCount)
    {
        case 1:
-
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                    CANARegs.SwVerProducttype      = ComBine(Product_Version,Product_Type);
@@ -788,9 +787,7 @@ interrupt void cpu_timer0_isr(void)
        break;
    }
    DigitalOutput(&SysRegs);
-
-   InitECan();
-   // Acknowledge this interrupt to receive more interrupts from group 1
+   //InitECan();
    if(SysRegs.MainIsr1>3000) {SysRegs.MainIsr1=0;}
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
@@ -850,7 +847,7 @@ interrupt void ISR_CANRXINTA(void)
             ECanaRegs.CANRMP.bit.RMP0 = 1;
 
         }
-        if(ECanaRegs.CANRMP.bit.RMP1==1) //0XR2~4 , R1~4)
+        if(ECanaRegs.CANRMP.bit.RMP1==1)
         {
             ModRegs.MD2XRxcount[0]++;
             if(ModRegs.MD2XRxcount[0]>200){ModRegs.MD2XRxcount[0]=0;}
@@ -898,7 +895,7 @@ interrupt void ISR_CANRXINTA(void)
             }
             ECanaRegs.CANRMP.bit.RMP1 = 1;
         }
-        if(ECanaRegs.CANRMP.bit.RMP2==1) //0XR31~4 , R1~4)
+        if(ECanaRegs.CANRMP.bit.RMP2==1) // 모듈 2
         {
             ModRegs.MD3XRxcount[0]++;
             SysRegs.MD3CANRxCount=0;
@@ -1158,8 +1155,7 @@ interrupt void ISR_CANRXINTA(void)
             ECanaRegs.CANRMP.bit.RMP30 = 1;
         }
     }
-   // ECanaRegs.CANGIF0.all = 0xFFFFFFFF;
-   // ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
+
     ECanaRegs.CANGIF0.all = ECanaRegs.CANGIF0.all;
     ECanaRegs.CANGIF1.all = ECanaRegs.CANGIF1.all;
     PieCtrlRegs.PIEACK.all = PIEACK_GROUP9;

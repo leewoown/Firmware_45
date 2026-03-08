@@ -40,49 +40,7 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     Data2High = 0x00ff&(Data2>>8);
     Data3Low  = 0x00ff&Data3;
     Data3High = 0x00ff&(Data3>>8);
-/*
-    EALLOW;
-    ECanaShadow.CANME.bit.ME31=0;
-    ECanaRegs.CANME.bit.ME31= ECanaShadow.CANME.bit.ME31;
 
-    ECanaMboxes.MBOX31.MSGID.bit.STDMSGID=ID;
-
-    ECanaShadow.CANME.bit.ME31=1;
-    ECanaRegs.CANME.bit.ME31= ECanaShadow.CANME.bit.ME31;
-    EDIS;
-
-    ECanaMboxes.MBOX31.MSGCTRL.bit.DLC=Length;
-
-    ECanaMboxes.MBOX31.MDL.byte.BYTE0=Data0Low;
-    ECanaMboxes.MBOX31.MDL.byte.BYTE1=Data0High;
-    ECanaMboxes.MBOX31.MDL.byte.BYTE2=Data1Low;
-    ECanaMboxes.MBOX31.MDL.byte.BYTE3=Data1High;
-    ECanaMboxes.MBOX31.MDH.byte.BYTE4=Data2Low;
-    ECanaMboxes.MBOX31.MDH.byte.BYTE5=Data2High;
-    ECanaMboxes.MBOX31.MDH.byte.BYTE6=Data3Low;
-    ECanaMboxes.MBOX31.MDH.byte.BYTE7=Data3High;
-
-    //CAN Tx Request
-    ECanaShadow.CANTRS.all=0;
-    ECanaShadow.CANTRS.bit.TRS31= 1;
-    ECanaRegs.CANTRS.all = ECanaShadow.CANTRS.all;
-    do
-    {
-       ECanaShadow.CANTA.all = ECanaRegs.CANTA.all;
-     //  CANWatchDog++;
-     //  if(CANWatchDog>20)
-     //  {
-     //      ECanaShadow.CANTA.bit.TA31=0;
-     //  }
-    }
-    while(!ECanaShadow.CANTA.bit.TA31);
-
-    //Tx Flag Clear
-
-    ECanaShadow.CANTA.all = 0;
-    ECanaShadow.CANTA.bit.TA31=1;                   // Clear TA5
-    ECanaRegs.CANTA.all = ECanaShadow.CANTA.all;
-*/
     EALLOW;
     ECanaShadow.CANME.all = ECanaRegs.CANME.all;
     ECanaShadow.CANME.bit.ME31=0;
@@ -95,6 +53,13 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     ECanaMboxes.MBOX31.MSGCTRL.bit.RTR = 0U;
     ECanaMboxes.MBOX31.MSGCTRL.bit.DLC=Length;
 
+
+
+    ECanaShadow.CANME.all = ECanaRegs.CANME.all;
+    ECanaShadow.CANME.bit.ME31 = 1U;
+    ECanaRegs.CANME.all = ECanaShadow.CANME.all;
+    EDIS;
+
     ECanaMboxes.MBOX31.MDL.byte.BYTE0=Data0Low;
     ECanaMboxes.MBOX31.MDL.byte.BYTE1=Data0High;
     ECanaMboxes.MBOX31.MDL.byte.BYTE2=Data1Low;
@@ -104,10 +69,7 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     ECanaMboxes.MBOX31.MDH.byte.BYTE6=Data3Low;
     ECanaMboxes.MBOX31.MDH.byte.BYTE7=Data3High;
 
-    ECanaShadow.CANME.all = ECanaRegs.CANME.all;
-    ECanaShadow.CANME.bit.ME31 = 1U;
-    ECanaRegs.CANME.all = ECanaShadow.CANME.all;
-    EDIS;
+
     ECanaRegs.CANTRS.bit.TRS31 = 1U;
 
     while (ECanaRegs.CANTA.bit.TA31 == 0U)
