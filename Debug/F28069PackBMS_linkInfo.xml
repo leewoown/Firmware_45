@@ -2,7 +2,11 @@
 <link_info>
    <banner>TMS320C2000 Linker PC v22.6.1.LTS</banner>
    <copyright>Copyright (c) 1996-2018 Texas Instruments Incorporated</copyright>
+<<<<<<< HEAD
    <link_time>0x69ad03de</link_time>
+=======
+   <link_time>0x692c0e47</link_time>
+>>>>>>> 357c297530e0eadf83f98f8e05da4dc6a01225c2
    <link_errors>0x0</link_errors>
    <output_file>F28069PackBMSRack1.out</output_file>
    <entry_point>
