@@ -35,7 +35,7 @@ void NVRAMSPIInit(void)
     SpiaRegs.SPICTL.bit.OVERRUNINTENA   = 0;    // Disable OverRun int
 
     //SpiaRegs.SPIBRR                   = 50;        //150 / 5 - 1; // Baud rate = LSPCLK/(SPIBRR+1), ~500k (for 6804 testing)
-    SpiaRegs.SPIBRR                     = 10;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) ¾à 15/(3+1) = 3.75 MHz
+    SpiaRegs.SPIBRR                     = 10;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) ì•½ 15/(3+1) = 3.75 MHz
                                                     // when SPIBRR 3 to 127
     SpiaRegs.SPICCR.bit.SPISWRESET      = 1;    // SPI SW Reset release
 }
@@ -43,10 +43,10 @@ void NVRAMSPIInit(void)
 void NvramSpiWrite(NvramReg *p)
 {
     /*
-     * »ç¿ë¿¹
+     * ì‚¬ìš©ì˜ˆ
      * NvramRegs.WDCMD   = NVR_READ_CMD;
-     * NvramRegs.WDAdder = 0x10u;           // Write ½ÃÀÛ ÁÖ¼Ò
-     * NvramRegs.WDPtr   = WriteBuf;        // ¾²±â ¹öÆÛ ½ÃÀÛ ÁÖ¼Ò
+     * NvramRegs.WDAdder = 0x10u;           // Write ì‹œì‘ ì£¼ì†Œ
+     * NvramRegs.WDPtr   = WriteBuf;        // ì“°ê¸° ë²„í¼ ì‹œì‘ ì£¼ì†Œ
      * NvramRegs.WDLen   = sizeof(WriteBuf);
      */
 
@@ -64,7 +64,7 @@ void NvramSpiWrite(NvramReg *p)
     // Set configuration
     // SpiaRegs.SPICCR.bit.CLKPOLARITY = 1;        // Rising edge output
     // SpiaRegs.SPIBRR                 = 10;       // Baud rate
-    pArray   = p->WDPtr;                           // AÀÇ ½ÃÀÛ ÁÖ¼Ò
+    pArray   = p->WDPtr;                           // Aì˜ ì‹œì‘ ì£¼ì†Œ
     DataLen  = p->WDLen;
     NvramCS;
     delay_us(5);
@@ -87,10 +87,10 @@ void NvramSpiWrite(NvramReg *p)
 void NvramSpiRead(NvramReg *p)
 {
     /*
-     * »ç¿ë¿¹
+     * ì‚¬ìš©ì˜ˆ
      * NvramRegs.RDCMD   = NVR_READ_CMD;
-     * NvramRegs.RDAdder = 0x10u;           // Read ½ÃÀÛ ÁÖ¼Ò
-     * NvramRegs.RDPtr   = ReadBuf;         // ÀĞ±â ¹öÆÛ¼Ò
+     * NvramRegs.RDAdder = 0x10u;           // Read ì‹œì‘ ì£¼ì†Œ
+     * NvramRegs.RDPtr   = ReadBuf;         // ì½ê¸° ë²„í¼ì†Œ
      * NvramRegs.RDLen   = sizeof(ReadBuf);
      */
     Uint16 i = 0;

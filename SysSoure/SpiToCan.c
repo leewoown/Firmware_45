@@ -34,57 +34,57 @@ extern void MCP2515InitHandle(CANBReg *p);
 
 void CANSPIWriteBytesHandle(Uint16 cmd, Uint16 addr, char TxBuf[], Uint16 len)
 {
-    // 1. MCP2515 ¼±ÅÃ (CS LOW)
+    // 1. MCP2515 ì„ íƒ (CS LOW)
     Uint16 i =0;
     //MCP2515CSEnable;
 
-    // 2. ¸í·É¾î Àü¼Û (¿¹: 0x02 = WRITE, 0x40 = LOAD TX BUFFER µî)
+    // 2. ëª…ë ¹ì–´ ì „ì†¡ (ì˜ˆ: 0x02 = WRITE, 0x40 = LOAD TX BUFFER ë“±)
     SPI_Write(cmd);
 
-    // 3. ÁÖ¼Ò Àü¼Û (·¹Áö½ºÅÍ ÁÖ¼Ò ¶Ç´Â ¹öÆÛ À§Ä¡)
+    // 3. ì£¼ì†Œ ì „ì†¡ (ë ˆì§€ìŠ¤í„° ì£¼ì†Œ ë˜ëŠ” ë²„í¼ ìœ„ì¹˜)
     SPI_Write(addr);
 
-    // 4. µ¥ÀÌÅÍ Àü¼Û (len ¸¸Å­ ¹İº¹)
+    // 4. ë°ì´í„° ì „ì†¡ (len ë§Œí¼ ë°˜ë³µ)
     for (i = 0; i < len; i++)
     {
         SPI_Write(TxBuf[i]);
     }
 
-    // 5. MCP2515 ¼±ÅÃ ÇØÁ¦ (CS HIGH)
+    // 5. MCP2515 ì„ íƒ í•´ì œ (CS HIGH)
     //MCP2515CSDisble;
 }
 void CANSPIReadBytesHandle(Uint16 cmd, Uint16 addr, char rxBuf[], Uint16 len)
 {
     Uint16 i=0;
-    // 1. READ ¸í·É Àü¼Û
-    SPI_Write(cmd);     // º¸Åë MCP_READ = 0x03
+    // 1. READ ëª…ë ¹ ì „ì†¡
+    SPI_Write(cmd);     // ë³´í†µ MCP_READ = 0x03
 
-    // 2. ½ÃÀÛ ÁÖ¼Ò Àü¼Û
+    // 2. ì‹œì‘ ì£¼ì†Œ ì „ì†¡
     SPI_Write(addr);
 
-    // 3. ¿øÇÏ´Â ±æÀÌ¸¸Å­ ¿¬¼Ó ÀĞ±â (auto-increment Áö¿øµÊ)
+    // 3. ì›í•˜ëŠ” ê¸¸ì´ë§Œí¼ ì—°ì† ì½ê¸° (auto-increment ì§€ì›ë¨)
     for (i = 0; i < len; i++)
     {
-        rxBuf[i] = SPI_Read();  // SPI_Read()´Â 8ºñÆ® ¼ö½Å ÇÔ¼ö
+        rxBuf[i] = SPI_Read();  // SPI_Read()ëŠ” 8ë¹„íŠ¸ ìˆ˜ì‹  í•¨ìˆ˜
     }
 
 }
 void TestCANSPIWriteBytesHandle(void)
 {
-    char configData[3] = {0x03, 0x90, 0x02};  // CNF1, CNF2, CNF3 ¼³Á¤°ª
+    char configData[3] = {0x03, 0x90, 0x02};  // CNF1, CNF2, CNF3 ì„¤ì •ê°’
     CANSPIWriteBytesHandle(0x02,0x2A,configData,3);
 }
 
 void MCP2515ResetHandle(void)
 {
-    // 1. CS È°¼ºÈ­
+    // 1. CS í™œì„±í™”
     MCP2515CSEnable;
-    // 2. RESET ¸í·É¾î Àü¼Û
+    // 2. RESET ëª…ë ¹ì–´ ì „ì†¡
     SPI_Write(MCP_RESET);  // 0xC0
-    // 3. CS ºñÈ°¼ºÈ­
+    // 3. CS ë¹„í™œì„±í™”
     MCP2515CSDisble;
-    // 4. MCP2515°¡ ³»ºÎÀûÀ¸·Î ÃÊ±âÈ­ ¿Ï·áÇÒ ¶§±îÁö ´ë±â
-    delay_us(10000);  // 10ms ´ë±â
+    // 4. MCP2515ê°€ ë‚´ë¶€ì ìœ¼ë¡œ ì´ˆê¸°í™” ì™„ë£Œí•  ë•Œê¹Œì§€ ëŒ€ê¸°
+    delay_us(10000);  // 10ms ëŒ€ê¸°
 }
 
 void MCP2515setConfgModeHanlde(void)
@@ -94,7 +94,7 @@ void MCP2515setConfgModeHanlde(void)
     MCP2515CSEnable;
     CANSPIWriteBytesHandle(MCP_WRITE,MCP_CANCTRL,&mode,1);
     MCP2515CSDisble;
-    delay_us(1000);  // ¼³Á¤ ÈÄ ¾ÈÁ¤È­¸¦ À§ÇÑ 1ms ´ë±â
+    delay_us(1000);  // ì„¤ì • í›„ ì•ˆì •í™”ë¥¼ ìœ„í•œ 1ms ëŒ€ê¸°
 }
 void MCP2515SetNormalModeHandle(void)
 {
@@ -104,7 +104,7 @@ void MCP2515SetNormalModeHandle(void)
     configData[1]= MCP_CANCTRL;
     configData[2]= MODE_NORMAL;
     CANSPIWriteBytesHandle(MCP_WRITE,MCP_CANCTRL,configData,1);
-    delay_us(1000);  // ¸ğµå ÀüÈ¯ ¾ÈÁ¤È­ ´ë±â
+    delay_us(1000);  // ëª¨ë“œ ì „í™˜ ì•ˆì •í™” ëŒ€ê¸°
     MCP2515CSDisble;
 }
 void MCP2515SetCNFHandle(char cnf1, char cnf2, char cnf3)
@@ -127,22 +127,22 @@ void MCP2515SetCNFHandle(char cnf1, char cnf2, char cnf3)
     configData[1] = cnf2;  // CNF2 (0x29)
     configData[2] = cnf3;  // CNF3 (0x28)
     MCP2515CSEnable;
-    // MCP_WRITE ¸í·É(0x02), ½ÃÀÛ ÁÖ¼Ò = CNF1 (0x2A), µ¥ÀÌÅÍ ±æÀÌ = 3
+    // MCP_WRITE ëª…ë ¹(0x02), ì‹œì‘ ì£¼ì†Œ = CNF1 (0x2A), ë°ì´í„° ê¸¸ì´ = 3
     CANSPIWriteBytesHandle(MCP_WRITE, MCP_CNF1, configData,3);
 
     MCP2515CSDisble;
-    delay_us(1000);  // ¼³Á¤ ÈÄ ¾ÈÁ¤È­¸¦ À§ÇÑ 1ms ´ë±â
+    delay_us(1000);  // ì„¤ì • í›„ ì•ˆì •í™”ë¥¼ ìœ„í•œ 1ms ëŒ€ê¸°
 }
 void MCP2515InitHandle(CANBReg *p)
 {
    // char readBack[1] = {0};
     p->DedugRegs.all=0x0000;
 
-    MCP2515ResetHandle();  // ³»ºÎ¿¡ DELAY_US(10000) Æ÷ÇÔµÇ¾î¾ß ÇÔ
+    MCP2515ResetHandle();  // ë‚´ë¶€ì— DELAY_US(10000) í¬í•¨ë˜ì–´ì•¼ í•¨
     MCP2515setConfgModeHanlde(); //
 
 
-    MCP2515SetCNFHandle(MCP_20MHz_500kBPS_CFG1,MCP_20MHz_500kBPS_CFG2,MCP_20MHz_500kBPS_CFG3); //³»ºÎ Delay Us(1000)
+    MCP2515SetCNFHandle(MCP_20MHz_500kBPS_CFG1,MCP_20MHz_500kBPS_CFG2,MCP_20MHz_500kBPS_CFG3); //ë‚´ë¶€ Delay Us(1000)
 
     MCP2515CSEnable;
     SPI_Write(0x03);  // 0x03
@@ -165,7 +165,7 @@ void MCP2515InitHandle(CANBReg *p)
     MCP2515CSEnable;
     MCP2515SetNormalModeHandle();
     MCP2515CSDisble;
-    delay_us(1000);  // ¾ÈÁ¤È­ ´ë±â
+    delay_us(1000);  // ì•ˆì •í™” ëŒ€ê¸°
 */
   //  return 1;
 }

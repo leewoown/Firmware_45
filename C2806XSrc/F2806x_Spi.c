@@ -73,7 +73,7 @@ void InitSpiBATIC(void)
     SpiaRegs.SPICTL.bit.OVERRUNINTENA   = 0;    // Disable OverRun int
 
     //SpiaRegs.SPIBRR                   = 50;        //150 / 5 - 1; // Baud rate = LSPCLK/(SPIBRR+1), ~500k (for 6804 testing)
-    SpiaRegs.SPIBRR                     = 60;      //=170; // Baud rate = LSPCLK/(SPIBRR+1) æ‡ 15/(3+1) = 3.75 MHz
+    SpiaRegs.SPIBRR                     = 60;      //=170; // Baud rate = LSPCLK/(SPIBRR+1) ÏïΩ 15/(3+1) = 3.75 MHz
                                                     // when SPIBRR 3 to 127
     SpiaRegs.SPICCR.bit.SPISWRESET      = 1;    // SPI SW Reset release
 }
@@ -94,7 +94,7 @@ void InitSpiCAN(void)
     SpiaRegs.SPICTL.bit.OVERRUNINTENA   = 0;    // Disable OverRun int
 
     //SpiaRegs.SPIBRR                   = 50;        //150 / 5 - 1; // Baud rate = LSPCLK/(SPIBRR+1), ~500k (for 6804 testing)
-    SpiaRegs.SPIBRR                     = 14;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) æ‡ 15/(3+1) = 3.75 MHz
+    SpiaRegs.SPIBRR                     = 14;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) ÏïΩ 15/(3+1) = 3.75 MHz
                                                     // when SPIBRR 3 to 127
     SpiaRegs.SPICCR.bit.SPISWRESET      = 1;    // SPI SW Reset release
 }
@@ -130,25 +130,25 @@ float MeasureSPISpeedHandle(Uint16 testLen)
     Uint32 startCount, endCount;
     float elapsedTime_us, spiFreq_MHz;
 
-    // 1. ≈∏¿Ã∏” Ω√¿€ ¡ˆ¡° ±‚∑œ (CPUTimer0 ªÁøÎ)
+    // 1. ÌÉÄÏù¥Î®∏ ÏãúÏûë ÏßÄÏ†ê Í∏∞Î°ù (CPUTimer0 ÏÇ¨Ïö©)
     startCount = CpuTimer0Regs.TIM.all;
 
-    // 2. SPI ¿¸º€ ∑Á«¡
+    // 2. SPI Ï†ÑÏÜ° Î£®ÌîÑ
     for (i = 0; i < testLen; i++)
     {
-        SPI_Write(dummy);  // 8∫Ò∆Æ º€Ω≈
+        SPI_Write(dummy);  // 8ÎπÑÌä∏ ÏÜ°Ïã†
     }
 
-    // 3. ≈∏¿Ã∏” ¡æ∑· ¡ˆ¡°
+    // 3. ÌÉÄÏù¥Î®∏ Ï¢ÖÎ£å ÏßÄÏ†ê
     endCount = CpuTimer0Regs.TIM.all;
 
-    // 4. Ω√∞£ ∞ËªÍ (≈∏¿Ã∏”¥¬ ¥ŸøÓƒ´øÓ∆Æ πÊΩƒ)
-    elapsedTime_us = (startCount - endCount) / 60.0f;  // CPUCLK = 60MHz ±‚¡ÿ
+    // 4. ÏãúÍ∞Ñ Í≥ÑÏÇ∞ (ÌÉÄÏù¥Î®∏Îäî Îã§Ïö¥Ïπ¥Ïö¥Ìä∏ Î∞©Ïãù)
+    elapsedTime_us = (startCount - endCount) / 60.0f;  // CPUCLK = 60MHz Í∏∞Ï§Ä
 
-    // 5. º”µµ ∞ËªÍ (testLen * 8bit) / Ω√∞£
+    // 5. ÏÜçÎèÑ Í≥ÑÏÇ∞ (testLen * 8bit) / ÏãúÍ∞Ñ
     spiFreq_MHz = ((float)(testLen * 8)) / elapsedTime_us;
 
-    return spiFreq_MHz;  // ¥‹¿ß: Mbps
+    return spiFreq_MHz;  // Îã®ÏúÑ: Mbps
 }
 #if DSP28_SPIA
 //
@@ -226,7 +226,7 @@ void SPI_Write(unsigned int WRData)
     Dummy = (WRData<<8)&0xFF00;
     while(SpiaRegs.SPISTS.bit.BUFFULL_FLAG);
     SpiaRegs.SPITXBUF = Dummy;              // Send
-    while(SpiaRegs.SPISTS.bit.INT_FLAG!=1); // Wait for Tx   ¿¸º€¿Ã ≥°≥µ∞≈≥™ ºˆΩ≈¿Ã Ω√¿€µ«∏È 1¿Ãµ .
+    while(SpiaRegs.SPISTS.bit.INT_FLAG!=1); // Wait for Tx   Ï†ÑÏÜ°Ïù¥ ÎÅùÎÇ¨Í±∞ÎÇò ÏàòÏã†Ïù¥ ÏãúÏûëÎêòÎ©¥ 1Ïù¥Îê®.
     Tmp=SpiaRegs.SPIRXBUF;
     Tmp=Tmp;
 }
@@ -239,7 +239,7 @@ unsigned int SPI_Read(void)
     //mmy = 0xAA;
     while(SpiaRegs.SPISTS.bit.BUFFULL_FLAG);
     SpiaRegs.SPITXBUF =Dummy;              // Send
-    while(SpiaRegs.SPISTS.bit.INT_FLAG!=1); // Wait for Tx¿¸º€¿Ã ≥°≥µ∞≈≥™ ºˆΩ≈¿Ã Ω√¿€µ«∏È 1¿Ãµ .
+    while(SpiaRegs.SPISTS.bit.INT_FLAG!=1); // Wait for TxÏ†ÑÏÜ°Ïù¥ ÎÅùÎÇ¨Í±∞ÎÇò ÏàòÏã†Ïù¥ ÏãúÏûëÎêòÎ©¥ 1Ïù¥Îê®.
     //delay_us(30);
     ReadData = SpiaRegs.SPIRXBUF& 0xff;
     return (ReadData);

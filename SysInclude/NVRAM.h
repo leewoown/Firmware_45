@@ -2,9 +2,8 @@
  * NVRAM.h
  *
  *  Created on: 2025. 11. 9.
- *      Author: leewo
+ *  Author: leewoowon
  */
-
 
 #ifndef SYSINCLUDE_NVRAM_H_
 #define SYSINCLUDE_NVRAM_H_
@@ -22,8 +21,6 @@
 #define NVR_WRITE_CMD       0x01
 #define NVR_SLEEP_CMD       0x13
 #define NVR_WAKE_CMD        0x12
-
-
 #define NvramCS   GpioDataRegs.GPACLEAR.bit.GPIO11 = 1
 #define NvramDS   GpioDataRegs.GPASET.bit.GPIO11 = 1
 
@@ -87,14 +84,14 @@ typedef struct NVRamR_Date
     Uint8 WDAdder;
     const Uint8 *WDPtr;
     Uint16 WDLen;
-
     Uint8 RDCMD;
     Uint8 RDAdder;
     Uint8 *RDPtr;
     Uint16 RDLen;
+    Uint16 DebegCnt;
+    Uint32 SysTick;
+    Uint32 NvrSeq;
     union NvramStatus_REG   NvramStatus;
 }NvramReg;
-
-
 
 #endif /* SYSINCLUDE_NVRAM_H_ */

@@ -1,9 +1,9 @@
 /* ==============================================================================
-System Name:  Çö´ëÀÚµ¿Â÷ ¼ö¼Ò Áö°ÔÂ÷ 80V
+System Name:  í˜„ëŒ€ìë™ì°¨ ìˆ˜ì†Œ ì§€ê²Œì°¨ 80V
 
 File Name:		PARAMETER.H
 
-Description:	Çö´ë
+Description:	í˜„ëŒ€
           	    Orientation Control for a Three Phase AC Induction Motor. 
 
 Originator:		Digital control systems Group - Texas Instruments
@@ -71,6 +71,8 @@ typedef struct
    /*
     *
     */
+
+
     Uint16  MDCellMaxVolt     [ModuleEA];
     Uint16  MDCellMinVolt     [ModuleEA];
     Uint16  MDCellAgvVolt     [ModuleEA];

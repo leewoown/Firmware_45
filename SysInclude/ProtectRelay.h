@@ -1,9 +1,9 @@
 /* ==============================================================================
-System Name:  Çö´ëÀÚµ¿Â÷ ¼ö¼Ò Áö°ÔÂ÷ 80V
+System Name:  í˜„ëŒ€ìë™ì°¨ ìˆ˜ì†Œ ì§€ê²Œì°¨ 80V
 
 File Name:		PARAMETER.H
 
-Description:	Çö´ë
+Description:	í˜„ëŒ€
           	    Orientation Control for a Three Phase AC Induction Motor. 
 
 Originator:		Digital control systems Group - Texas Instruments
@@ -37,7 +37,7 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
  */
 #define WakeUpOnProRlyOnTime             500  // 50msec
 #define WakeUpOnPRlayOnTime              200  // 50msec
-#define WakeUpOnProRlyOffTime            500 //50msec, ÃÊÃæ ½Ã°£ °ü¸®
+#define WakeUpOnProRlyOffTime            500 //50msec, ì´ˆì¶© ì‹œê°„ ê´€ë¦¬
 #define WakeUpONTimeOut                  5000
 
 /*
