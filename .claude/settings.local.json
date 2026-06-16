@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python -c \"import can; print\\('python-can', can.__version__\\)\" 2>&1)",
+      "PowerShell(python -c \"from can.io import BLFReader; print\\('BLFReader OK'\\)\" 2>&1)"
+    ]
+  }
+}
