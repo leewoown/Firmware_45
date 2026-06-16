@@ -1,0 +1,52 @@
+{
+    "configurations": [
+        {
+            "name": "TI C2000 F28069",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/C2806Xinclude",
+                "${workspaceFolder}/C2806XSrc",
+                "${workspaceFolder}/C2806XSrc/include",
+                "${workspaceFolder}/SysInclude",
+                "${workspaceFolder}/SysSoure",
+                "C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "__TMS320C2000__",
+                "__TMS320C28XX__",
+                "__TMS320F28069__",
+                "__TI_COMPILER_VERSION__=22006001",
+                "_FLASH",
+                "CPU1",
+                "CPU_FRQ_60MHZ",
+                "CPU_RATE=16.667L",
+                "LARGE_MODEL",
+                "__interrupt=",
+                "__cregister=",
+                "interrupt=",
+                "cregister=",
+                "__asm(x)=",
+                "__attribute__(x)="
+            ],
+            "compilerPath": "",
+            "cStandard": "c99",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "gcc-x86",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "${workspaceFolder}/C2806Xinclude",
+                    "${workspaceFolder}/C2806XSrc",
+                    "${workspaceFolder}/C2806XSrc/include",
+                    "${workspaceFolder}/SysInclude",
+                    "${workspaceFolder}/SysSoure",
+                    "C:/ti/ccs1271/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db"
+            }
+        }
+    ],
+    "version": 4
+}

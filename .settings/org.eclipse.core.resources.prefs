@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//C2806XSrc/F2806x_Adc.c=UTF-8
 encoding//C2806XSrc/F2806x_ECan.c=UTF-8
+encoding//C2806Xinclude/DSP28x_Project.h=UTF-8
 encoding//Debug/C2806XSrc/subdir_rules.mk=UTF-8
 encoding//Debug/C2806XSrc/subdir_vars.mk=UTF-8
 encoding//Debug/SysInclude/subdir_rules.mk=UTF-8
@@ -12,4 +13,7 @@ encoding//Debug/objects.mk=UTF-8
 encoding//Debug/sources.mk=UTF-8
 encoding//Debug/subdir_rules.mk=UTF-8
 encoding//Debug/subdir_vars.mk=UTF-8
+encoding//SysInclude/parameter.h=UTF-8
+encoding//SysSoure/BATAlgorithm.c=UTF-8
 encoding//SysSoure/DSP28x_Project.c=UTF-8
+encoding//SysSoure/main.c=UTF-8

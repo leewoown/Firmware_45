@@ -26,10 +26,28 @@ extern int float32ToInt(float32 Vaule, Uint32 Num);
 //extern SystemReg       SysRegs;
 void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned int Data1,unsigned int Data2,unsigned int Data3)
 {
+    /*--------------------------------------------------------------
+     * 260615 : CANATX 재작성 - MBOX31 단일공유 안전화 + 송신 race(0x601 dip) 제거
+     *   기존 : 송신요청 후 완료까지 블로킹 대기(최대 3ms) -> 버스부하시 메인 지연/dip
+     *   변경 : 시작에서 직전 송신완료만 확인, 송신요청 후 즉시 복귀(non-blocking)
+     *--------------------------------------------------------------*/
     struct ECAN_REGS ECanaShadow;
     unsigned int CANWatchDog=0;
     unsigned int Data0Low, Data0High, Data1Low, Data1High;
     unsigned int Data2Low, Data2High, Data3Low, Data3High;
+
+    /* 1) 직전 송신 완료 보장 (MBOX31 재사용 충돌 방지) - 평소 즉시통과, 부하시만 대기 */
+    while (ECanaRegs.CANTRS.bit.TRS31 == 1U)   // wait until previous send is done
+    {
+        if (++CANWatchDog > 20000U)   // TODOS : [검증] (71, 송신 race 방지: 직전 송신완료 대기 타임아웃 3ms)
+        {
+            break; // give up previous send
+        }
+    }
+    if (ECanaRegs.CANTA.bit.TA31 == 1U)        // clear previous done flag (write-1-clear)
+    {
+        ECanaRegs.CANTA.bit.TA31 = 1U;
+    }
 
     Data0Low  = 0x00ff&Data0;
     Data0High = 0x00ff&(Data0>>8);
@@ -50,7 +68,7 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = (Uint16)(ID & 0x07FFU); // 11-bit
 
     ECanaMboxes.MBOX31.MSGCTRL.bit.RTR = 0U;
-    ECanaMboxes.MBOX31.MSGCTRL.bit.DLC=Length;
+    ECanaMboxes.MBOX31.MSGCTRL.bit.DLC = (Length > 8U) ? 8U : Length; // clamp to 8
 
 
 
@@ -69,20 +87,7 @@ void CANATX(unsigned int ID, unsigned char Length, unsigned int Data0, unsigned 
     ECanaMboxes.MBOX31.MDH.byte.BYTE7=Data3High;
 
 
-    ECanaRegs.CANTRS.bit.TRS31 = 1U;
-
-    while (ECanaRegs.CANTA.bit.TA31 == 0U)
-    {
-        if (++CANWatchDog > 2000U)
-        {
-           break; // 타임아웃
-       }
-    }
-    // TA31 플래그 클리어
-    if (ECanaRegs.CANTA.bit.TA31 == 1U)
-    {
-       ECanaRegs.CANTA.bit.TA31 = 1U;
-    }
+    ECanaRegs.CANTRS.bit.TRS31 = 1U;   // request transmit (완료는 다음 호출에서 확인, non-blocking)
 
 }
 void SysTimerINIT(SystemReg *s)
@@ -229,6 +234,8 @@ void CANRegVarINIT(CANAReg *P)
 {
     P->SWTypeVer=0;
     P->PackID=0;
+    P->PackSWID=0;
+    P->MDNumCountE=0;   // TODOS : [검증] (32, 0x60E 디버그 멀티플렉서 인덱스 초기화)
     P->PackSate=0;
     P->PackProtetSate=0;
     P->PackSateInfo=0;
@@ -1430,7 +1437,7 @@ int float32ToInt(float32 Vaule, Uint32 Num)
 
 void DigitalInput(SystemReg *sys)
 {
-    unsigned int IDVaule=0;
+   // unsigned int IDVaule=0;
     if(IDSW00==0)
     {
         sys->DigitalInputReg.bit.DipSW00=1;
@@ -1455,14 +1462,20 @@ void DigitalInput(SystemReg *sys)
     {
         sys->DigitalInputReg.bit.DipSW02=0;
     }
-    if(IDSW03==0)
-    {
-        sys->DigitalInputReg.bit.DipSW03=1;
-    }
-    else
-    {
-        sys->DigitalInputReg.bit.DipSW03=0;
-    }
+    /*--------------------------------------------------------------
+     * 260613 : GPIO19(IDSW03) HW 이슈 - 외부 회로(RS485B 잔재)로 핀이 low 고정
+     *          → SW03 입력 무시, 강제 0 처리 (HW 수정 전까지 임시 우회)
+     *          Rack 식별은 SW00/SW01(PackSWID 0~3)만으로 충분
+     *--------------------------------------------------------------*/
+    //if(IDSW03==0)
+    //{
+    //    sys->DigitalInputReg.bit.DipSW03=1;
+    //}
+    //else
+    //{
+    //    sys->DigitalInputReg.bit.DipSW03=0;
+    //}
+    sys->DigitalInputReg.bit.DipSW03=0;   // TODOS : [검증] (63, GPIO19 HW고장 우회: SW03 강제 0)
     if(CANRX0INT==0)
     {
         sys->DigitalInputReg.bit.CANRX0=1;
@@ -1504,12 +1517,28 @@ void DigitalInput(SystemReg *sys)
     {
         sys->DigitalInputReg.bit.EMGSWStauts=0;
     }
-    IDVaule= sys->DigitalInputReg.all& 0x000f;
-    sys-> PackID = IDVaule <<4;
-    // TODOS : [검증] (31, 유효 Rack1~4(0x00/0x10/0x20/0x30)만 인식, 0x40 이상(DIP 4~15, TEST 0xF0 포함)은 0x0000(Rack1/TEST)으로 처리)
-    if(sys-> PackID > 0x0030)
+    /*--------------------------------------------------------------
+     * 260612 (No.31) : PackID 인식 로직 개선 + 디버깅 변수 분리
+     *   - PackSWID 신설: 실제 DIP 니블(0~15) 보존(클램프X) → 디버깅용
+     *   - 유효화 조건 ==0x00f0(TEST만) → >0x0030(0x40 이상 전부)
+     *     DIP 4~15(TEST 0xF0 포함) → 0x0000(Rack1) 인식
+     *--------------------------------------------------------------*/
+    //--- 변경 전 ---
+    //IDVaule = sys->DigitalInputReg.all & 0x000f;
+    //sys->PackID = IDVaule << 4;
+    //if(sys->PackID==0x00f0) { sys->PackID=0x0000; }
+
+    //--- 변경 후 ---
+    /*--------------------------------------------------------------
+     * 260613 : GPIO19(SW03) HW 고장으로 bit3 신뢰불가 → PackSWID 계산에서 bit3 마스킹
+     *          (SW03 강제0 우회와 이중 안전). Rack 식별은 SW00/SW01(0~3)만 사용
+     *--------------------------------------------------------------*/
+    //sys->PackSWID = sys->DigitalInputReg.all & 0x000f;   // (구) DIP 니블 4비트 전체
+    sys->PackSWID = sys->DigitalInputReg.all & 0x0007;     // 디버깅 표시용(현재 PackID 미반영)
+    sys->PackID   = sys->PackSWID << 4;
+    if(sys->PackID > 0x0030)
     {
-        sys-> PackID=0x0000;
+        sys->PackID = 0x0000;                            // 0x40 이상 → Rack1
     }
 }
 void DigitalOutput(SystemReg *sys)
@@ -1603,7 +1632,7 @@ void DigitalOutput(SystemReg *sys)
     }
     if(sys->DigitalOutPutReg.bit.LEDCAnOUT==1)
     {
-  -
+  
         sys->LEDCanCount++;
         if(sys->LEDCanCount>500)
         {

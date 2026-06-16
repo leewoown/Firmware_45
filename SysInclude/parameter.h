@@ -268,7 +268,7 @@ Parameter
 #define     Product_Voltage                    618.2 // 3.664*24
 #define     Product_Capacity                   100.0  //
 #define     SW_Type                            0   // TODOS : [검증] (32, Product_Type->SW_Type, 초기값 0 (BRA_SW_Type))
-#define     Product_Version                    2   // 26.06.08 친환경선박 CAN 규약 R2 반영 (0x600~0x60F 재정의, R01 보호판정 활성화)
+#define     Product_Version                    1   // 24.09.21
 
 #define     PackSysVoltMax                     6972 //4.2*24
 #define     PackSysVoltMin                     504  //2.8*2.4

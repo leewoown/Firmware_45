@@ -47,9 +47,9 @@ void BatCalcRegsInit(BatCalcReg *P)
     memset(&P->MDCellDivVoltF[0],0.0,7);
 
     memset(&P->MDCellMaxTempsF[0],0.0,7);
-    memset(&P->MDCellMaxTempsF[0],0.0,7);
-    memset(&P->MDCellMaxTempsF[0],0.0,7);
-    memset(&P->MDCellMaxTempsF[0],0.0,7);
+    memset(&P->MDCellMinTempsF[0],0.0,7);   // TODOS : [완료] (65, RegsInit 복붙오류 수정: Min/Agv/Div TempsF 초기화 누락 복구)
+    memset(&P->MDCellAgvTempsF[0],0.0,7);
+    memset(&P->MDCellDivTempsF[0],0.0,7);
 
 
     memset(&P->MDTotalVolt[0],0,7);
@@ -104,6 +104,7 @@ void BatCalcVoltHandle(BatCalcReg *P)
     Uint16  Count;
     Uint16  const MoudleEa =7;
     Uint16  const PackCellEa =24*7;
+    float32 PackVoltageBufF=0;
     /*
      * 정수를 소수점 변환하는 루틴
      */
@@ -112,10 +113,9 @@ void BatCalcVoltHandle(BatCalcReg *P)
         P->MDCellMaxVoltF[Count] =(float32) P->MDCellMaxVolt[Count]  *0.001f;
         P->MDCellMinVoltF[Count] =(float32) P->MDCellMinVolt[Count]  *0.001f;
         P->MDCellAgvVoltF[Count] =(float32) P->MDCellAgvVolt[Count]  *0.001f;
-        P->MDCellDivVoltF[Count] =(float32) P->MDCellDivVoltF[Count] *0.001f;
+        P->MDCellDivVoltF[Count] =(float32) P->MDCellDivVolt[Count]  *0.001f;    // TODOS : [검증] (63, 셀전압 편차 자기참조 버그 수정: MDCellDivVoltF→MDCellDivVolt 원본 정수 변환)
         P->MDTotalVoltF[Count]   =(float32) P->MDTotalVolt[Count]    *0.01f;
     }
-    float32 PackVoltageBufF=0;
     for(Count=0; Count<MoudleEa; Count++)
     {
         PackVoltageBufF = PackVoltageBufF+P->MDTotalVoltF[Count];
@@ -151,7 +151,7 @@ void BatCalcVoltHandle(BatCalcReg *P)
     P->PackCellMinVoltF  = CellMinVoltF;
     P->PackCellAgvVoltF  = P->PackPTCANF/(float32)PackCellEa;
     P->PackCellDivVoltF  = CellMaxVoltF-CellMinVoltF;
-    P->PackCellMaxVoltPos =  (MDCellMaxVoltPos*24)+P->MDMaxVoltPo[MDCellMinVoltPos-1];
+    P->PackCellMaxVoltPos =  (MDCellMaxVoltPos*24)+P->MDMaxVoltPo[MDCellMaxVoltPos-1];   // TODOS : [검증] (64, 셀최대전압 위치 인덱스 오용 수정: MDCellMinVoltPos→MDCellMaxVoltPos / base 통일은 보류)
     P->PackCellMinVoltPos =  (MDCellMinVoltPos*24)+P->MDMinVoltPo[MDCellMinVoltPos-1];
 
 }

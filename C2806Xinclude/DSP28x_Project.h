@@ -43,7 +43,6 @@
 
 #ifndef DSP28x_PROJECT_H
 #define DSP28x_PROJECT_H
-
 //
 // Included Files
 //
@@ -340,23 +339,43 @@ struct SystemAlarm_BIT
 {       // bits   description
   //  unsigned int     PackVDISCHACT_OV          :1; // 0
   //  unsigned int     PackVCHACT_OV             :1; // 1
-    // TODOS : [완료] (46, 0x603 Warn(bit0-15) 일치 — bit13-15 셀IR 경고 신규, UnbaPWR(구13-14) 삭제)
-    unsigned int     PackVCur_OC                :1; // 0   BRA_Wn_CT_OV
-    unsigned int     PackVSOC_OV                :1; // 1   BRA_Wn_SOC_OV
-    unsigned int     PackVSOC_UN                :1; // 2   BRA_Wn_SOC_UN
-    unsigned int     PackVolt_OV                :1; // 3   BRA_Wn_Volt_OV
-    unsigned int     PackVolt_UN                :1; // 4   BRA_Wn_Volt_UN
-    unsigned int     PackTemp_OT                :1; // 5   BRA_Wn_Temp_OV
-    unsigned int     PackTemp_UT                :1; // 6   BRA_Wn_Temp_UN
-    unsigned int     CellVolt_OV                :1; // 7   Cell_Wn_Volt_OV
-    unsigned int     CellVolt_UN                :1; // 8   Cell_Wn_Volt_UN
-    unsigned int     CellVolt_BL                :1; // 9   Cell_Wn_Volt_DIV
-    unsigned int     CellTemp_OT                :1; // 10  Cell_Wn_Temp_OV
-    unsigned int     CellTemp_UT                :1; // 11  Cell_Wn_Temp_UN
-    unsigned int     CellTemp_BL                :1; // 12  Cell_Wn_Temp_DIV
-    unsigned int     CellIR_OV                  :1; // 13  Cell_Wn_IR_OV  (신규)
-    unsigned int     CellIR_UN                  :1; // 14  Cell_Wn_IR_UN  (신규)
-    unsigned int     CellIR_DIV                 :1; // 15  Cell_Wn_IR_DIV (신규)
+    /*--------------------------------------------------------------
+     * 260616 : 0x603 Warn(bit0-15) 배치 R57->R58 전면 재편 (Master R5 기준)
+     *          - bit1 예비(Not_Warn2) 삽입 / SOC,Volt,Cell,Temp 순서 재배치
+     *          - 구 bit13-15 CellIR 경고 삭제(옛코드 주석보존), UnbaPWR 2비트 부활
+     *--------------------------------------------------------------*/
+    //unsigned int     PackVCur_OC                :1; // 0   BRA_Wn_CT_OV    (R57)
+    //unsigned int     PackVSOC_OV                :1; // 1   BRA_Wn_SOC_OV
+    //unsigned int     PackVSOC_UN                :1; // 2   BRA_Wn_SOC_UN
+    //unsigned int     PackVolt_OV                :1; // 3   BRA_Wn_Volt_OV
+    //unsigned int     PackVolt_UN                :1; // 4   BRA_Wn_Volt_UN
+    //unsigned int     PackTemp_OT                :1; // 5   BRA_Wn_Temp_OV
+    //unsigned int     PackTemp_UT                :1; // 6   BRA_Wn_Temp_UN
+    //unsigned int     CellVolt_OV                :1; // 7   Cell_Wn_Volt_OV
+    //unsigned int     CellVolt_UN                :1; // 8   Cell_Wn_Volt_UN
+    //unsigned int     CellVolt_BL                :1; // 9   Cell_Wn_Volt_DIV
+    //unsigned int     CellTemp_OT                :1; // 10  Cell_Wn_Temp_OV
+    //unsigned int     CellTemp_UT                :1; // 11  Cell_Wn_Temp_UN
+    //unsigned int     CellTemp_BL                :1; // 12  Cell_Wn_Temp_DIV
+    //unsigned int     CellIR_OV                  :1; // 13  Cell_Wn_IR_OV   (R58 Warn 삭제)
+    //unsigned int     CellIR_UN                  :1; // 14  Cell_Wn_IR_UN   (R58 Warn 삭제)
+    //unsigned int     CellIR_DIV                 :1; // 15  Cell_Wn_IR_DIV  (R58 Warn 삭제)
+    unsigned int     PackVCur_OC                :1; // 0   BRA1_Wn_OC                    // TODOS : [검증] (72, 0x603 Warn R58 재배치)
+    unsigned int     NotWarn1                   :1; // 1   Not_Warn2 (예비)
+    unsigned int     PackVSOC_OV                :1; // 2   BRA1_Wn_SOC_OV
+    unsigned int     PackVSOC_UN                :1; // 3   BRA1_Wn_SOC_Un
+    unsigned int     PackVolt_OV                :1; // 4   BRA1_Wn_OV
+    unsigned int     PackVolt_UN                :1; // 5   BRA1_Wn_UV
+    unsigned int     CellVolt_OV                :1; // 6   BRA1_Wn_Cell_OV
+    unsigned int     CellVolt_UN                :1; // 7   BRA1_Wn_Cell_UV
+    unsigned int     CellVolt_BL                :1; // 8   BRA1_Wn_Cell_UnbalV
+    unsigned int     PackTemp_OT                :1; // 9   BRA1_Wn_PackOT
+    unsigned int     PackTemp_UT                :1; // 10  BRA1_Wn_PackUT
+    unsigned int     CellTemp_OT                :1; // 11  BRA1_Wn_CellOT
+    unsigned int     CellTemp_UT                :1; // 12  BRA1_Wn_CellUT
+    unsigned int     CellTemp_BL                :1; // 13  BRA1_Wn_Cell_UnbalT
+    unsigned int     PackUnbaDisCh_UbPWR        :1; // 14  BRA1_Wn_Discharger_UnbaPWR
+    unsigned int     PackUnbaCahr_UbPWR         :1; // 15  BRA1_Wn_Charger_UnbaPWR
     unsigned int     SW16                       :1; // 16
     unsigned int     SW17                       :1; // 17
     unsigned int     SW18                       :1; // 18
@@ -494,6 +513,7 @@ typedef struct System_Date
      *
      */
     Uint16  PackID;
+    Uint16  PackSWID;
     Uint16  Test;
     Uint16  Maincount;
     Uint16  MainIsr1;
@@ -797,6 +817,7 @@ union DebugState_REG
 typedef struct CANA_DATA
 {
     Uint16 PackID;
+    Uint16 PackSWID;
     Uint16 SWTypeVer;
     Uint16 MDNumCountA;
     Uint16 MDNumCountB;

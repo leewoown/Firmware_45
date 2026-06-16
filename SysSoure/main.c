@@ -186,8 +186,9 @@ void main(void)
   //  InitSpiGpio();
   ///  InitSpiCAN();
     // TEST
+
     InitECanGpio();
-    InitECan();
+   // InitECana();
 
     MemCopy(&RamfuncsLoadStart, &RamfuncsLoadEnd, &RamfuncsRunStart);
     InitFlash();
@@ -245,13 +246,17 @@ void main(void)
                   PrtectRelayRegs.StateMachine=STATERly_INIT;
                   SysRegs.SysMachine=System_STATE_STANDBY;
                   DigitalInput(&SysRegs);
+                 // SysRegs.PackID =0x0000;
                   delay_ms(100);
+                  InitECana();
                   if(SysRegs.PackStateReg.bit.SysPrtct==1)
                   {
                     //SysRegs.SysMachine=System_STATE_PROTECTER;
                   }
                   SysRegs.PackStateReg.bit.SysSeqState=1;
-                  InitECan();
+                  SysRegs.PackID =0x0000;
+               //   SysRegs.PackID==0x0000;
+               //   InitECana();
                   delay_ms(10);
 
             break;
@@ -359,7 +364,6 @@ void main(void)
     }*/
 
 }
-
 interrupt void cpu_timer0_isr(void)
 {
    SysRegs.MainIsr1++;
@@ -429,6 +433,8 @@ interrupt void cpu_timer0_isr(void)
   //     SysRegs.PackProtectReg.bit.PackEMSSWErr=0;
   // }
   // CANARegs.PackProtetSate=0;
+     SysRegs.PackFaultReg.all=0;
+     SysRegs.PackProtectReg.all=0;
    if(SysRegs.PackStateReg.bit.INITOK==1)
    {
       // TODOS : [완료] (02, R01 경고/Fault/보호 판정 활성화 (1ms ISR 주기))
@@ -447,6 +453,7 @@ interrupt void cpu_timer0_isr(void)
      SysRegs.PackStateReg.bit.SysAalarm=0;
      CANARegs.PackProtetSate=0;
    }
+
    if((SysRegs.PackFaultReg.all >0)&&(SysRegs.PackStateReg.bit.INITOK==1))
    {
      SysRegs.PackStateReg.bit.SysFault=1;
@@ -482,7 +489,7 @@ interrupt void cpu_timer0_isr(void)
                    SysRegs.PackSOHF = 100.0;
                    CANARegs.PackPT = (unsigned int)(SysRegs.PackVoltageF*10);
                    CANARegs.PackCT = (int)(SysRegs.PackCurrentF*10.0);
-                   CANARegs.PackSOC =(unsigned int)(SysRegs.PackSOCF*10);
+                   CANARegs.PackSOC =(int)(SysRegs.PackSOCF*10);
                    CANARegs.PackSOH =(unsigned int)(SysRegs.PackSOHF*10);
                    // TODOS : [완료] (03, 0x601 BPA_Calc1 (PackPT/PackCT/PackSOC/PackSOH 각 ×10))
                    CANARegs.PackID =0X601|SysRegs.PackID;
@@ -490,26 +497,9 @@ interrupt void cpu_timer0_isr(void)
                }
        break;
        case 2:
-               // TODOS : [완료] (04, 셀 전압 상태 계산)
-               memcpy(&BatCalcRegs.MDCellMaxVolt[0], &ModRegs.MDCellMaxVolt[0],sizeof(Uint16)*7);
-               memcpy(&BatCalcRegs.MDCellMinVolt[0], &ModRegs.MDCellMinVolt[0],sizeof(Uint16)*7);
-               memcpy(&BatCalcRegs.MDTotalVolt[0],   &ModRegs.MDTotalVolt[0],sizeof(Uint16)*7);
-               memcpy(&BatCalcRegs.MDMaxVoltPo[0],   &ModRegs.MDMaxVoltPo[0],sizeof(Uint16)*7);
-               memcpy(&BatCalcRegs.MDMinVoltPo[0],   &ModRegs.MDMinVoltPo[0],sizeof(Uint16)*7);
-               BatCalcVoltHandle(&BatCalcRegs);
-               SysRegs.PackVoltageF= BatCalcRegs.PackPTCANF;
-               SysRegs.PackCellMaxVoltageF= BatCalcRegs.PackCellMaxVoltF;
-               // 반드시 수정 필요함
-               SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMaxVoltF-0.005;
-               SysRegs.PackCellAgvVoltageF= BatCalcRegs.PackCellAgvVoltF;
-               SysRegs.PackCellDivVoltageF= BatCalcRegs.PackCellDivVoltF;
-               SysRegs.PackCellMaxVoltPos = BatCalcRegs.PackCellMaxVoltPos;
-               SysRegs.PackCellMinVoltPos = BatCalcRegs.PackCellMinVoltPos;
 
        break;
        case 5:
-
-
        break;
        case 7:
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
@@ -546,7 +536,7 @@ interrupt void cpu_timer0_isr(void)
                {
                   // TODOS : [완료] (07, 0x500 BPA_Module 모듈별 밸런스/보호 상태)
                   CANARegs.PackID =0X500|(SysRegs.PackID+0x0010);
-                  CANATX(CANARegs.PackID,8,0X00,0X00,CANARegs.PackTemperatureAVG,ANARegs.PackBalanVolt);
+                  CANATX(CANARegs.PackID,8,0X00,0X00,CANARegs.PackTemperatureAVG,CANARegs.PackBalanVolt);
                }
        break;
        case 5:
@@ -584,7 +574,21 @@ interrupt void cpu_timer0_isr(void)
                SysRegs.PackCellMinTmepsPos    = BatCalcRegs.PackCellMinTempsPos;
        break;
        case 30 :
-
+               // TODOS : [완료] (04, 셀 전압 상태 계산)
+               memcpy(&BatCalcRegs.MDCellMaxVolt[0], &ModRegs.MDCellMaxVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDCellMinVolt[0], &ModRegs.MDCellMinVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDTotalVolt[0],   &ModRegs.MDTotalVolt[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDMaxVoltPo[0],   &ModRegs.MDMaxVoltPo[0],sizeof(Uint16)*7);
+               memcpy(&BatCalcRegs.MDMinVoltPo[0],   &ModRegs.MDMinVoltPo[0],sizeof(Uint16)*7);
+               BatCalcVoltHandle(&BatCalcRegs);
+               SysRegs.PackVoltageF= BatCalcRegs.PackPTCANF;
+               SysRegs.PackCellMaxVoltageF= BatCalcRegs.PackCellMaxVoltF;
+               // TODOS : [검증] (66, 셀 최소전압 임시코드(Max-5mV) 제거 → 실제 계산값 PackCellMinVoltF 반영)
+               SysRegs.PackCellMinVoltageF= BatCalcRegs.PackCellMinVoltF;
+               SysRegs.PackCellAgvVoltageF= BatCalcRegs.PackCellAgvVoltF;
+               SysRegs.PackCellDivVoltageF= BatCalcRegs.PackCellDivVoltF;
+               SysRegs.PackCellMaxVoltPos = BatCalcRegs.PackCellMaxVoltPos;
+               SysRegs.PackCellMinVoltPos = BatCalcRegs.PackCellMinVoltPos;
 
        break;
        default :
@@ -666,10 +670,9 @@ interrupt void cpu_timer0_isr(void)
                     CANARegs.PackVoltageMaxMinNum       = ComBine(SysRegs.PackCellMinVoltPos,SysRegs.PackCellMaxVoltPos);
                     CANARegs.PackTemperatureMaxMinNum   = ComBine(SysRegs.PackCellMinTmepsPos,SysRegs.PackCellMaxTmepsPos);
                     CANARegs.PackIRMaxMinNUM            = ComBine(SysRegs.PackCellMinIRPos,SysRegs.PackCellMaxIRPos);
-                    CANARegs.PackAh                     = (int16)(Kam100AHSocRegs.SysAhF * 10);
-                    // TODOS : [검증] (14, 0x608 BPA_Cell_Pocalc 위치정보(CellV/T/IR Max·Min byte0-5) + PackAh(byte6-7) 반영)
+                    // TODOS : [검증] (14, 0x608 BPA_Cell_Pocalc 위치정보(CellV/T/IR Max·Min byte0-5) + byte6-7 예비(0). PackAh는 0x60A로 이전)
                     CANARegs.PackID =0X608|SysRegs.PackID;
-                    CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxMinNum,CANARegs.PackTemperatureMaxMinNum,CANARegs.PackIRMaxMinNUM,CANARegs.PackAh);
+                    CANATX(CANARegs.PackID,8,CANARegs.PackVoltageMaxMinNum,CANARegs.PackTemperatureMaxMinNum,CANARegs.PackIRMaxMinNUM,0X000);
                 }
        break;
        case 26:
@@ -709,15 +712,43 @@ interrupt void cpu_timer0_isr(void)
                }
        break;
        case 10:
+                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
+                {
+                   // TODOS : [검증] (18, 0x60A 송신: byte0-1 PackID, byte2-3 DI.all, byte4-5 DO.all, byte6-7 PackAh)
+                   CANARegs.PackID =0X60A|SysRegs.PackID;
+                   CANARegs.PackAh = (int16)(Kam100AHSocRegs.SysAhF * 10);
+                   CANATX(CANARegs.PackID,8,SysRegs.PackSWID,SysRegs.DigitalInputReg.all,SysRegs.DigitalOutPutReg.all,CANARegs.PackAh);
+                }
+       break;
+       case 20:
+                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
+                {
+                   /*--------------------------------------------------------------
+                    * 260613 : 0x60B BM_ComCnt 멀티플렉서化 (MD1~7/CT/Master 9개 카운터 순환 전송)
+                    *--------------------------------------------------------------*/
+                   //CANATX(CANARegs.PackID,8,CANARegs.PackID,CANARegs.MailBoxRxCount,CANARegs.MailBox1RxCount,CANARegs.MailBox2RxCount); // 옛 단일 프레임(PackID/AllRx/CT/Master)
+                   // TODOS : [검증] (17, 0x60B BM_ComCnt 멀티플렉서: byte0-1 idx(0~2), byte2-7 카운터 3개 (MD1~7/CT/Master))
+                   CANARegs.PackID =0X60B|SysRegs.PackID;
+                   switch(CANARegs.MDNumCountF)
+                   {
+                     case 0: CANATX(CANARegs.PackID,8,0,SysRegs.MD1CANRxCount,SysRegs.MD2CANRxCount,SysRegs.MD3CANRxCount); break;
+                     case 1: CANATX(CANARegs.PackID,8,1,SysRegs.MD4CANRxCount,SysRegs.MD5CANRxCount,SysRegs.MD6CANRxCount); break;
+                     case 2: CANATX(CANARegs.PackID,8,2,SysRegs.MD7CANRxCount,SysRegs.CTRxCount,SysRegs.MasterRxCount);     break;
+                     default: CANARegs.MDNumCountF=0;                                                                       break;
+                   }
+                   if(++CANARegs.MDNumCountF>=3){CANARegs.MDNumCountF=0;}
+                }
+       break;
+       case 30:
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
-                   // TODOS : [검증] (16, 0x60A 모듈별 RxCount 멀티플렉서 (CANARegs.MDXRxcountP[bm] 사용, BMNum + RxCount[0]~[6] 8bit 패킹))
+                   // TODOS : [검증] (16, 0x60C 모듈별 RxCount 멀티플렉서 (CANARegs.MDXRxcountP[bm] 사용, BMNum + RxCount[0]~[6] 8bit 패킹))
                    CANARegs.MDRxCurP   = CANARegs.MDXRxcountP[CANARegs.MDNumCountB];
                    CANARegs.MDRxCount1 = ComBine(CANARegs.MDRxCurP[0],CANARegs.MDNumCountB);
                    CANARegs.MDRxCount2 = ComBine(CANARegs.MDRxCurP[2],CANARegs.MDRxCurP[1]);
                    CANARegs.MDRxCount3 = ComBine(CANARegs.MDRxCurP[4],CANARegs.MDRxCurP[3]);
                    CANARegs.MDRxCount4 = ComBine(CANARegs.MDRxCurP[6],CANARegs.MDRxCurP[5]);
-                   CANARegs.PackID =0X60A|SysRegs.PackID;
+                   CANARegs.PackID =0X60C|SysRegs.PackID;
                    CANATX(CANARegs.PackID,8,CANARegs.MDRxCount1 ,CANARegs.MDRxCount2 ,CANARegs.MDRxCount3 ,CANARegs.MDRxCount4);
                    if(++CANARegs.MDNumCountB>=7)
                    {
@@ -729,36 +760,24 @@ interrupt void cpu_timer0_isr(void)
                    CANARegs.MDNumCountB=0;
                }
        break;
-       case 20:
-                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
-                {
-                   // TODOS : [완료] (17, 0x60B BM_ComCnt 통신진단 (PackID/MailBoxRxCount/MailBox1RxCount=CT/MailBox2RxCount=Master))
-                   CANARegs.PackID =0X60B|SysRegs.PackID;
-                   CANATX(CANARegs.PackID,8,CANARegs.PackID,CANARegs.MailBoxRxCount,CANARegs.MailBox1RxCount,CANARegs.MailBox2RxCount);
-                }
-       break;
-       case 30:
-                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
-                {
-                   // TODOS : [완료] (18, 0x60C 예비/사용자 별도 (CANATX 주석=현재 미송신, 규약 미적용))
-                   CANARegs.PackID =0X60C|SysRegs.PackID;
-                  // CANATX(CANARegs.PackID,8,CANARegs.PackID,CANARegs.MailBoxRxCount,CANARegs.MailBox1RxCount,CANARegs.MailBox2RxCount);
-                }
-       break;
        case 40:
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                   // TODOS : [완료] (19, 0x60D 예비/사용자 별도 (CANATX 주석=현재 미송신, 규약 미적용))
+                   // TODOS : [검증] (32, 0x60D 디버그 멀티플렉서: [0]idx(0~6) [1]MBOXn 설정 RX_ID [2][3]예비(0) — 분석기로 RX필터 확인용)
                    CANARegs.PackID =0X60D|SysRegs.PackID;
-                  // CANATX(CANARegs.PackID,8,CANARegs.PackID,CANARegs.MailBoxRxCount,CANARegs.MailBox1RxCount,CANARegs.MailBox2RxCount);
+                   CANATX(CANARegs.PackID,8,
+                          CANARegs.MDNumCountE,                                          /* [0] 메일박스 인덱스(0~6) */
+                          (&ECanaMboxes.MBOX0)[CANARegs.MDNumCountE].MSGID.bit.STDMSGID, /* [1] 해당 MBOX 설정 RX ID (eCAN MBOX는 연속배치라 포인터 인덱싱) */
+                          0X0000,0X0000);                                                /* [2][3] 예비(0) */
+                   if(++CANARegs.MDNumCountE>=7){CANARegs.MDNumCountE=0;}
                 }
        break;
        case 50:
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                   // TODOS : [완료] (20, 0x60E 예비/사용자 별도 (CANATX 주석=현재 미송신, 규약 미적용))
+                   // TODOS : [완료] (19, 0x60E 예비/사용자 별도 (CANATX 주석=현재 미송신, 규약 미적용))
                    CANARegs.PackID =0X60E|SysRegs.PackID;
-                  // CANATX(CANARegs.PackID,8,CANARegs.PackID,CANARegs.MailBoxRxCount,CANARegs.MailBox1RxCount,CANARegs.MailBox2RxCount);
+                  // CANATX(CANARegs.PackID,8,CANARegs.MDNumCountE,(&ECanaMboxes.MBOX0)[CANARegs.MDNumCountE].MSGID.bit.STDMSGID,SysRegs.PackSWID,SysRegs.PackID);
                 }
        break;
        case 60:
@@ -821,18 +840,19 @@ interrupt void cpu_timer0_isr(void)
    }
 
    DigitalOutput(&SysRegs);
-   //InitECan();
+  // InitECan();
    if(SysRegs.MainIsr1>3000) {SysRegs.MainIsr1=0;}
    PieCtrlRegs.PIEACK.all = PIEACK_GROUP1;
 }
 interrupt void ISR_CANRXINTA(void)
 {
-//    struct ECAN_REGS ECanaShadow;
+    struct ECAN_REGS ECanaShadow;
     CANARegs.MailBoxRxCount++;
     if(CANARegs.MailBoxRxCount>3000){CANARegs.MailBoxRxCount=0;}
     if(ECanaRegs.CANGIF0.bit.GMIF0 == 1)
     {
-        if(ECanaRegs.CANRMP.bit.RMP0==1)
+        // TODOS : [완료] (01, RMP 클리어를 비트필드 RMW 대신 메일박스별 즉시 클리어(shadow .all 기록)로 변경 - 동시 TX 시 손실 창 최소화)
+        if(ECanaRegs.CANRMP.bit.RMP0==1) // 모듈 1
         {
             ModRegs.MD1XRxcount[0]++;
             if(ModRegs.MD1XRxcount[0]>200){ModRegs.MD1XRxcount[0]=0;}
@@ -877,10 +897,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[0]     = ECanaMboxes.MBOX0.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[0]      = ComBine(ECanaMboxes.MBOX0.MDH.byte.BYTE7,ECanaMboxes.MBOX0.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP0 = 1;
-
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP0 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP0만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP1==1)
+        if(ECanaRegs.CANRMP.bit.RMP1==1) // 모듈 2
         {
             ModRegs.MD2XRxcount[0]++;
             if(ModRegs.MD2XRxcount[0]>200){ModRegs.MD2XRxcount[0]=0;}
@@ -926,9 +947,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDstatusbit[1]      = ComBine(ECanaMboxes.MBOX1.MDH.byte.BYTE7,ECanaMboxes.MBOX1.MDH.byte.BYTE6);
 
             }
-            ECanaRegs.CANRMP.bit.RMP1 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP1 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP1만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP2==1) // 모듈 2
+        if(ECanaRegs.CANRMP.bit.RMP2==1) // 모듈 3
         {
             ModRegs.MD3XRxcount[0]++;
             SysRegs.MD3CANRxCount=0;
@@ -937,12 +960,12 @@ interrupt void ISR_CANRXINTA(void)
             if(CANARegs.CanMBOX2Mask==2)
             {
                 ModRegs.MD3XRxcount[1]++;
-                if(ModRegs.MD3XRxcount[1]>200){ModRegs.MD3XRxcount[1]=0;}
                 ModRegs.MDCellVoltQty[2]    = ECanaMboxes.MBOX2.MDL.byte.BYTE0;
                 ModRegs.MDFirmwareVer[2]    = ECanaMboxes.MBOX2.MDL.byte.BYTE1;
                 ModRegs.MDNorCapacity[2]    = ComBine(ECanaMboxes.MBOX2.MDL.byte.BYTE3,ECanaMboxes.MBOX2.MDL.byte.BYTE2);
                 ModRegs.MDNorVolt[2]        = ComBine(ECanaMboxes.MBOX2.MDH.byte.BYTE5,ECanaMboxes.MBOX2.MDH.byte.BYTE4);
                 ModRegs.PackMinVolteRec[2]  = ComBine(ECanaMboxes.MBOX2.MDH.byte.BYTE7,ECanaMboxes.MBOX2.MDH.byte.BYTE6);
+                if(ModRegs.MD3XRxcount[1]>200){ModRegs.MD3XRxcount[1]=0;}
             }
             else if(CANARegs.CanMBOX2Mask==3)
             {
@@ -973,9 +996,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[2]     = ECanaMboxes.MBOX2.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[2]      = ComBine(ECanaMboxes.MBOX2.MDH.byte.BYTE7,ECanaMboxes.MBOX2.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP2 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP2 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP2만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP3==1)
+        if(ECanaRegs.CANRMP.bit.RMP3==1) // 모듈 4
         {
             ModRegs.MD4XRxcount[0]++;
             SysRegs.MD4CANRxCount=0;
@@ -1020,9 +1045,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[3]     = ECanaMboxes.MBOX3.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[3]      = ComBine(ECanaMboxes.MBOX3.MDH.byte.BYTE7,ECanaMboxes.MBOX3.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP3 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP3 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP3만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP4==1)
+        if(ECanaRegs.CANRMP.bit.RMP4==1) // 모듈 5
         {
             SysRegs.MD5CANRxCount=0;
             ModRegs.MD5XRxcount[0]++;
@@ -1069,9 +1096,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[4]     = ECanaMboxes.MBOX4.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[4]      = ComBine(ECanaMboxes.MBOX4.MDH.byte.BYTE7,ECanaMboxes.MBOX4.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP4 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP4 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP4만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP5==1)
+        if(ECanaRegs.CANRMP.bit.RMP5==1) // 모듈 6
         {
             SysRegs.MD6CANRxCount=0;
             ModRegs.MD6XRxcount[0]++;
@@ -1116,9 +1145,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[5]     = ECanaMboxes.MBOX5.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[5]      = ComBine(ECanaMboxes.MBOX5.MDH.byte.BYTE7,ECanaMboxes.MBOX5.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP5 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP5 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP5만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP6==1)
+        if(ECanaRegs.CANRMP.bit.RMP6==1) // 모듈 7
         {
             SysRegs.MD7CANRxCount=0;
             ModRegs.MD7XRxcount[0]++;
@@ -1163,9 +1194,11 @@ interrupt void ISR_CANRXINTA(void)
                 ModRegs.MDMinTempsPo[6]     = ECanaMboxes.MBOX6.MDH.byte.BYTE5;
                 ModRegs.MDstatusbit[6]      = ComBine(ECanaMboxes.MBOX6.MDH.byte.BYTE7,ECanaMboxes.MBOX6.MDH.byte.BYTE6);
             }
-            ECanaRegs.CANRMP.bit.RMP6 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP6 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP6만 클리어
         }
-        if(ECanaRegs.CANRMP.bit.RMP29==1)
+        if(ECanaRegs.CANRMP.bit.RMP29==1) // CAN CAN 
         {
             SysRegs.CTRxCount=0;
             CANARegs.MailBox1RxCount++;
@@ -1173,20 +1206,24 @@ interrupt void ISR_CANRXINTA(void)
             SysRegs.CurrentData.byte.CurrentH   = (ECanaMboxes.MBOX29.MDL.byte.BYTE0<<8)|(ECanaMboxes.MBOX29.MDL.byte.BYTE1);
             SysRegs.CurrentData.byte.CurrentL   = (ECanaMboxes.MBOX29.MDL.byte.BYTE2<<8)|(ECanaMboxes.MBOX29.MDL.byte.BYTE3);
 
-            ECanaRegs.CANRMP.bit.RMP29 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP29 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP29만 클리어
         }
         if(ECanaRegs.CANRMP.bit.RMP30==1)
         {
             CANARegs.MailBox2RxCount++;
             SysRegs.MasterRxCount=0;
-            if(CANARegs.MailBox2RxCount>200){CANARegs.MailBox2RxCount=0;}
+            if(CANARegs.MailBox2RxCount>200) {CANARegs.MailBox2RxCount=0;}
             CANARegs.PMSCMDRegs.all = ComBine(ECanaMboxes.MBOX30.MDL.byte.BYTE1,ECanaMboxes.MBOX30.MDL.byte.BYTE0);
             if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
             {
                 CANARegs.PMSCMDRegs.bit.RUNStatus01=0;
             }
 
-            ECanaRegs.CANRMP.bit.RMP30 = 1;
+            ECanaShadow.CANRMP.all = 0;
+            ECanaShadow.CANRMP.bit.RMP30 = 1;
+            ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP30만 클리어
         }
     }
     ECanaRegs.CANGIF0.all = ECanaRegs.CANGIF0.all;

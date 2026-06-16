@@ -1,0 +1,18 @@
+{
+    "recommendations": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+        "dan-c-underwood.arm",
+        "zixuanwang.linkerscript",
+        "marus25.cortex-debug",
+        "jeff-hykin.better-c-syntax",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "gruntfuggly.todo-tree",
+        "usernamehw.errorlens",
+        "alefragnani.bookmarks",
+        "aaron-bond.better-comments",
+        "oderwat.indent-rainbow"
+    ]
+}

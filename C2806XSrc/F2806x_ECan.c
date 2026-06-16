@@ -635,6 +635,7 @@ void InitECana(void)
 #endif // endif DSP28_ECANA
 
 #if DSP28_ECANASET_SHIP
+//============ 1. SHIP InitECana 시작 (DSP28_ECANASET_SHIP) ============
 void InitECana(void)
 {
           struct ECAN_REGS ECanaShadow;
@@ -664,6 +665,7 @@ void InitECana(void)
        // Some bits of MSGCTRL register come up in an unknown state. For proper operation,
        // all bits (including reserved bits) of MSGCTRL must be initialized to zero
 
+           //============ 2. 메일박스 제어(MSGCTRL) 전체 초기화 ============
            ECanaMboxes.MBOX0.MSGCTRL.all = 0x00000000;
            ECanaMboxes.MBOX1.MSGCTRL.all = 0x00000000;
            ECanaMboxes.MBOX2.MSGCTRL.all = 0x00000000;
@@ -706,6 +708,7 @@ void InitECana(void)
            ECanaRegs.CANGIF1.all = 0xFFFFFFFF;
 
        //ID 설정
+           //============ 3. 메일박스 ID(MSGID) 전체 클리어 ============
            ECanaMboxes.MBOX0.MSGID.all     = 0;
            ECanaMboxes.MBOX1.MSGID.all     = 0;
            ECanaMboxes.MBOX2.MSGID.all     = 0;
@@ -739,6 +742,7 @@ void InitECana(void)
            ECanaMboxes.MBOX30.MSGID.all    = 0;
            ECanaMboxes.MBOX31.MSGID.all    = 0;
 
+           //============ 4. Rack별 메일박스 ID 설정 (모듈 0x_1X~0x_7X / CT / PMS) ============
            if(SysRegs.PackID==0x0000)
            {
                ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x110);
@@ -775,7 +779,6 @@ void InitECana(void)
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            }
            if(SysRegs.PackID==0x0010)
-
            {
                ECanaMboxes.MBOX0.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x210);
                ECanaMboxes.MBOX1.MSGID.bit.STDMSGID  = CAN_ALIGN_1BYTE(0x220);
@@ -807,7 +810,7 @@ void InitECana(void)
                ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
                ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
                ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;*/
-               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x522;   // CT Rack2 (0x512->0x522 정정)
                ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x701;
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            }
@@ -1020,6 +1023,7 @@ void InitECana(void)
        /* Configure bit timing parameters for eCANA*/
 
            ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
+           //============ 5. config 모드 진입(CCR=1) : 이하 mask/비트레이트는 이 구간에서만 설정 가능 ============
            ECanaShadow.CANMC.bit.CCR = 1;            // Set CCR = 1
            ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
 
@@ -1043,11 +1047,13 @@ void InitECana(void)
 
 
            ECanaShadow.CANGAM.all = 0xFFFFFFFF;   // 기본: 모두 don't-care
+           //============ 6. 글로벌 mask off (AMI=0, 메일박스별 LAM 사용) ============
            ECanaShadow.CANGAM.bit.AMI = 0;        // LAM 사용(글로벌 마스크 대신 LAMx 적용)
            ECanaRegs.CANGAM.all = ECanaShadow.CANGAM.all;
 
 
 
+           //============ 7. 모듈 MBOX0~6 acceptance mask (AME=1 + LAM 끝니블 don't-care) ============
            ECanaMboxes.MBOX0.MSGID.bit.AME  = 1;//Module 1
            ECanaMboxes.MBOX1.MSGID.bit.AME  = 1;//Module 2
            ECanaMboxes.MBOX2.MSGID.bit.AME  = 1;//Module 3
@@ -1130,6 +1136,7 @@ void InitECana(void)
            ECanaRegs.CANBTC.all = ECanaShadow.CANBTC.all;
             */
 
+           //============ 8. 비트레이트 500kbps (eCAN bit clock = SYSCLKOUT/2 = 30MHz 기준) ============
            //CPU 클럭 60MHz
            ECanaShadow.CANBTC.bit.BRPREG =  5;
            ECanaShadow.CANBTC.bit.TSEG2REG = 1;
@@ -1150,6 +1157,7 @@ void InitECana(void)
            #endif
 
            ECanaShadow.CANMC.all = ECanaRegs.CANMC.all;
+           //============ 9. config 모드 종료(CCR=0) ============
            ECanaShadow.CANMC.bit.CCR = 0 ;                // Set CCR = 0
            ECanaRegs.CANMC.all = ECanaShadow.CANMC.all;
 
@@ -1168,6 +1176,8 @@ void InitECana(void)
            //ByCHOO : 두개의 인터럽트 서비스 중 하나를 선택, 32개 모두를 0번 인터럽트에 배당
            EALLOW;
            ECanaShadow.CANMIL.all = ECanaRegs.CANMIL.all;                  // 1 이면 해당 MailBox 인트럽트 Generateon 1 선언함 ; 0 이면 해당 MailBox 인트럽트 Generateon 0 선언함
+           
+           //============ 10. 수신 인터럽트 라인 0 연결 (main의 ISR_CANRXINTA) ============
            ECanaShadow.CANMIL.all = 0x00000000;                            //ByCHOO 0이면 interrupt 0에 연결. 나중에 Main에서  PieVectTable.ECAN0INTA    = &ISR_CANRXINTA; 이런 식으로 연계
            ECanaRegs.CANMIL.all  = ECanaShadow.CANMIL.all;
 
@@ -1175,6 +1185,7 @@ void InitECana(void)
 
            ECanaShadow.CANMD.all = ECanaRegs.CANMD.all;                    // 해당 MailBox을 1:RX, 0:TX 선정함. 우선은 모두 RX 로 설정. 32개 메일박스 RX인터럽트 확인한다.
 
+           //============ 11. 메일박스 RX/TX 방향 (MBOX0~6=모듈, 29=CT, 30=PMS → RX) ============
            ECanaShadow.CANMD.bit.MD0=1;   //RX:Module 1
            ECanaShadow.CANMD.bit.MD1=1;   //RX:Module 2
            ECanaShadow.CANMD.bit.MD2=1;   //RX:Module 3
@@ -1212,6 +1223,7 @@ void InitECana(void)
            // 해당 MailBox를 CAN Enable 시킴
 
            ECanaShadow.CANME.all = ECanaRegs.CANME.all;
+           //============ 12. 메일박스 Enable (켜야 실제 동작) ============
            ECanaShadow.CANME.bit.ME0= 1;
            ECanaShadow.CANME.bit.ME1= 1;
            ECanaShadow.CANME.bit.ME2= 1;
