@@ -774,7 +774,8 @@ void InitECana(void)
                ECanaMboxes.MBOX26.MSGID.bit.STDMSGID = 0x01B;
                ECanaMboxes.MBOX27.MSGID.bit.STDMSGID = 0x01C;
                ECanaMboxes.MBOX28.MSGID.bit.STDMSGID = 0x01D;
-               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;
+               //ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x3C2;   // 변경 전
+               ECanaMboxes.MBOX29.MSGID.bit.STDMSGID = 0x512;   // TODOS : [검증] (33, TEST/Rack1 전류센서 ID 0x3C2→0x512, 실제 CT 송신 ID 일치)
                ECanaMboxes.MBOX30.MSGID.bit.STDMSGID = 0x700;
                ECanaMboxes.MBOX31.MSGID.bit.STDMSGID = 0X300;
            }
