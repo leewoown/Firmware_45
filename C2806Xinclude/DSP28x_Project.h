@@ -400,26 +400,47 @@ union SystemAlarm_REG
    Uint32                   all;
 };
 struct SystemFault_BIT
-{       // bits   description
+{       // bits   description (0x603 Data1 = R59 SB16~31)
 //    unsigned int     PackVDISCHACT_OV          :1; // 0
 //    unsigned int     PackVCHACT_OV             :1; // 1
     // TODOS : [완료] (47, 0x603 Fault(bit16-31) 일치 — bit13-15 셀IR Fault 신규, UnbaPWR(구13-14) 삭제)
-    unsigned int     PackVCur_OC                :1; // 0   BRA_FLT_CT_OV
-    unsigned int     PackVSOC_OV                :1; // 1   BRA_FLT_SOC_OV
-    unsigned int     PackVSOC_UN                :1; // 2   BRA_FLT_SOC_UN
-    unsigned int     PackVolt_OV                :1; // 3   BRA_FLT_Volt_OV
-    unsigned int     PackVolt_UN                :1; // 4   BRA_FLT_Volt_UN
-    unsigned int     PackTemp_OT                :1; // 5   BRA_FLT_Temp_OV
-    unsigned int     PackTemp_UT                :1; // 6   BRA_FLT_Temp_UN
-    unsigned int     CellVolt_OV                :1; // 7   Cell_FLT_Volt_OV
-    unsigned int     CellVolt_UN                :1; // 8   Cell_FLT_Volt_UN
-    unsigned int     CellVolt_BL                :1; // 9   Cell_FLT_Volt_DIV
-    unsigned int     CellTemp_OT                :1; // 10  Cell_FLT_Temp_OV
-    unsigned int     CellTemp_UT                :1; // 11  Cell_FLT_Temp_UN
-    unsigned int     CellTemp_BL                :1; // 12  Cell_FLT_Temp_DIV
-    unsigned int     CellIR_OV                  :1; // 13  Cell_FLT_IR_OV  (신규)
-    unsigned int     CellIR_UN                  :1; // 14  Cell_FLT_IR_UN  (신규)
-    unsigned int     CellIR_DIV                 :1; // 15  Cell_FLT_IR_DIV (신규)
+    /*--------------------------------------------------------------
+     * 260615 : 0x603 Fault(SB16~31) R59 정렬 (Warn과 동일 배치)
+     *          - bit1 예비(Not_Fault2) 삽입 → SOC/Volt/Cell/Temp 한 칸씩 이동
+     *          - bit13~15 CellIR 삭제 → Cell_UnbalT/Discharger·Charger_UnbaPWR 부활
+     *--------------------------------------------------------------*/
+    //unsigned int     PackVCur_OC                :1; // 0   BRA_FLT_CT_OV    (R57 옛 배치)
+    //unsigned int     PackVSOC_OV                :1; // 1
+    //unsigned int     PackVSOC_UN                :1; // 2
+    //unsigned int     PackVolt_OV                :1; // 3
+    //unsigned int     PackVolt_UN                :1; // 4
+    //unsigned int     PackTemp_OT                :1; // 5
+    //unsigned int     PackTemp_UT                :1; // 6
+    //unsigned int     CellVolt_OV                :1; // 7
+    //unsigned int     CellVolt_UN                :1; // 8
+    //unsigned int     CellVolt_BL                :1; // 9
+    //unsigned int     CellTemp_OT                :1; // 10
+    //unsigned int     CellTemp_UT                :1; // 11
+    //unsigned int     CellTemp_BL                :1; // 12
+    //unsigned int     CellIR_OV                  :1; // 13  (R59 삭제)
+    //unsigned int     CellIR_UN                  :1; // 14  (R59 삭제)
+    //unsigned int     CellIR_DIV                 :1; // 15  (R59 삭제)
+    unsigned int     PackVCur_OC                :1; // 0   BRA1_FLT_OC                  // TODOS : [검증] (77, 0x603 Fault R59 정렬)
+    unsigned int     NotFault1                  :1; // 1   Not_Fault2 (예비)
+    unsigned int     PackVSOC_OV                :1; // 2   BRA1_FLT_SOC_OV
+    unsigned int     PackVSOC_UN                :1; // 3   BRA1_FLT_SOC_Un
+    unsigned int     PackVolt_OV                :1; // 4   BRA1_FLT_OV
+    unsigned int     PackVolt_UN                :1; // 5   BRA1_FLT_UV
+    unsigned int     CellVolt_OV                :1; // 6   BRA1_FLT_Cell_OV
+    unsigned int     CellVolt_UN                :1; // 7   BRA1_FLT_Cell_UV
+    unsigned int     CellVolt_BL                :1; // 8   BRA1_FLT_Cell_UnbalV
+    unsigned int     PackTemp_OT                :1; // 9   BRA1_FLT_PackOT
+    unsigned int     PackTemp_UT                :1; // 10  BRA1_FLT_PackUT
+    unsigned int     CellTemp_OT                :1; // 11  BRA1_FLT_CellOT
+    unsigned int     CellTemp_UT                :1; // 12  BRA1_FLT_CellUT
+    unsigned int     CellTemp_BL                :1; // 13  BRA1_FLT_Cell_UnbalT
+    unsigned int     PackUnbaDisCh_UbPWR        :1; // 14  BRA1_FLT_Discharger_UnbaPWR
+    unsigned int     PackUnbaCahr_UbPWR         :1; // 15  BRA1_FLT_Charger_UnbaPWR
     unsigned int     SW16                       :1; // 16
     unsigned int     SW17                       :1; // 17
     unsigned int     SW18                       :1; // 18
@@ -446,35 +467,71 @@ union SystemFault_REG
 struct SystemProtect_BIT
 {       // bits   description
     // TODOS : [완료] (48, 0x603 Protect(bit32-60) 행순서 일치 — 셀IR/BATICCOM/MSD/SysEmgStop/IMD/OffGas 신규)
-    unsigned int     PackVCT_OV                :1; // 0   BRA1_Prtct_OC
-    unsigned int     PackVSOC_OV               :1; // 1   BRA1_Prtct_SOC_OV
-    unsigned int     PackVSOC_UN               :1; // 2   BRA1_Prtct_SOC_Un
-    unsigned int     PackVolt_OV               :1; // 3   BRA_Prtct_Volt_OV
-    unsigned int     PackVolt_UN               :1; // 4   BRA_Prtct_Volt_UN
-    unsigned int     PackTemp_OV               :1; // 5   BRA_Prtct_Temp_OV
-    unsigned int     PackTemp_UN               :1; // 6   BRA_Prtct_Temp_UN
-    unsigned int     CellVolt_OV               :1; // 7   Cell_Prtct_Volt_OV
-    unsigned int     CellVolt_UN               :1; // 8   Cell_Prtct_Volt_UN
-    unsigned int     CellVolt_BL               :1; // 9   Cell_Prtct_Volt_DIV
-    unsigned int     CellTemp_OV               :1; // 10  Cell_Prtct_Temp_OV
-    unsigned int     CellTemp_UN               :1; // 11  Cell_Prtct_Temp_UN
-    unsigned int     CellTemp_BLT              :1; // 12  Cell_Prtct_Temp_DIV
-    unsigned int     CellIR_OV                 :1; // 13  Cell_Prtct_IR_OV   (신규)
-    unsigned int     CellIR_UN                 :1; // 14  Cell_Prtct_IR_UN   (신규)
-    unsigned int     CellIR_DIV                :1; // 15  Cell_Prtct_IR_DIV  (신규)
-    unsigned int     PackUnbaDisCh_UbPWR       :1; // 16  BRA_Prtct_Discharger_UnbaPWR
-    unsigned int     PackUnbaCahr_UbPWR        :1; // 17  BRA_Prtct_Charger_UnbaPWR
-    unsigned int     PackRlyErr                :1; // 18  BRA_Prtct_Rly_Err
-    unsigned int     PackCTComErr              :1; // 19  BRA_Prtct_CT_Err
-    unsigned int     PackExComErr              :1; // 20  BRA_Prtct_MABCOM_Err  (RACK>SYS BMS)
-    unsigned int     PackINComErr              :1; // 21  BRA_Prtct_MDCOM_Err   (BM>Rack)
-    unsigned int     PackBATICComErr           :1; // 22  BRA_Prtct_BATICCOM_Err (신규, BM>BATIC)
-    unsigned int     PackMSDErr                :1; // 23  BRA_Prtct_MSD_Err      (신규)
-    unsigned int     PackEMSSWErr              :1; // 24  BRA_Prtct_EmgSW_Err
-    unsigned int     PackSysEmgStopErr         :1; // 25  BRA_Prtct_SysEmgStop_Err (신규)
-    unsigned int     PackWaterleakErr          :1; // 26  BRA_Prtct_WLeak_Err
-    unsigned int     PackIMDErr                :1; // 27  BRA_Prtct_IMD_Err      (신규)
-    unsigned int     PackOffGasErr             :1; // 28  BRA_Prtct_OffGas_Err   (신규)
+    /*--------------------------------------------------------------
+     * 260615 : 0x603 Protect(SB32~56) R59 정렬
+     *          - bit1 예비(Not_Prtct2) 삽입 → SOC/Volt/Cell/Temp 한 칸씩 이동
+     *          - bit13~15 CellIR 삭제 → Cell_UnbalT/Discharger·Charger_UnbaPWR(bit13~15) 부활
+     *          - 후반 에러 R59순: Rly/IN_COM/EX_COM/CT_COM/Water/EMS/MSD/IMD/OffGas
+     *          - R59 미정의 BATICComErr/SysEmgStopErr 삭제
+     *--------------------------------------------------------------*/
+    //unsigned int     PackVCT_OV                :1; // 0   BRA1_Prtct_OC       (R57 옛 배치)
+    //unsigned int     PackVSOC_OV               :1; // 1
+    //unsigned int     PackVSOC_UN               :1; // 2
+    //unsigned int     PackVolt_OV               :1; // 3
+    //unsigned int     PackVolt_UN               :1; // 4
+    //unsigned int     PackTemp_OV               :1; // 5
+    //unsigned int     PackTemp_UN               :1; // 6
+    //unsigned int     CellVolt_OV               :1; // 7
+    //unsigned int     CellVolt_UN               :1; // 8
+    //unsigned int     CellVolt_BL               :1; // 9
+    //unsigned int     CellTemp_OV               :1; // 10
+    //unsigned int     CellTemp_UN               :1; // 11
+    //unsigned int     CellTemp_BLT              :1; // 12
+    //unsigned int     CellIR_OV                 :1; // 13  (R59 삭제)
+    //unsigned int     CellIR_UN                 :1; // 14  (R59 삭제)
+    //unsigned int     CellIR_DIV                :1; // 15  (R59 삭제)
+    //unsigned int     PackUnbaDisCh_UbPWR       :1; // 16  (R59 bit14로 이동)
+    //unsigned int     PackUnbaCahr_UbPWR        :1; // 17  (R59 bit15로 이동)
+    //unsigned int     PackRlyErr                :1; // 18
+    //unsigned int     PackCTComErr              :1; // 19
+    //unsigned int     PackExComErr              :1; // 20
+    //unsigned int     PackINComErr              :1; // 21
+    //unsigned int     PackBATICComErr           :1; // 22  (R59 삭제)
+    //unsigned int     PackMSDErr                :1; // 23
+    //unsigned int     PackEMSSWErr              :1; // 24
+    //unsigned int     PackSysEmgStopErr         :1; // 25  (R59 삭제)
+    //unsigned int     PackWaterleakErr          :1; // 26
+    //unsigned int     PackIMDErr                :1; // 27
+    //unsigned int     PackOffGasErr             :1; // 28
+    unsigned int     PackVCT_OV                :1; // 0   BRA1_Prtct_OC                // TODOS : [검증] (78, 0x603 Protect R59 정렬)
+    unsigned int     NotPrtct1                 :1; // 1   Not_Prtct2 (예비)
+    unsigned int     PackVSOC_OV               :1; // 2   BRA1_Prtct_SOC_OV
+    unsigned int     PackVSOC_UN               :1; // 3   BRA1_Prtct_SOC_Un
+    unsigned int     PackVolt_OV               :1; // 4   BRA1_Prtct_OV
+    unsigned int     PackVolt_UN               :1; // 5   BRA1_Prtct_UV
+    unsigned int     CellVolt_OV               :1; // 6   BRA1_Prtct_Cell_OV
+    unsigned int     CellVolt_UN               :1; // 7   BRA1_Prtct_Cell_UV
+    unsigned int     CellVolt_BL               :1; // 8   BRA1_Prtct_Cell_UnbalV
+    unsigned int     PackTemp_OV               :1; // 9   BRA1_Prtct_PackOT
+    unsigned int     PackTemp_UN               :1; // 10  BRA1_Prtct_PackUT
+    unsigned int     CellTemp_OV               :1; // 11  BRA1_Prtct_CellOT
+    unsigned int     CellTemp_UN               :1; // 12  BRA1_Prtct_CellUT
+    unsigned int     CellTemp_BLT              :1; // 13  BRA1_Prtct_Cell_UnbalT
+    unsigned int     PackUnbaDisCh_UbPWR       :1; // 14  BRA1_Prtct_Discharger_UnbaPWR
+    unsigned int     PackUnbaCahr_UbPWR        :1; // 15  BRA1_Prtct_Charger_UnbaPWR
+    unsigned int     PackRlyErr                :1; // 16  BRA1_PrtctRly_Err
+    unsigned int     PackINComErr              :1; // 17  BRA1_Prtct_IN_COM_Err  (BM>Rack)
+    unsigned int     PackExComErr              :1; // 18  BRA1_Prtct_EX_COM_Err  (RACK>SYS BMS)
+    unsigned int     PackCTComErr              :1; // 19  BRA1_Prtct_CT_COM_Err
+    unsigned int     PackWaterleakErr          :1; // 20  BRA1_Prtct_Water_Leak_Err
+    unsigned int     PackEMSSWErr              :1; // 21  BRA1_Prtct_EMS_SW_Err
+    unsigned int     PackMSDErr                :1; // 22  BRA1_Prtct_MSD_Err
+    unsigned int     PackIMDErr                :1; // 23  BRA1_Prtct_IMD_Err
+    unsigned int     PackOffGasErr             :1; // 24  BRA1_Prtct_OffGas_Err
+    unsigned int     SW25                      :1; // 25
+    unsigned int     SW26                      :1; // 26
+    unsigned int     SW27                      :1; // 27
+    unsigned int     SW28                      :1; // 28
     unsigned int     SW29                      :1; // 29
     unsigned int     SW30                      :1; // 30
     unsigned int     SW31                      :1; // 31
@@ -710,19 +767,35 @@ typedef struct
   unsigned int TimerVaule;
 }TimerReg;
 struct BATStatus_BIT
-{       // bits   description
+{       // bits   description (0x602 Data1 = R59 SB16~31)
     // TODOS : [완료] (51, 0x602 BPA_State 비트맵 재배치 (Aux 릴레이/EMG/OffGas 추가))
-    unsigned int     PackBalance          :1; // 0
-    unsigned int     PackNeg_Rly          :1; // 1
-    unsigned int     PackPos_Rly          :1; // 2
-    unsigned int     PackPreChar_Rly      :1; // 3
-    unsigned int     PackNeg_Rly_Aux      :1; // 4
-    unsigned int     PackPos_Rly_Aux      :1; // 5
-    unsigned int     PackPreChar_AUX      :1; // 6
-    unsigned int     PackMSD_AUX          :1; // 7
-    unsigned int     PackEmg_STOP_SW      :1; // 8
-    unsigned int     PackWater_Leak       :1; // 9
-    unsigned int     PackOffGas           :1; // 10
+    /*--------------------------------------------------------------
+     * 260615 : 0x602 PackStatus(SB16~31) R59 정렬
+     *          - R59 미정의 Aux 릴레이3(bit4~6)·OffGas(bit10) 제거
+     *          - MSD_AUX/EMG_SW/Water_leak 을 SB20~22(bit4~6)로 당김
+     *--------------------------------------------------------------*/
+    //unsigned int     PackBalance          :1; // 0
+    //unsigned int     PackNeg_Rly          :1; // 1
+    //unsigned int     PackPos_Rly          :1; // 2
+    //unsigned int     PackPreChar_Rly      :1; // 3
+    //unsigned int     PackNeg_Rly_Aux      :1; // 4   (R59 삭제)
+    //unsigned int     PackPos_Rly_Aux      :1; // 5   (R59 삭제)
+    //unsigned int     PackPreChar_AUX      :1; // 6   (R59 삭제)
+    //unsigned int     PackMSD_AUX          :1; // 7
+    //unsigned int     PackEmg_STOP_SW      :1; // 8
+    //unsigned int     PackWater_Leak       :1; // 9
+    //unsigned int     PackOffGas           :1; // 10  (R59 0x602 미정의)
+    unsigned int     PackBalance          :1; // 0   BRA1_Balance     (SB16)   // TODOS : [검증] (73, 0x602 PackStatus R59 정렬)
+    unsigned int     PackNeg_Rly          :1; // 1   BRA1_NegRly      (SB17)
+    unsigned int     PackPos_Rly          :1; // 2   BRA1_PosRly      (SB18)
+    unsigned int     PackPreChar_Rly      :1; // 3   BRA1_PreCharRly  (SB19)
+    unsigned int     PackMSD_AUX          :1; // 4   BRA1_MSD_AUX     (SB20)
+    unsigned int     PackEmg_STOP_SW      :1; // 5   BRA1_EMG_SW      (SB21)
+    unsigned int     PackWater_Leak       :1; // 6   BRA1_Water_leak  (SB22)
+    unsigned int     Stauts07             :1; // 7   (SB23 예비)
+    unsigned int     Stauts08             :1; // 8   (SB24 예비)
+    unsigned int     Stauts09             :1; // 9   (SB25 예비)
+    unsigned int     Stauts10             :1; // 10  (SB26 예비)
     unsigned int     Stauts11             :1; // 11
     unsigned int     Stauts12             :1; // 12
     unsigned int     Stauts13             :1; // 13
