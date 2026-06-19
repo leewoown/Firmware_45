@@ -34,9 +34,17 @@ extern void CalFrey60AhSocHandle(SocReg *P);
 #define C_SOCX2         -198.04
 #define C_SOCX1         1646.6
 #define C_SOCX0         -3324.3
-#define C_NegAh         -80.0
-#define C_PogAh          80.0
-#define AhNorm          0.0125//1/80Ah (셀용량 100Ah x DOD80% = 80Ah 기준 정규화)
+/*--------------------------------------------------------------
+ * 260619 : 80Ah 기준 단일 소스화. 가용용량을 C_UsableAh 한 곳에
+ *          정의하고 클램프/정규화를 파생 -> 한 값만 바꿔도 정합 유지.
+ *--------------------------------------------------------------*/
+//#define C_NegAh         -80.0
+//#define C_PogAh          80.0
+//#define AhNorm          0.0125//1/80Ah (셀용량 100Ah x DOD80% = 80Ah 기준 정규화)
+#define C_UsableAh       80.0                 // TODOS : [검증] (93, 가용용량 셀100Ah x DOD80% / 260619_Note1, 0.1)
+#define C_NegAh         (-C_UsableAh)         // TODOS : [검증] (93, 방전 한계 = -가용용량 / 260619_Note1, 0.1)
+#define C_PogAh          (C_UsableAh)         // TODOS : [검증] (93, 충전 한계 = +가용용량 / 260619_Note1, 0.1)
+#define AhNorm          (1.0/C_UsableAh)      // TODOS : [검증] (93, 1/80 정규화 / 260619_Note1, 0.1)
 extern void CalKokam100AhRegsInit(SocReg *P);
 extern void CalKokam100AhSocInit(SocReg *P);
 extern void Calkokam100AhSocHandle(SocReg *P);
@@ -306,6 +314,8 @@ void CalKokam100AhSocInit(SocReg *P)
 
 void Calkokam100AhSocHandle(SocReg *P)
 {
+    Uint16 PrevCalMethU = P->SoCStateRegs.bit.CalMeth;   /* remember mode before this update */
+
     P->SysTime++;
     if(P->SysTime>=C_SocSamPleCount)
     {
@@ -313,6 +323,15 @@ void Calkokam100AhSocHandle(SocReg *P)
         {
             P->SoCStateRegs.bit.CalMeth=1;
             P->CTCount=0;
+            /*--------------------------------------------------------------
+             * 260619 : 휴지(OCV)->적산 전환 시 과거 누적 Ah가 새 baseline에
+             *          이중 반영되어 SOC가 튀던 문제. 0->1 엣지에서만 누적 리셋.
+             *--------------------------------------------------------------*/
+            if(PrevCalMethU==0)
+            {
+                P->SysAhF    = 0.0;   // TODOS : [검증] (91, 적산 전환 시 누적Ah 리셋 / 260619_Note1, 0.1)
+                P->SysAhOldF = 0.0;   // TODOS : [검증] (91, 적산 전환 시 누적Ah 리셋 / 260619_Note1, 0.1)
+            }
         }
         else
         {
@@ -351,7 +370,11 @@ void Calkokam100AhSocHandle(SocReg *P)
                      P->SysSOCdtF = C_CTSampleTime*C_SocCumulativeTime; // CumulativeTime(1/3600) -> 누적시간
                      P->SysAhNewF = P->SysSoCCTF * P->SysSOCdtF;
                      P->SysAhF    = P->SysAhNewF + P->SysAhOldF;
-                     P->SysAhOldF = P->SysAhF;
+                     /*--------------------------------------------------------------
+                      * 260619 : anti-windup. 클램프를 baseline 저장보다 먼저 적용해
+                      *          ±한계에서 SysAhOldF가 한도를 넘어 누적되지 않게 함.
+                      *--------------------------------------------------------------*/
+                     //P->SysAhOldF = P->SysAhF;          // (구) 클램프 전 값을 저장 -> windup 유발
                      if(P->SysAhF <= C_NegAh)
                      {
                         P->SysAhF =C_NegAh;
@@ -360,23 +383,50 @@ void Calkokam100AhSocHandle(SocReg *P)
                      {
                          P->SysAhF= C_PogAh;
                      }
+                     P->SysAhOldF = P->SysAhF;   // TODOS : [검증] (92, 클램프 후 값으로 baseline 저장 / 260619_Note1, 0.1)
                      /*
                      * SOC 변환
                      */
                      P->SysSOCBufF1 = P->SysAhF *AhNorm;//0.0125 ;// 1/80 --> 0.0125--> 일반화
                      P->SysSOCBufF2 = P->SysSOCBufF1*100.0; //--> 단위 변환 %
                      P->SysSOCF     = P->SysSocInitF+P->SysSOCBufF2;
+                     /*--------------------------------------------------------------
+                      * 260616 : 적산모드 SOC 0~100% 클램프 추가 (OCV모드와 동일)
+                      *          baseline + 적산분(+-100%)이 범위 초과/음수 되던 문제
+                      *--------------------------------------------------------------*/
+                     if(P->SysSOCF < 0.0)
+                     {
+                         P->SysSOCF = 0.0;     // TODOS : [검증] (105, 적산 SOC 하한 클램프 0%)
+                     }
+                     else if(P->SysSOCF > 100.0)
+                     {
+                         P->SysSOCF = 100.0;   // TODOS : [검증] (105, 적산 SOC 상한 클램프 100%)
+                     }
                  }
-                 P->state = SOC_STATE_Save;
+                 /*--------------------------------------------------------------
+                  * 260616 : Save 토글 제거 - RUNNING 매 50ms 적산 (dt C_CTSampleTime 0.05s 정합)
+                  *          (구) RUNNING->Save 토글로 적산 100ms化 -> SOC 절반 오차
+                  *          state 변경 안 함 -> RUNNING 상시 유지
+                  *--------------------------------------------------------------*/
+                 //P->state = SOC_STATE_Save;   // TODOS : [검증] (103, Save 토글 제거 - RUNNING 50ms 적산)
 
             break;
-            case SOC_STATE_Save:
-
-                P->state = SOC_STATE_RUNNING;
-
-            break;
+            //case SOC_STATE_Save:               // (구) 빈 토글 case 폐기 - RUNNING 상시 유지로 불필요
+            //
+            //    P->state = SOC_STATE_RUNNING;
+            //
+            //break;
             case SOC_STATE_CLEAR:
+                /*--------------------------------------------------------------
+                 * 260616 : CLEAR 진입 시 탈출 불가(데드락) 방지
+                 *          누적 Ah 초기화 후 RUNNING 복귀 (적산 클리어 용도)
+                 *--------------------------------------------------------------*/
+                P->SysAhF    = 0.0;
+                P->SysAhOldF = 0.0;
+                P->state     = SOC_STATE_RUNNING;   // TODOS : [검증] (104, CLEAR 탈출 추가 - 누적Ah 초기화 후 RUNNING 복귀)
 
+            break;
+            default:                                 // TODOS : [검증] (106, IDLE/예상외 state 방어 - 동작 없음, main이 RUNNING 설정 전 구간)
             break;
         }
         P->SysTime=0;

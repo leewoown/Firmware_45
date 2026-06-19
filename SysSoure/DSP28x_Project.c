@@ -534,14 +534,27 @@ void SysCurrentHandle(SystemReg *s)
         s->PackCurrentAsbF =s->PackCurrentF;
     }
     // TODOS : [검증] (27, 충/방전 모드 판정 - 전류 부호 기준(SOC 누적 규약상 +=충전, -=방전). 실차 부호 검증 필요)
-    if(s->PackCurrentF < 0.0)
+    /*--------------------------------------------------------------
+     * 260616 : 0 부근 채터링 방지 데드밴드 추가 (+-2A)
+     *          < -2A 방전 / > +2A 충전 / 그 사이는 이전 상태 유지
+     *--------------------------------------------------------------*/
+    //if(s->PackCurrentF < 0.0)
+    //{
+    //    s->PackStateReg.bit.SysDisCharMode = 1u;   // 방전
+    //}
+    //else
+    //{
+    //    s->PackStateReg.bit.SysDisCharMode = 0u;   // 충전
+    //}
+    if(s->PackCurrentF < -2.0)
     {
-        s->PackStateReg.bit.SysDisCharMode = 1u;   // 방전
+        s->PackStateReg.bit.SysDisCharMode = 1u;   // 방전          // TODOS : [검증] (102, 충/방전 데드밴드 +-2A, 0부근 채터링 방지)
     }
-    else
+    else if(s->PackCurrentF > 2.0)
     {
         s->PackStateReg.bit.SysDisCharMode = 0u;   // 충전
     }
+    /* -2A ~ +2A : 이전 상태 유지 (set 안 함) */
 }
 
 /* ----------------------------------------------------------------------------
