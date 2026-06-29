@@ -42,9 +42,17 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
 #define ISR_FREQUENCY 	    10
 #define SYSTEM_FREQUENCY    60
 #define CPUCLK			       60000000L					// CPU Main Clock
+#define CPU_CLOCK_SPEED     16.667L                     // TODO : [검증] 260622_Note1, 0.1 for a 60MHz CPU clock speed (실제 SYSCLKOUT)
 
 //#define CPU_CLOCK_SPEED     6.6667L   			    // for a 150MHz CPU clock speed
-#define CPU_CLOCK_SPEED     11.111L                     // for a 90MHz CPU clock speed
+/*--------------------------------------------------------------
+ * 260622 : stale 오기 정정. 실제 SYSCLKOUT=60MHz(CPUCLK=60000000L,
+ *          PLLCR=12,DIVSEL=2)인데 90MHz(11.111L)로 표기돼 있었음.
+ *          본 매크로는 현재 참조처 없음(지연은 CPU_RATE 사용, 이미 60MHz
+ *          정상) -> 문서 정정용.
+ *--------------------------------------------------------------*/
+//#define CPU_CLOCK_SPEED     11.111L                     // for a 90MHz CPU clock speed
+
 #define ADC_usDELAY 	    5000L
 
 

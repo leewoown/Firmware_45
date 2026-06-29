@@ -192,9 +192,15 @@ void main(void)
 
     MemCopy(&RamfuncsLoadStart, &RamfuncsLoadEnd, &RamfuncsRunStart);
     InitFlash();
-
     ConfigCpuTimer(&CpuTimer0, 80, 1000);
-    CpuTimer0Regs.PRD.all = 80000;// 90000 is 1msec
+    /*--------------------------------------------------------------
+     * 260622 : SOC 적산 dt 클럭 의존 버그. PRD=80000은 옛 80MHz 잔재라
+     *          실제 60MHz(PLLCR=12,DIVSEL=2)에서 ISR 1.333ms(50틱=66.7ms)
+     *          -> 적산 Ah 0.75배 과소. timer must tick every 1ms.
+     *          60MHz x 1ms = 60000 으로 정정해 50틱=50ms=C_CTSampleTime 정합.
+     *--------------------------------------------------------------*/
+    //CpuTimer0Regs.PRD.all = 80000;// 90000 is 1msec
+    CpuTimer0Regs.PRD.all = 60000;// TODO : [검증] 260622_Note1, 0.1 60MHz×1ms=60000 (ISR 1ms 보장, 적산 dt 정합)
     //   ConfigCpuTimer(&CpuTimer1, 80, 1000000);
     //   ConfigCpuTimer(&CpuTimer2, 80, 1000000);
     CpuTimer0Regs.TCR.all = 0x4001; // Use write-only instruction to set TSS bit = 0
