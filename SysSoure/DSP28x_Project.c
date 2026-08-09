@@ -196,6 +196,7 @@ void SysVarINIT(SystemReg *s)
     s->MD7CANRxCount=0;
     s->CTRxCount=0;
     s->MasterRxCount=0;
+    s->MasterCommGraceCount=0;
 
     s->PackInMDCANrxReg.all=0;
 
@@ -312,46 +313,83 @@ void CANRegVarINIT(CANAReg *P)
 }
 void ModuleInit(ModulemReg *P)
 {
-    memset(&P->MDCellVoltQty[0],0,7);
-    memset(&P->MDCellTempsQty[0],0,7);
-    memset(&P->MDFirmwareVer[0],0,7);
-    memset(&P->MDFirmwareRev[0],0,7);
-    memset(&P->MDNorVolt[0],0,7);
-    memset(&P->MDNorCapacity[0],0,7);
-    memset(&P->PackMinVolteRec[0],0,7);
+    // memset(&P->MDCellVoltQty[0],0,7);
+    // memset(&P->MDCellTempsQty[0],0,7);
+    // memset(&P->MDFirmwareVer[0],0,7);
+    // memset(&P->MDFirmwareRev[0],0,7);
+    // memset(&P->MDNorVolt[0],0,7);
+    // memset(&P->MDNorCapacity[0],0,7);
+    // memset(&P->PackMinVolteRec[0],0,7);
 
-    memset(&P->MDCellMaxVolt[0],0,7);
-    memset(&P->MDCellMinVolt[0],0,7);
-    memset(&P->MDCellAgvVolt[0],0,7);
-    memset(&P->MDCellDivVolt[0],0,7);
+    // memset(&P->MDCellMaxVolt[0],0,7);
+    // memset(&P->MDCellMinVolt[0],0,7);
+    // memset(&P->MDCellAgvVolt[0],0,7);
+    // memset(&P->MDCellDivVolt[0],0,7);
 
-    memset(&P->MDCellMaxTemps[0],0,7);
-    memset(&P->MDCellMinTemps[0],0,7);
-    memset(&P->MDCellAgvTemps[0],0,7);
-    memset(&P->MDCellDivTemps[0],0,7);
+    // memset(&P->MDCellMaxTemps[0],0,7);
+    // memset(&P->MDCellMinTemps[0],0,7);
+    // memset(&P->MDCellAgvTemps[0],0,7);
+    // memset(&P->MDCellDivTemps[0],0,7);
 
-    memset(&P->MDCTComErr[0],0,7);
-    memset(&P->MDSubComErr[0],0,7);
-    memset(&P->MDBatICCOMErr[0],0,7);
-    memset(&P->MDWaterLeakErr[0],0,7);
+    // memset(&P->MDCTComErr[0],0,7);
+    // memset(&P->MDSubComErr[0],0,7);
+    // memset(&P->MDBatICCOMErr[0],0,7);
+    // memset(&P->MDWaterLeakErr[0],0,7);
 
-    memset(&P->MDTotalVolt[0],0,7);
-    memset(&P->MDMaxVoltPo[0],0,7);
-    memset(&P->MDMinVoltPo[0],0,7);
-    memset(&P->MDMaxTempsPo[0],0,7);
-    memset(&P->MDMinTempsPo[0],0,7);
-    memset(&P->MDstatusbit[0],0,7);
+    // memset(&P->MDTotalVolt[0],0,7);
+    // memset(&P->MDMaxVoltPo[0],0,7);
+    // memset(&P->MDMinVoltPo[0],0,7);
+    // memset(&P->MDMaxTempsPo[0],0,7);
+    // memset(&P->MDMinTempsPo[0],0,7);
+    // memset(&P->MDstatusbit[0],0,7);
 
 
 
-    memset(&P->MD1XRxcount[0],0,7);
-    memset(&P->MD2XRxcount[0],0,7);
-    memset(&P->MD3XRxcount[0],0,7);
-    memset(&P->MD4XRxcount[0],0,7);
-    memset(&P->MD5XRxcount[0],0,7);
-    memset(&P->MD6XRxcount[0],0,7);
-    memset(&P->MD7XRxcount[0],0,7);
+    // memset(&P->MD1XRxcount[0],0,7);
+    // memset(&P->MD2XRxcount[0],0,7);
+    // memset(&P->MD3XRxcount[0],0,7);
+    // memset(&P->MD4XRxcount[0],0,7);
+    // memset(&P->MD5XRxcount[0],0,7);
+    // memset(&P->MD6XRxcount[0],0,7);
+    // memset(&P->MD7XRxcount[0],0,7);
 
+    memset(&P->MDCellVoltQty[0], 0, sizeof(P->MDCellVoltQty));
+    memset(&P->MDCellTempsQty[0], 0, sizeof(P->MDCellTempsQty));
+    memset(&P->MDFirmwareVer[0], 0, sizeof(P->MDFirmwareVer));
+    memset(&P->MDFirmwareRev[0], 0, sizeof(P->MDFirmwareRev));
+    memset(&P->MDNorVolt[0], 0, sizeof(P->MDNorVolt));
+    memset(&P->MDNorCapacity[0], 0, sizeof(P->MDNorCapacity));
+    memset(&P->PackMinVolteRec[0], 0, sizeof(P->PackMinVolteRec));
+
+    memset(&P->MDCellMaxVolt[0], 0, sizeof(P->MDCellMaxVolt));
+    memset(&P->MDCellMinVolt[0], 0, sizeof(P->MDCellMinVolt));
+    memset(&P->MDCellAgvVolt[0], 0, sizeof(P->MDCellAgvVolt));
+    memset(&P->MDCellDivVolt[0], 0, sizeof(P->MDCellDivVolt));
+
+    memset(&P->MDCellMaxTemps[0], 0, sizeof(P->MDCellMaxTemps));
+    memset(&P->MDCellMinTemps[0], 0, sizeof(P->MDCellMinTemps));
+    memset(&P->MDCellAgvTemps[0], 0, sizeof(P->MDCellAgvTemps));
+    memset(&P->MDCellDivTemps[0], 0, sizeof(P->MDCellDivTemps));
+
+    memset(&P->MDCTComErr[0], 0, sizeof(P->MDCTComErr));
+    memset(&P->MDSubComErr[0], 0, sizeof(P->MDSubComErr));
+    memset(&P->MDBatICCOMErr[0], 0, sizeof(P->MDBatICCOMErr));
+    memset(&P->MDWaterLeakErr[0], 0, sizeof(P->MDWaterLeakErr));
+
+    memset(&P->MDTotalVolt[0], 0, sizeof(P->MDTotalVolt));
+    memset(&P->MDMaxVoltPo[0], 0, sizeof(P->MDMaxVoltPo));
+    memset(&P->MDMinVoltPo[0], 0, sizeof(P->MDMinVoltPo));
+    memset(&P->MDMaxTempsPo[0], 0, sizeof(P->MDMaxTempsPo));
+    memset(&P->MDMinTempsPo[0], 0, sizeof(P->MDMinTempsPo));
+    memset(&P->MDstatusbit[0], 0, sizeof(P->MDstatusbit));
+
+    memset(&P->MD1XRxcount[0], 0, sizeof(P->MD1XRxcount));
+    memset(&P->MD2XRxcount[0], 0, sizeof(P->MD2XRxcount));
+    memset(&P->MD3XRxcount[0], 0, sizeof(P->MD3XRxcount));
+    memset(&P->MD4XRxcount[0], 0, sizeof(P->MD4XRxcount));
+    memset(&P->MD5XRxcount[0], 0, sizeof(P->MD5XRxcount));
+    memset(&P->MD6XRxcount[0], 0, sizeof(P->MD6XRxcount));
+    memset(&P->MD7XRxcount[0], 0, sizeof(P->MD7XRxcount));
 }
 
 
@@ -423,17 +461,25 @@ void SysCommErrHandle(SystemReg *P)
     P->MD7CANRxCount++;
     P->CTRxCount++;
     P->MasterRxCount++;
-    if(P->MasterRxCount>5000)
+    /* 260720 : BDU(본 시스템)가 BPU보다 먼저 부팅되어 기동 직후 PackExComErr가
+     *          오탐되는 문제 - INITOK 이후 20초(20000ms) 유예시간 동안은 PackExComErr를
+     *          판정하지 않음. 유예시간이 지난 뒤에도 마스터로부터 한 번도 응답이 없거나
+     *          (또는 이후 5초 이상 무응답이면) 정상적으로 에러 판정. */
+    if(P->MasterCommGraceCount<20000)
     {
-        P->MasterRxCount =5100;
-      //  P->PackStateReg.bit.EXCANCOMERR=1;
-        P->PackProtectReg.bit.PackExComErr=1;
+        P->MasterCommGraceCount++;
     }
+   if((P->MasterRxCount>5000) && (P->MasterCommGraceCount>=20000))
+   {
+       P->MasterRxCount =5100;
+       //P->PackStateReg.bit.EXCANCOMERR=1;
+       P->PackProtectReg.bit.PackExComErr=1;
+   }
     if(P->CTRxCount>5000)
     {
         P->CTRxCount=5100;
       //  P->PackStateReg.bit.CTCOMErr=1;
-      //  P->PackProtectReg.bit.PackCTComErr=1;
+        P->PackProtectReg.bit.PackCTComErr=1;
     }
     if(P->PackInMDCANrxReg.all>0)
     {
@@ -1435,21 +1481,26 @@ void CalSysProtectCheck(SystemReg *s)
     }
 #endif
     /*----------------------------------------------------------------------
-     16. 방전 불평형전력 보호 (즉시 차단)   ON = 300kW(이상)   기준: 방전 전력 피크
-         ※ 불평형전력 전용 측정값 없어 기존 피크전력(PackDisCHAPWRPeakF)으로 대체
+     16/17. 방전/충전 불평형전력 보호 (즉시 차단)   방전=300A(이상), 충전=150A(이상)
+         ※ 불평형전력 전용 측정값 없어 기존 피크전류(PackDisCHAPWRPeakF/PackCHAPWRPeakF)로 대체
          TODOS : [검증] (62, 불평형전력 보호 - 피크전력 대체, 전용 측정 구현 시 교체)
+         260714 : SysDisCharMode로 게이팅 안 해서 방전 중에도 충전 불평형 protect가
+                  걸리던 문제 수정 (반대도 마찬가지로 방지)
     ----------------------------------------------------------------------*/
-    if(Hyst_On(s->PackDisCHAPWRPeakF, C_PackDisCharUnBalPWRProtect))
-    {
-        s->PackProtectReg.bit.PackUnbaDisCh_UbPWR = 1u;
-    }
-    /*----------------------------------------------------------------------
-     17. 충전 불평형전력 보호 (즉시 차단)   ON = 150kW(이상)   기준: 충전 전력 피크(PackCHAPWRPeakF)
-    ----------------------------------------------------------------------*/
-    if(Hyst_On(s->PackCHAPWRPeakF, C_PackCharUnBalPWRProtect))
-    {
-        s->PackProtectReg.bit.PackUnbaCahr_UbPWR = 1u;
-    }
+    // if(s->PackStateReg.bit.SysDisCharMode == 1u)   /* 방전 중 */
+    // {
+    //     if(Hyst_On(s->PackDisCHAPWRPeakF, C_PackDisCharUnBalPWRProtect))
+    //     {
+    //         s->PackProtectReg.bit.PackUnbaDisCh_UbPWR = 1u;
+    //     }
+    // }
+    // else                                            /* 충전 중 */
+    // {
+    //     if(Hyst_On(s->PackCHAPWRPeakF, C_PackCharUnBalPWRProtect))
+    //     {
+    //         s->PackProtectReg.bit.PackUnbaCahr_UbPWR = 1u;
+    //     }
+    // }
 }
 int float32ToInt(float32 Vaule, Uint32 Num)
 {

@@ -55,6 +55,13 @@ Note: In this software, the default inverter is supposed to be DMC1500 board.
  */
 //#define ProtectPRelayOFFTime          5 // 250msec
 //#define ProtectNRelayOFFTime          5 // 250msec
+/*
+ * 260721 : 릴레이 시퀀스 미완료 감시 타임아웃 (1ms ISR 카운트 기준)
+ *   - RlyCloseFailTimeOut_ms : OnSeq에서 접점이 안 닫힘 (DI 단선 / 릴레이 미투입), 정상 소요 약 750ms
+ *   - RlyOpenWeldTimeOut_ms  : OffSeq에서 접점이 안 열림 (융착), 정상 소요 약 1050ms
+ */
+#define RlyCloseFailTimeOut_ms          2000   // 2sec
+#define RlyOpenWeldTimeOut_ms           3000   // 3sec
 typedef enum
 {
   STATERly_INIT,

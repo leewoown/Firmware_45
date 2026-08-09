@@ -5,6 +5,9 @@
 #include "math.h"
 #include "string.h"
 
+#define TEMPERATURE_CORRECTION  0   // 1: 보정 ON 0:보정OFF
+
+
 #if ShipPack_168S1P
 extern void BatCalcRegsInit(BatCalcReg *P);
 extern void BatCalcVoltHandle(BatCalcReg *P);
@@ -31,34 +34,34 @@ float RandVaule(float inputVaule)
 }
 void BatCalcRegsInit(BatCalcReg *P)
 {
-    memset(&P->MDCellMaxVolt[0],0,7);
-    memset(&P->MDCellMinVolt[0],0,7);
-    memset(&P->MDCellAgvVolt[0],0,7);
-    memset(&P->MDCellDivVolt[0],0,7);
+    memset(&P->MDCellMaxVolt[0],0,sizeof(P->MDCellMaxVolt));
+    memset(&P->MDCellMinVolt[0],0,sizeof(P->MDCellMinVolt));
+    memset(&P->MDCellAgvVolt[0],0,sizeof(P->MDCellAgvVolt));
+    memset(&P->MDCellDivVolt[0],0,sizeof(P->MDCellDivVolt));
 
-    memset(&P->MDCellMaxTemps[0],0.0,7);
-    memset(&P->MDCellMinTemps[0],0.0,7);
-    memset(&P->MDCellAgvTemps[0],0.0,7);
-    memset(&P->MDCellDivTemps[0],0.0,7);
+    memset(&P->MDCellMaxTemps[0],0,sizeof(P->MDCellMaxTemps));
+    memset(&P->MDCellMinTemps[0],0,sizeof(P->MDCellMinTemps));
+    memset(&P->MDCellAgvTemps[0],0,sizeof(P->MDCellAgvTemps));
+    memset(&P->MDCellDivTemps[0],0,sizeof(P->MDCellDivTemps));
 
-    memset(&P->MDCellMaxVoltF[0],0.0,7);
-    memset(&P->MDCellMinVoltF[0],0.0,7);
-    memset(&P->MDCellAgvVoltF[0],0.0,7);
-    memset(&P->MDCellDivVoltF[0],0.0,7);
+    memset(&P->MDCellMaxVoltF[0],0,sizeof(P->MDCellMaxVoltF));
+    memset(&P->MDCellMinVoltF[0],0,sizeof(P->MDCellMinVoltF));
+    memset(&P->MDCellAgvVoltF[0],0,sizeof(P->MDCellAgvVoltF));
+    memset(&P->MDCellDivVoltF[0],0,sizeof(P->MDCellDivVoltF));
 
-    memset(&P->MDCellMaxTempsF[0],0.0,7);
-    memset(&P->MDCellMinTempsF[0],0.0,7);   // TODOS : [완료] (65, RegsInit 복붙오류 수정: Min/Agv/Div TempsF 초기화 누락 복구)
-    memset(&P->MDCellAgvTempsF[0],0.0,7);
-    memset(&P->MDCellDivTempsF[0],0.0,7);
+    memset(&P->MDCellMaxTempsF[0],0,sizeof(P->MDCellMaxTempsF));
+    memset(&P->MDCellMinTempsF[0],0,sizeof(P->MDCellMinTempsF));   // TODOS : [완료] (65, RegsInit 복붙오류 수정: Min/Agv/Div TempsF 초기화 누락 복구)
+    memset(&P->MDCellAgvTempsF[0],0,sizeof(P->MDCellAgvTempsF));
+    memset(&P->MDCellDivTempsF[0],0,sizeof(P->MDCellDivTempsF));
 
 
-    memset(&P->MDTotalVolt[0],0,7);
-    memset(&P->MDTotalVoltF[0],0.0,7);
+    memset(&P->MDTotalVolt[0],0,sizeof(P->MDTotalVolt));
+    memset(&P->MDTotalVoltF[0],0,sizeof(P->MDTotalVoltF));
 
-    memset(&P->MDMaxVoltPo[0],0.0,7);
-    memset(&P->MDMinVoltPo[0],0.0,7);
-    memset(&P->MDMaxTempsPo[0],0.0,7);
-    memset(&P->MDMinTempsPo[0],0.0,7);
+    memset(&P->MDMaxVoltPo[0],0,sizeof(P->MDMaxVoltPo));
+    memset(&P->MDMinVoltPo[0],0,sizeof(P->MDMinVoltPo));
+    memset(&P->MDMaxTempsPo[0],0,sizeof(P->MDMaxTempsPo));
+    memset(&P->MDMinTempsPo[0],0,sizeof(P->MDMinTempsPo));
 
 
     /*
@@ -151,8 +154,14 @@ void BatCalcVoltHandle(BatCalcReg *P)
     P->PackCellMinVoltF  = CellMinVoltF;
     P->PackCellAgvVoltF  = P->PackPTCANF/(float32)PackCellEa;
     P->PackCellDivVoltF  = CellMaxVoltF-CellMinVoltF;
-    P->PackCellMaxVoltPos =  (MDCellMaxVoltPos*24)+P->MDMaxVoltPo[MDCellMaxVoltPos-1];   // TODOS : [검증] (64, 셀최대전압 위치 인덱스 오용 수정: MDCellMinVoltPos→MDCellMaxVoltPos / base 통일은 보류)
-    P->PackCellMinVoltPos =  (MDCellMinVoltPos*24)+P->MDMinVoltPo[MDCellMinVoltPos-1];
+    /* 260721 : base 오류 수정 - MDCellMaxVoltPos/MDCellMinVoltPos는 1-based 모듈번호(1~7)인데
+     *          모듈 내 오프셋을 더할 때 (모듈번호-1)*24가 아니라 모듈번호*24를 그대로 곱해서
+     *          매번 모듈 1개분(24칸)만큼 더 밀려 계산되던 문제. 마지막 모듈(7)에서는
+     *          7*24+23=191까지 나와 팩 전체 셀수(168)를 초과하는 out-of-range 값이 되었음. */
+    // P->PackCellMaxVoltPos =  (MDCellMaxVoltPos*24)+P->MDMaxVoltPo[MDCellMaxVoltPos-1];   // TODOS : [검증] (64, 셀최대전압 위치 인덱스 오용 수정: MDCellMinVoltPos→MDCellMaxVoltPos / base 통일은 보류)
+    // P->PackCellMinVoltPos =  (MDCellMinVoltPos*24)+P->MDMinVoltPo[MDCellMinVoltPos-1];
+    P->PackCellMaxVoltPos =  ((MDCellMaxVoltPos-1)*24)+P->MDMaxVoltPo[MDCellMaxVoltPos-1];
+    P->PackCellMinVoltPos =  ((MDCellMinVoltPos-1)*24)+P->MDMinVoltPo[MDCellMinVoltPos-1];
 
 }
 void BatCalcTempsHandle(BatCalcReg *P)
@@ -228,6 +237,7 @@ void BatCalcTempsHandle(BatCalcReg *P)
     /* -------- Max 온도 보정 -------- */
     CellMaxTempsAdF = CellMaxTempsF;
 
+#if TEMPERATURE_CORRECTION
     if(BETWEEN(CellMaxTempsF, 20.0f, 25.0f)){CellMaxTempsAdF = CellMaxTempsF - 4.2f;}
     if(BETWEEN(CellMaxTempsF, 25.0f, 30.0f)){CellMaxTempsAdF = CellMaxTempsF - 4.7f;}
     if(BETWEEN(CellMaxTempsF, 30.0f, 35.0f)){CellMaxTempsAdF = CellMaxTempsF - 3.8f;}
@@ -237,10 +247,10 @@ void BatCalcTempsHandle(BatCalcReg *P)
     if(BETWEEN(CellMaxTempsF, 50.0f, 55.0f)){CellMaxTempsAdF = CellMaxTempsF - 4.8f;}
     if(BETWEEN(CellMaxTempsF, 55.0f, 60.0f)){CellMaxTempsAdF = CellMaxTempsF - 6.0f;}
     if(BETWEEN(CellMaxTempsF, 60.0f, 65.0f)){CellMaxTempsAdF = CellMaxTempsF - 6.0f;}
-
+#endif
     /* -------- Min 온도 보정 -------- */
     CellMinTempsAdF = CellMinTempsF;
-
+#if TEMPERATURE_CORRECTION
     if(BETWEEN(CellMinTempsF, 20.0f, 25.0f)){CellMinTempsAdF = CellMinTempsF - 4.2f;}
     if(BETWEEN(CellMinTempsF, 25.0f, 30.0f)){CellMinTempsAdF = CellMinTempsF - 4.7f;}
     if(BETWEEN(CellMinTempsF, 30.0f, 35.0f)){CellMinTempsAdF = CellMinTempsF - 3.8f;}
@@ -250,7 +260,7 @@ void BatCalcTempsHandle(BatCalcReg *P)
     if(BETWEEN(CellMinTempsF, 50.0f, 55.0f)){CellMinTempsAdF = CellMinTempsF - 4.8f;}
     if(BETWEEN(CellMinTempsF, 55.0f, 60.0f)){CellMinTempsAdF = CellMinTempsF - 6.0f;}
     if(BETWEEN(CellMinTempsF, 60.0f, 65.0f)){CellMinTempsAdF = CellMinTempsF - 6.0f;}
-
+#endif
     /* =========================================================
      * 4. 셀 위치 계산 (모듈 + 셀 위치 → Pack Index)
      * ========================================================= */

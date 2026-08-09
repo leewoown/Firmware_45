@@ -1,3 +1,4 @@
+
 /*
  * NVRAM.C
  *
@@ -35,7 +36,7 @@ void NVRAMSPIInit(void)
     SpiaRegs.SPICTL.bit.OVERRUNINTENA   = 0;    // Disable OverRun int
 
     //SpiaRegs.SPIBRR                   = 50;        //150 / 5 - 1; // Baud rate = LSPCLK/(SPIBRR+1), ~500k (for 6804 testing)
-    SpiaRegs.SPIBRR                     = 10;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) 약 15/(3+1) = 3.75 MHz
+    SpiaRegs.SPIBRR                     = 10;         //=170; // Baud rate = LSPCLK/(SPIBRR+1) �빟 15/(3+1) = 3.75 MHz
                                                     // when SPIBRR 3 to 127
     SpiaRegs.SPICCR.bit.SPISWRESET      = 1;    // SPI SW Reset release
 }
@@ -43,10 +44,10 @@ void NVRAMSPIInit(void)
 void NvramSpiWrite(NvramReg *p)
 {
     /*
-     * 사용예
+     * �궗�슜�삁
      * NvramRegs.WDCMD   = NVR_READ_CMD;
-     * NvramRegs.WDAdder = 0x10u;           // Write 시작 주소
-     * NvramRegs.WDPtr   = WriteBuf;        // 쓰기 버퍼 시작 주소
+     * NvramRegs.WDAdder = 0x10u;           // Write �떆�옉 二쇱냼
+     * NvramRegs.WDPtr   = WriteBuf;        // �벐湲� 踰꾪띁 �떆�옉 二쇱냼
      * NvramRegs.WDLen   = sizeof(WriteBuf);
      */
 
@@ -64,7 +65,7 @@ void NvramSpiWrite(NvramReg *p)
     // Set configuration
     // SpiaRegs.SPICCR.bit.CLKPOLARITY = 1;        // Rising edge output
     // SpiaRegs.SPIBRR                 = 10;       // Baud rate
-    pArray   = p->WDPtr;                           // A의 시작 주소
+    pArray   = p->WDPtr;                           // A�쓽 �떆�옉 二쇱냼
     DataLen  = p->WDLen;
     NvramCS;
     delay_us(5);
@@ -87,10 +88,10 @@ void NvramSpiWrite(NvramReg *p)
 void NvramSpiRead(NvramReg *p)
 {
     /*
-     * 사용예
+     * �궗�슜�삁
      * NvramRegs.RDCMD   = NVR_READ_CMD;
-     * NvramRegs.RDAdder = 0x10u;           // Read 시작 주소
-     * NvramRegs.RDPtr   = ReadBuf;         // 읽기 버퍼소
+     * NvramRegs.RDAdder = 0x10u;           // Read �떆�옉 二쇱냼
+     * NvramRegs.RDPtr   = ReadBuf;         // �씫湲� 踰꾪띁�냼
      * NvramRegs.RDLen   = sizeof(ReadBuf);
      */
     Uint16 i = 0;
@@ -139,4 +140,3 @@ void NVRAMRegsInitHandle(NvramReg *p)
     SPI_Write(0x82);
     NvramDS;
 }
-

@@ -117,8 +117,8 @@ Next, definitions used in main file.
 #define     ToggleBit(val, bit)              (val ^= BIT_MASK(bit))
 #define     bit_is_set(val, bit)             (val & BIT_MASK(bit))
 #define     bit_is_clear(val, bit)           (~val & BIT_MASK(bit))
-#define     Hyst_On(Value, SetValue)         ((Value) > (SetValue))
-#define     Hyst_Off(Value, RstValue)        ((Value) < (RstValue))
+#define     Hyst_On(Value, SetValue)         ((Value) >= (SetValue))
+#define     Hyst_Off(Value, RstValue)        ((Value) <= (RstValue))
 #define     IS_OVER_AND_UNDER(A, MIN, MAX)   ((A) >= (MIN) && (A) <= (MAX))
 #define     IS_ABOVE_AND_UNDER(A, MIN, MAX)  ((A) >  (MIN) && (A) <= (MAX))
 #define     IS_OVER_AND_BELOW(A, MIN, MAX)   ((A) >= (MIN) && (A) <  (MAX))
@@ -223,7 +223,8 @@ typedef enum
    System_STATE_DATALOG,
    System_STATE_ProtectHistory,
    System_STATE_MANUALMode,
-   System_STATE_CLEAR
+   System_STATE_CLEAR,
+   System_STATE_RESET
 } SysState;
 struct SystemStauts_BIT
 {       // bits   description
@@ -596,6 +597,7 @@ typedef struct System_Date
     Uint16  BalanceModeCount;
     Uint16  BalanceTimeCount;
     Uint16  RelayCheck;
+    Uint16  ProtectOpenWaitCount;   // 260709 : PROTECTER 진입 후 대기시간(ms), 5초 초과 시 원인 무관 강제 open
     float32 PackVoltageF;
     float32 PackCurrentF;
     float32 PackCurrentAsbF;
@@ -657,6 +659,7 @@ typedef struct System_Date
     Uint16 MD7CANRxCount;
     Uint16 CTRxCount;
     Uint16 MasterRxCount;
+    Uint16 MasterCommGraceCount; /* 260720 : 부팅 후 BPU 통신 대기 유예시간(ms) - PackExComErr 오탐 방지 */
 
     SysState    SysMachine;
 
@@ -810,7 +813,7 @@ union BATStatus_REG
 
 struct VCUCOMMAND_BIT
 {       // bits   description
-   unsigned int     RUNStatus01          :1; // 0
+   unsigned int     RUNStatus01          :1; // 0  MAS1_WakeUp
    unsigned int     RUNStatus02         :1; // 1
    unsigned int     RUNStatus03          :1; // 2
    unsigned int     RUNStatus04          :1; // 3
@@ -986,6 +989,8 @@ typedef struct CANA_DATA
     union DigitalOutPut_REG           PackDigitalOutPutReg;
     union VCUCOMMAND_REG              PMSCMDRegs;
 //    union VCUCOMMAND_REG              PMSCMDRegs;
+    Uint16  SysCellMinV;      // 260714 : 0x700 MAS1_Cell_MinV 원본값 (raw)
+    Uint16  SysCellAgvT;      // 260714 : 0x700 MAS1_Cell_AGVT 원본값 (raw)
     Uint16 PackSate;
     Uint16 PackProtetSate;
     Uint16 PackSateInfo;

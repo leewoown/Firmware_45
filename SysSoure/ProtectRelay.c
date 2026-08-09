@@ -43,24 +43,25 @@ void ProtectRelayHandle(PrtectRelayReg *P)
               P->StateMachine = STATERly_STANDBY;
         break;
         case STATERly_STANDBY :
-             if((P->State.bit.PRlyDI==1)||(P->State.bit.NRlyDI==1))
-             {
-                    P->State.bit.RlyFaulttSate =1;
-                    P->StateMachine = STATERly_PrtectSeq;
-             }
-             if((P->State.bit.PRlyDI==0)&&(P->State.bit.NRlyDI==0))
-             {
-                    P->State.bit.RlyFaulttSate =0;
-             }
              P->State.bit.WakeuPOffEND=0;
              P->State.bit.WakeuPOnEND=0;
         break;
         case STATERly_Ready :
             P->State.bit.WakeuPOffEND=0;
             P->State.bit.WakeuPOnEND=0;
-            if(P->State.bit.WakeUpEN==1)
+
+            if((P->State.bit.PRlyDI==1)||(P->State.bit.NRlyDI==1))
             {
-                P->StateMachine = STATERly_OnSeq;
+                P->State.bit.RlyFaulttSate = 1;
+                P->StateMachine = STATERly_PrtectSeq;
+            }
+            else
+            {
+                P->State.bit.RlyFaulttSate = 0;
+                if(P->State.bit.WakeUpEN==1)
+                {
+                    P->StateMachine = STATERly_OnSeq;
+                }
             }
         break;
         case STATERly_OnSeq :
@@ -91,12 +92,20 @@ void ProtectRelayHandle(PrtectRelayReg *P)
                      P->StateMachine = STATERly_OffSeq;
                  }
              }
+             /* 260721 : 닫힘 시퀀스가 시간 내 완료 안 됨 = DI 단선 / 릴레이 미투입.
+              *          프리차지가 계속 켜진 채 방치되는 것을 막기 위해 PrtectSeq로 강제 전환. */
+             if((P->State.bit.WakeuPOnEND==0) && (P->WakeupOn_TimeCount >= RlyCloseFailTimeOut_ms))
+             {
+                 P->State.bit.RlyFaulttSate = 1;
+                 P->StateMachine = STATERly_PrtectSeq;
+             }
 
         break;
         case STATERly_OffSeq:
-            P->State.bit.NRlyDO=0;
-            delay_ms(300);
+            /* 260709 : Open 순서 지정 - 1.Positive 릴레이 먼저, 2.Negative 릴레이 나중 */
             P->State.bit.PRlyDO=0;
+            delay_ms(300);
+            P->State.bit.NRlyDO=0;
             delay_ms(50);
             if((P->State.bit.NRlyDI==0)&&(P->State.bit.ProRlyDI==0)&&(P->State.bit.PRlyDI==0))
             {
@@ -104,10 +113,14 @@ void ProtectRelayHandle(PrtectRelayReg *P)
                 P->State.bit.WakeuPOnEND=0;
                 if(P->State.bit.WakeUpEN==0)
                  {
-
                      P->StateMachine = STATERly_Ready;
-
                  }
+            }
+            /* 260721 : 열림 시퀀스가 시간 내 완료 안 됨 = 접점 융착 의심. */
+            if((P->State.bit.WakeuPOffEND==0) && (P->WakeupOff_TimeCount >= RlyOpenWeldTimeOut_ms))
+            {
+                P->State.bit.RlyFaulttSate = 1;
+                P->StateMachine = STATERly_PrtectSeq;
             }
         break;
 

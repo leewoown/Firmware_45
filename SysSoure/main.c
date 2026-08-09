@@ -145,6 +145,7 @@ float32         NCMsocTestVoltAGV =3.210;
 extern unsigned int   CANTXFALAG=0;
 extern unsigned int   CANTXFALAG1=0;
 extern unsigned int   CANTXFALAG12=0;
+short time1000mscnt = 0;
 //extern unsigned int    CellVoltUnBalaneFaulCount=0;
 void main(void)
 {
@@ -225,149 +226,215 @@ void main(void)
     SysRegs.PackStateReg.bit.INITOK=0;
    // gBattery_InitSocPct=20.0f;
     //gBattery_CapacityAh=80.0f;
-    while(1)
+    while (1)
     {
         SysRegs.Maincount++;
 
-        switch(SysRegs.SysMachine)
+        switch (SysRegs.SysMachine)
         {
-            case System_STATE_INIT:
-                  SysTimerINIT(&SysRegs);
-                  SysVarINIT(&SysRegs);
-                  CANRegVarINIT(&CANARegs);
-                  ModuleInit(&ModRegs);
-                  // TODOS : [완료] (01, 0x60A 멀티플렉서용 모듈 RxCount 포인터 1회 설정)
-                  CANARegs.MDXRxcountP[0]=ModRegs.MD1XRxcount; CANARegs.MDXRxcountP[1]=ModRegs.MD2XRxcount;
-                  CANARegs.MDXRxcountP[2]=ModRegs.MD3XRxcount; CANARegs.MDXRxcountP[3]=ModRegs.MD4XRxcount;
-                  CANARegs.MDXRxcountP[4]=ModRegs.MD5XRxcount; CANARegs.MDXRxcountP[5]=ModRegs.MD6XRxcount;
-                  CANARegs.MDXRxcountP[6]=ModRegs.MD7XRxcount;
-                //  gBattery_InitSocPct=20.0f;
-               //   gBattery_CapacityAh=80.0f;
-                  BatCalcRegsInit(&BatCalcRegs);
-                  ProtectRlyVarINIT(&PrtectRelayRegs);
-                //  BatteryModel_UserInit();
-                  // Function SysMachine
-                  CalKokam100AhRegsInit(&Kam100AHSocRegs);
-                  Kam100AHSocRegs.state=SOC_STATE_IDLE;
-                  PrtectRelayRegs.StateMachine=STATERly_INIT;
-                  SysRegs.SysMachine=System_STATE_STANDBY;
-                  DigitalInput(&SysRegs);
-                  delay_ms(100);
-                  InitECana();
-                  if(SysRegs.PackStateReg.bit.SysPrtct==1)
-                  {
-                    //SysRegs.SysMachine=System_STATE_PROTECTER;
-                  }
-                  SysRegs.PackStateReg.bit.SysSeqState=1;
-                  SysRegs.PackID =0x0000;
-               //   SysRegs.PackID==0x0000;
-               //   InitECana();
-                  delay_ms(10);
+        case System_STATE_INIT:
+            SysTimerINIT(&SysRegs);
+            SysVarINIT(&SysRegs);
+            CANRegVarINIT(&CANARegs);
+            ModuleInit(&ModRegs);
+            // TODOS : [완료] (01, 0x60A 멀티플렉서용 모듈 RxCount 포인터 1회 설정)
+            CANARegs.MDXRxcountP[0] = ModRegs.MD1XRxcount;
+            CANARegs.MDXRxcountP[1] = ModRegs.MD2XRxcount;
+            CANARegs.MDXRxcountP[2] = ModRegs.MD3XRxcount;
+            CANARegs.MDXRxcountP[3] = ModRegs.MD4XRxcount;
+            CANARegs.MDXRxcountP[4] = ModRegs.MD5XRxcount;
+            CANARegs.MDXRxcountP[5] = ModRegs.MD6XRxcount;
+            CANARegs.MDXRxcountP[6] = ModRegs.MD7XRxcount;
+            //  gBattery_InitSocPct=20.0f;
+            //   gBattery_CapacityAh=80.0f;
+            BatCalcRegsInit(&BatCalcRegs);
+            ProtectRlyVarINIT(&PrtectRelayRegs);
+            //  BatteryModel_UserInit();
+            // Function SysMachine
+            CalKokam100AhRegsInit(&Kam100AHSocRegs);
+            Kam100AHSocRegs.state = SOC_STATE_IDLE;
+            PrtectRelayRegs.StateMachine = STATERly_INIT;
+            SysRegs.SysMachine = System_STATE_STANDBY;
+            DigitalInput(&SysRegs);
+            delay_ms(50);
+            InitECana();
+            delay_ms(50);
+            if (SysRegs.PackStateReg.bit.SysPrtct == 1)
+            {
+                SysRegs.SysMachine = System_STATE_PROTECTER;
+            }
+            // 260706 can으로 state 확인하기 위해서 CANCOMEnable = 1
+            SysRegs.PackStateReg.bit.CANCOMEnable = 1;
+            SysRegs.PackStateReg.bit.SysSeqState = 0;
+            SysRegs.PackID = 0x0000;
+            //   SysRegs.PackID==0x0000;
+            //   InitECana();
+
+            // CANARegs.PackID = 0X602 | SysRegs.PackID;
+            // CANATX(CANARegs.PackID, 8, CANARegs.PackSateInfo, CANARegs.PackStatus.all, SysRegs.PackStateReg.Word.DataL, SysRegs.PackStateReg.Word.DataH);
+            delay_ms(50);
 
             break;
-            case System_STATE_STANDBY:
-                  SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=0;
-                  PrtectRelayRegs.StateMachine=STATERly_STANDBY;
-                  if(SysRegs.PackStateReg.bit.SysPrtct==1)
-                  {
-                    //  SysRegs.PackStateReg.bit.INITOK=1;
-                  }
-                  delay_ms(1000);
-                  // Function SysMachine
-                  /* 셀전압이 유효해진 시점(STANDBY)에서 전압 기반 초기 SOC 1회 산정 */
-                  CalKokam100AhRegsInit(&Kam100AHSocRegs);
-                  Kam100AHSocRegs.CellAgvVoltageF = SysRegs.PackCellAgvVoltageF;
-                  CalKokam100AhSocInit(&Kam100AHSocRegs);
-                  Kam100AHSocRegs.state= SOC_STATE_RUNNING;
-                  SysRegs.SysMachine=System_STATE_READY;
-                  PrtectRelayRegs.StateMachine=STATERly_Ready;
-                  SysRegs.PackStateReg.bit.CANCOMEnable=1;
-                  SysRegs.PackStateReg.bit.INITOK=1;
-                  SysRegs.PackStateReg.bit.SysSeqState=2;
+        case System_STATE_STANDBY:
+            SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT = 0;
+            PrtectRelayRegs.StateMachine = STATERly_STANDBY;
+            if (SysRegs.PackStateReg.bit.SysPrtct == 1)
+            {
+                //  SysRegs.PackStateReg.bit.INITOK=1;
+            }
+            delay_ms(1000);
+            // Function SysMachine
+            /* 셀전압이 유효해진 시점(STANDBY)에서 전압 기반 초기 SOC 1회 산정 */
+            CalKokam100AhRegsInit(&Kam100AHSocRegs);
+            Kam100AHSocRegs.CellAgvVoltageF = SysRegs.PackCellAgvVoltageF;
+            CalKokam100AhSocInit(&Kam100AHSocRegs);
+            Kam100AHSocRegs.state = SOC_STATE_RUNNING;
+            SysRegs.SysMachine = System_STATE_READY;
+            PrtectRelayRegs.StateMachine = STATERly_Ready;
+            SysRegs.PackStateReg.bit.CANCOMEnable = 1;
+            SysRegs.PackStateReg.bit.INITOK = 1;
+            SysRegs.PackStateReg.bit.SysSeqState = 1;
+            delay_ms(50);
+            // CANARegs.PackSate = 2; break;   // STANDBY   -> Standby
+            // CANARegs.PackID = 0X602 | SysRegs.PackID;
+            // CANATX(CANARegs.PackID, 8, CANARegs.PackSateInfo, CANARegs.PackStatus.all, SysRegs.PackStateReg.Word.DataL, SysRegs.PackStateReg.Word.DataH);
+            // delay_ms(50);
             break;
-            case System_STATE_READY:
-                 SysRegs.PackStateReg.bit.CANCOMEnable=1;
-                 SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=0;
-                 if(CANARegs.PMSCMDRegs.bit.RUNStatus01==1)
-                 {
-                     PrtectRelayRegs.State.bit.WakeUpEN=1;
-                 }
-                 // Function SysMachine
-                 if(PrtectRelayRegs.State.bit.WakeuPOnEND==1)
-                 {
-                     SysRegs.SysMachine=System_STATE_RUNING;
-                 }
-                   SysRegs.PackStateReg.bit.SysSeqState = 3;
+        case System_STATE_READY:
+            SysRegs.PackStateReg.bit.CANCOMEnable = 1;
+            SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT = 0;
+            if (CANARegs.PMSCMDRegs.bit.RUNStatus01 == 1)
+            {
+                PrtectRelayRegs.State.bit.WakeUpEN = 1;
+            }
+            // Function SysMachine
+            /* 260721 : 릴레이 피드백 재확인 블록 삭제. WakeuPOnEND는 OnSeq에서 NRlyDI==1 &&
+             *          PRlyDI==1을 확인해야만 세팅되고, 여기서 읽는 DI는 그때와 동일한 값이라
+             *          조건이 구조적으로 항상 거짓인 dead code였음. 실제 단선/융착 검출은
+             *          ProtectRelay.c의 시퀀스 타임아웃이 담당. */
+            if (PrtectRelayRegs.State.bit.WakeuPOnEND == 1)
+            {
+                SysRegs.SysMachine = System_STATE_RUNING;
+            }
+            SysRegs.PackStateReg.bit.SysSeqState = 2;
             break;
-            case System_STATE_RUNING:
-                 Kam100AHSocRegs.state= SOC_STATE_RUNNING;
-                 SysRegs.PackStateReg.bit.CANCOMEnable=1;
-                 SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT=1;
-                 /*--------------------------------------------------------------
-                  * 260618 : RUNING 정상 구간에서 SysSeqState가 갱신되지 않아
-                  *          READY 값(3)이 남던 문제. 진입 시 항상 4(Run) 부여.
-                  *--------------------------------------------------------------*/
-                 SysRegs.PackStateReg.bit.SysSeqState = 4;   // RUNING 진입 시 항상 Run 표시   // TODOS : [검증] (90, 260618_Note2, RUNING 상시 SysSeqState=4)
-                 if(CANARegs.PMSCMDRegs.bit.RUNStatus01==0)
-                 {
-                     PrtectRelayRegs.State.bit.WakeUpEN=0;
-                     //SysRegs.PackStateReg.bit.SysSeqState = 4;   // 260618 : 위로 이동(상시 부여)
-                 }
-                 if(PrtectRelayRegs.State.bit.WakeuPOffEND==1)
-                 {
-                     SysRegs.SysMachine=System_STATE_READY;
+        case System_STATE_RUNING:
+            Kam100AHSocRegs.state = SOC_STATE_RUNNING;
+            SysRegs.PackStateReg.bit.CANCOMEnable = 1;
+            SysRegs.DigitalOutPutReg.bit.PWRLAMPOUT = 1;
+            /*--------------------------------------------------------------
+             * 260618 : RUNING 정상 구간에서 SysSeqState가 갱신되지 않아
+             *          READY 값(3)이 남던 문제. 진입 시 항상 4(Run) 부여.
+             *--------------------------------------------------------------*/
+            SysRegs.PackStateReg.bit.SysSeqState = 3; // RUNING 진입 시 항상 Run 표시   // TODOS : [검증] (90, 260618_Note2, RUNING 상시 SysSeqState=4)
+            if (CANARegs.PMSCMDRegs.bit.RUNStatus01 == 0)
+            {
+                PrtectRelayRegs.State.bit.WakeUpEN = 0;
+                if(SysRegs.PackStateReg.bit.SysPrtct==1)
+                    SysRegs.PackStateReg.bit.SysSeqState = 4; // 260618 : 위로 이동(상시 부여)
 
-                 }
-                 
-               //  SysRegs.PackStateReg.bit.SysSTATE = 4;
+            }
+            /* 260721 : 위 READY 케이스와 동일 사유로 dead code 삭제 (WakeuPOffEND는 OffSeq에서
+             *          모든 DI==0을 확인해야만 세팅됨). 융착 검출은 ProtectRelay.c 타임아웃이 담당. */
+            if (PrtectRelayRegs.State.bit.WakeuPOffEND == 1)
+            {
+                SysRegs.SysMachine = System_STATE_READY;
+            }
+
+            //  SysRegs.PackStateReg.bit.SysSTATE = 4;
             break;
-            case System_STATE_PROTECTER:
-                 SysRegs.PackStateReg.bit.CANCOMEnable=1;
-                 CANARegs.PMSCMDRegs.all=0;
-                 if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
-                 {
-                     CANARegs.PMSCMDRegs.bit.PrtctReset01=0;
-                     SysTimerINIT(&SysRegs);
-                     SysVarINIT(&SysRegs);
-                     CANRegVarINIT(&CANARegs);
-                   //  ModuleInit(&ModRegs);
-                     BatCalcRegsInit(&BatCalcRegs);
-                     ProtectRlyVarINIT(&PrtectRelayRegs);
-                     CalKokam100AhRegsInit(&Kam100AHSocRegs);
-                     delay_ms(200);
-                     SysRegs.SysMachine=System_STATE_INIT;
-                 }
-                 SysRegs.PackStateReg.bit.SysSeqState = 5;
+        case System_STATE_PROTECTER:
+            SysRegs.PackStateReg.bit.CANCOMEnable = 1;
+            SysRegs.PackStateReg.bit.SysSeqState = 4;
+            // CANARegs.PMSCMDRegs.all=0;
+            /* 260709 : 마스터(상위)가 먼저 open 했다는 걸 RUNStatus01==0으로 확인한 후에만
+             *          이 랙의 릴레이 오픈(WakeUpEN 클리어)을 진행. 단, 마스터 BMS와의 통신에러
+             *          (PackExComErr, SysCommErrHandle의 MasterRxCount>5000=5초 타임아웃에서
+             *          이미 세팅됨)일 때는 대기 없이 즉시 강제로 open. 그 외 원인이라도
+             *          PROTECTER에서 5초(ProtectOpenWaitCount>=5000) 넘게 못 풀리면 안전을 위해
+             *          원인 무관 강제로 open (독립 OR 조건, 이중대기 아님) */
+            
+            //if ((CANARegs.PMSCMDRegs.bit.RUNStatus01 == 0) || SysRegs.PackProtectReg.bit.PackExComErr)
+            if ((CANARegs.PMSCMDRegs.bit.RUNStatus01 == 0) || 
+            SysRegs.PackProtectReg.bit.PackExComErr || 
+            SysRegs.PackProtectReg.bit.PackEMSSWErr ||
+            (SysRegs.ProtectOpenWaitCount >= 5000))
+            {
+                if (PrtectRelayRegs.State.bit.WakeUpEN == 1)
+                    PrtectRelayRegs.State.bit.WakeUpEN = 0;
+            }
+
+            if (CANARegs.PMSCMDRegs.bit.PrtctReset01 == 1)
+            {
+                CANARegs.PMSCMDRegs.bit.PrtctReset01 = 0;
+                CANARegs.PMSCMDRegs.all = 0;            
+                SysRegs.SysMachine = System_STATE_RESET;
+            }
+            // CANARegs.PackID = 0X602 | SysRegs.PackID;
+            // CANATX(CANARegs.PackID, 8, CANARegs.PackSateInfo, CANARegs.PackStatus.all, SysRegs.PackStateReg.Word.DataL, SysRegs.PackStateReg.Word.DataH);
+            delay_ms(50);
             break;
-            case System_STATE_DATALOG:
+        case System_STATE_RESET:    
+            SysRegs.PackStateReg.bit.SysSeqState = 7;
+            // CANARegs.PackID = 0X602 | SysRegs.PackID;
+            // CANATX(CANARegs.PackID, 8, CANARegs.PackSateInfo, CANARegs.PackStatus.all, SysRegs.PackStateReg.Word.DataL, SysRegs.PackStateReg.Word.DataH);
+            delay_ms(50);
+            SysRegs.SysMachine = System_STATE_INIT;
+
+            break;
+
+        case System_STATE_DATALOG:
             //     SysRegs.PackStateReg.bit.CANCOMEnable=1;
             break;
-            case System_STATE_ProtectHistory:
+        case System_STATE_ProtectHistory:
 
             break;
-            case System_STATE_MANUALMode:
+        case System_STATE_MANUALMode:
 
             break;
-            case System_STATE_CLEAR:
+        case System_STATE_CLEAR:
 
             break;
-            default :
+        default:
             break;
         }
-        if(SysRegs.Maincount>3000){SysRegs.Maincount=0;}
-        if(CANTXFALAG==1)
         {
-         //   MCP2515InitHandle(&CANBRegs);
-            CANTXFALAG=0;
-       }
-        PrtectRelayRegs.State.bit.NRlyDI=SysRegs.DigitalInputReg.bit.NAUX;
-        PrtectRelayRegs.State.bit.PRlyDI=SysRegs.DigitalInputReg.bit.PAUX;
+            /* 260709 : SysSeqState가 실제로 바뀐 순간에만 0x602를 즉시 전송 (폴링 지연 없이 상태 전이 확인용) */
+            static Uint16 PrevSysSeqState = 0xFFFF;
+            if (SysRegs.PackStateReg.bit.SysSeqState != PrevSysSeqState)
+            {
+                PrevSysSeqState = SysRegs.PackStateReg.bit.SysSeqState;
+                switch (SysRegs.PackStateReg.bit.SysSeqState)
+                {
+                    case 0:  CANARegs.PackSate = 2; break;   // INIT      -> Standby
+                    case 1:  CANARegs.PackSate = 2; break;   // STANDBY   -> Standby
+                    case 2:  CANARegs.PackSate = 3; break;   // READY     -> Ready
+                    case 3:  CANARegs.PackSate = 4; break;   // RUNING    -> Run
+                    case 4:  CANARegs.PackSate = 5; break;   // PROTECTER -> Protect
+                    default: CANARegs.PackSate = 0; break;   // 그외 -> None
+                }
+                CANARegs.PackSateInfo = ComBine(CANARegs.PackProtetSate, CANARegs.PackSate);
+                CANARegs.PackID = 0X602 | SysRegs.PackID;
+                CANATX(CANARegs.PackID, 8, CANARegs.PackSateInfo, CANARegs.PackStatus.all, SysRegs.PackStateReg.Word.DataL, SysRegs.PackStateReg.Word.DataH);
+            }
+        }
+        if (SysRegs.Maincount > 3000)
+        {
+            SysRegs.Maincount = 0;
+        }
+        if (CANTXFALAG == 1)
+        {
+            //   MCP2515InitHandle(&CANBRegs);
+            CANTXFALAG = 0;
+        }
+        PrtectRelayRegs.State.bit.NRlyDI = SysRegs.DigitalInputReg.bit.NAUX;
+        PrtectRelayRegs.State.bit.PRlyDI = SysRegs.DigitalInputReg.bit.PAUX;
         ProtectRelayHandle(&PrtectRelayRegs);
-        SysRegs.DigitalOutPutReg.bit.NRlyOUT=PrtectRelayRegs.State.bit.NRlyDO;
-        SysRegs.DigitalOutPutReg.bit.PRlyOUT=PrtectRelayRegs.State.bit.PRlyDO;
-        SysRegs.DigitalOutPutReg.bit.ProRlyOUT=PrtectRelayRegs.State.bit.PreRlyDO;
-        SysRegs.PackProtectReg.bit.PackRlyErr=PrtectRelayRegs.State.bit.RlyFaulttSate;
-   //     CANBRegs.SPISpeedHz=MeasureSPISpeedHandle(100);
+        SysRegs.DigitalOutPutReg.bit.NRlyOUT = PrtectRelayRegs.State.bit.NRlyDO;
+        SysRegs.DigitalOutPutReg.bit.PRlyOUT = PrtectRelayRegs.State.bit.PRlyDO;
+        SysRegs.DigitalOutPutReg.bit.ProRlyOUT = PrtectRelayRegs.State.bit.PreRlyDO;
+        SysRegs.PackProtectReg.bit.PackRlyErr = PrtectRelayRegs.State.bit.RlyFaulttSate;
+        //     CANBRegs.SPISpeedHz=MeasureSPISpeedHandle(100);
     }
   /*  if(SysRegs.SysMachine==System_STATE_READY)//||(SysRegs.SysMachine==System_STATE_RUNING)||(SysRegs.SysMachine==System_STATE_PROTECTER))
     {
@@ -434,63 +501,167 @@ interrupt void cpu_timer0_isr(void)
    /*
     * 에러 검출
     */
-  // SysCommErrHandle(&SysRegs);
- //  if(SysRegs.DigitalInputReg.bit.EMGSWStauts==1)
- //  {
-  //     SysRegs.PackProtectReg.bit.PackEMSSWErr=1;
-  // }
-  // else
-  // {
-  //     SysRegs.PackProtectReg.bit.PackEMSSWErr=0;
-  // }
-  // CANARegs.PackProtetSate=0;
-     SysRegs.PackFaultReg.all=0;
-     SysRegs.PackProtectReg.all=0;
-   if(SysRegs.PackStateReg.bit.INITOK==1)
+
+   SysRegs.PackFaultReg.all = 0;
+   SysRegs.PackProtectReg.all = 0;
+
+   
+
+
+
+   if (SysRegs.DigitalInputReg.bit.EMGSWStauts == 1)
    {
-      // TODOS : [완료] (02, R01 경고/Fault/보호 판정 활성화 (1ms ISR 주기))
-      CalSysAlarmtCheck(&SysRegs);
-     // CalSysFaultCheck(&SysRegs);
-     // CalSysProtectCheck(&SysRegs);
-   }
- //  CalSysAlarmtCheck(&SysRegs);
-   if((SysRegs.PackAlarmReg.all > 0)&&(SysRegs.PackStateReg.bit.INITOK==1))
-   {
-       SysRegs.PackStateReg.bit.SysAalarm=1;
-       CANARegs.PackProtetSate=1;
+       SysRegs.PackProtectReg.bit.PackEMSSWErr = 1;
    }
    else
    {
-     SysRegs.PackStateReg.bit.SysAalarm=0;
-     CANARegs.PackProtetSate=0;
+       SysRegs.PackProtectReg.bit.PackEMSSWErr = 0;
    }
 
-   if((SysRegs.PackFaultReg.all >0)&&(SysRegs.PackStateReg.bit.INITOK==1))
+   /* 260721 : 릴레이 상태머신이 세운 fault를 protect 비트로 반영.
+    *          PackProtectReg는 매 1ms ISR 진입 시 0으로 초기화되므로, 메인루프(하단
+    *          PackRlyErr 대입)에서만 세팅하면 아래 protect 평가 시점엔 이미 지워져 있음. */
+   if (PrtectRelayRegs.State.bit.RlyFaulttSate == 1)
    {
-     SysRegs.PackStateReg.bit.SysFault=1;
-     CANARegs.PackProtetSate=2;
+       SysRegs.PackProtectReg.bit.PackRlyErr = 1;
    }
-   else
-   {
-       SysRegs.PackStateReg.bit.SysFault=0;
-       CANARegs.PackProtetSate=0;
-   }
-   if((SysRegs.PackProtectReg.all> 0)&&(SysRegs.PackStateReg.bit.INITOK==1))
-   {
-       SysRegs.PackStateReg.bit.SysPrtct=1;
-       CANARegs.PackProtetSate=3;
-   }
+  // CANARegs.PackProtetSate=0;
+
+     if (SysRegs.PackStateReg.bit.INITOK == 1)
+     {
+         // TODOS : [완료] (02, R01 경고/Fault/보호 판정 활성화 (1ms ISR 주기))
+         CalSysAlarmtCheck(&SysRegs);
+         CalSysFaultCheck(&SysRegs);
+         CalSysProtectCheck(&SysRegs);
+         SysCommErrHandle(&SysRegs);
+     }
+
+     if (SysRegs.PackStateReg.bit.INITOK == 1)
+     {
+         if (SysRegs.PackInMDCANrxReg.all > 0 ||
+             SysRegs.PackModuleAllRegs.bit.BATICErrFault ||
+             SysRegs.PackModuleAllRegs.bit.Fault)
+         {
+             SysRegs.PackProtectReg.bit.PackINComErr = 1; // BM->Rack 통신에러 / 모듈 BATIC 통신에러 / 모듈 범용 Fault -> IN_COM_Err로 묶음
+         }
+         if (SysRegs.PackModuleAllRegs.bit.CTCOMErrFault)
+         {
+             SysRegs.PackProtectReg.bit.PackCTComErr = 1; // 모듈이 보고한 CT 통신에러 -> protect
+         }
+         if (SysRegs.PackModuleAllRegs.bit.WaterleakFault)
+         {
+             SysRegs.PackProtectReg.bit.PackWaterleakErr = 1; // 모듈 누수 -> protect
+         }
+         if (SysRegs.PackModuleAllRegs.bit.CellVoltageFault)
+         {
+             SysRegs.PackProtectReg.bit.CellVolt_OV = 1; // 모듈이 보고한 셀전압 에러(방향 미구분) -> Cell_OV 슬롯에 OR
+         }
+         if (SysRegs.PackModuleAllRegs.bit.CellTemperatureFault)
+         {
+             SysRegs.PackProtectReg.bit.CellTemp_OV = 1; // 모듈이 보고한 셀온도 에러(방향 미구분) -> CellTemp_OV 슬롯에 OR
+         }
+     }
+
+     if ((SysRegs.PackAlarmReg.all > 0) && (SysRegs.PackStateReg.bit.INITOK == 1))
+     {
+         SysRegs.PackStateReg.bit.SysAalarm = 1;
+         CANARegs.PackProtetSate = 1;
+     }
+     else
+     {
+         SysRegs.PackStateReg.bit.SysAalarm = 0;
+         CANARegs.PackProtetSate = 0;
+     }
+
+     if ((SysRegs.PackFaultReg.all > 0) && (SysRegs.PackStateReg.bit.INITOK == 1))
+     {
+         SysRegs.PackStateReg.bit.SysFault = 1;
+         CANARegs.PackProtetSate = 2;
+     }
+     else
+     {
+         SysRegs.PackStateReg.bit.SysFault = 0;
+         CANARegs.PackProtetSate = 0;
+     }
+
+     if ((SysRegs.PackProtectReg.all > 0) && (SysRegs.PackStateReg.bit.INITOK == 1))
+     {
+         SysRegs.PackStateReg.bit.SysPrtct = 1;
+         CANARegs.PackProtetSate = 3;
+         // CANARegs.PMSCMDRegs.bit.RUNStatus01=0; //테스트용
+         /* 260709 : 이미 PROTECTER/RESET 진행 중이면 강제 재진입시키지 않음
+          *          (PrtctReset01->System_STATE_RESET 전이가 이 ISR에 의해 즉시 덮어써지던 문제 수정) */
+         if ((SysRegs.SysMachine != System_STATE_PROTECTER) && (SysRegs.SysMachine != System_STATE_RESET))
+         {
+             SysRegs.SysMachine = System_STATE_PROTECTER;
+         }
+     }
+     else
+     {
+         SysRegs.PackStateReg.bit.SysPrtct = 0;
+         CANARegs.PackProtetSate = 0;
+     }
+     /* 260709 : PROTECTER에서 RUNStatus01==0을 계속 못 받을 때, 원인과 무관하게 5초 후
+      *          안전을 위해 강제로 open 시키기 위한 대기시간 카운트(1ms 단위) */
+     if (SysRegs.SysMachine == System_STATE_PROTECTER)
+     {
+         if (CANARegs.PMSCMDRegs.bit.RUNStatus01 != 0)
+         {
+             if (SysRegs.ProtectOpenWaitCount < 60000)
+                 SysRegs.ProtectOpenWaitCount++;
+         }
+         else
+         {
+             SysRegs.ProtectOpenWaitCount = 0;
+         }
+     }
+     else
+     {
+         SysRegs.ProtectOpenWaitCount = 0;
+     }
+
+     /* 260721 : 릴레이 ON/OFF 시퀀스가 완료되지 못하고 멈춰있는 시간(1ms 단위) 감시.
+      *          단선/미투입(OnSeq 미완료) 및 융착(OffSeq 미완료) 검출용.
+      *          시퀀스 완료(WakeuPOnEND/WakeuPOffEND=1) 또는 다른 상태로 가면 자동 클리어. */
+     if ((PrtectRelayRegs.StateMachine == STATERly_OnSeq) &&
+         (PrtectRelayRegs.State.bit.WakeuPOnEND == 0))
+     {
+         PrtectRelayRegs.WakeupOn_TimeCount++;
+         if (PrtectRelayRegs.WakeupOn_TimeCount > RlyCloseFailTimeOut_ms)
+         {
+             PrtectRelayRegs.WakeupOn_TimeCount = RlyCloseFailTimeOut_ms + 100;  // 오버플로우 방지
+         }
+     }
+     else
+     {
+         PrtectRelayRegs.WakeupOn_TimeCount = 0;
+     }
+
+     if ((PrtectRelayRegs.StateMachine == STATERly_OffSeq) &&
+         (PrtectRelayRegs.State.bit.WakeuPOffEND == 0))
+     {
+         PrtectRelayRegs.WakeupOff_TimeCount++;
+         if (PrtectRelayRegs.WakeupOff_TimeCount > RlyOpenWeldTimeOut_ms)
+         {
+             PrtectRelayRegs.WakeupOff_TimeCount = RlyOpenWeldTimeOut_ms + 100;  // 오버플로우 방지
+         }
+     }
+     else
+     {
+         PrtectRelayRegs.WakeupOff_TimeCount = 0;
+     }
+
    switch(SysRegs.SysRegTimer5msecCount)
    {
-       case 1:
-               if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
-               {
-                   SysRegs.SysMachine=System_STATE_INIT;
-               }
+   case 1:
+       if (CANARegs.PMSCMDRegs.bit.PrtctReset01 == 1)
+       {
+           SysRegs.SysMachine = System_STATE_RESET;
+           CANARegs.PMSCMDRegs.bit.PrtctReset01 = 0;
+       }
        break;
-       default :
+   default:
        break;
-
    }
    switch(SysRegs.SysRegTimer10msecCount)
    {
@@ -535,12 +706,12 @@ interrupt void cpu_timer0_isr(void)
                      //case 4:  CANARegs.PackSate = 5; break;   // PROTECTER -> Protect
                      switch(SysRegs.PackStateReg.bit.SysSeqState)   // map internal seq to R59 device state   // TODOS : [검증] (74, 0x602 Divice_Status 매핑)
                      {
-                         case 1:  CANARegs.PackSate = 2; break;   // INIT      -> Standby (기존 유지)   // TODOS : [검증] (89, 260618_Note2, SysSeqState case 정렬)
-                         case 2:  CANARegs.PackSate = 2; break;   // STANDBY   -> Standby
-                         case 3:  CANARegs.PackSate = 3; break;   // READY     -> Ready
-                         case 4:  CANARegs.PackSate = 4; break;   // RUNING    -> Run
-                         case 5:  CANARegs.PackSate = 5; break;   // PROTECTER -> Protect
-                         default: CANARegs.PackSate = 0; break;   // 그외      -> None
+                         case 0:  CANARegs.PackSate = 2; break;   // INIT      -> Standby   // 260709 : SysSeqState 0-base(0~4) 재정렬
+                         case 1:  CANARegs.PackSate = 2; break;   // STANDBY   -> Standby
+                         case 2:  CANARegs.PackSate = 3; break;   // READY     -> Ready
+                         case 3:  CANARegs.PackSate = 4; break;   // RUNING    -> Run
+                         case 4:  CANARegs.PackSate = 5; break;   // PROTECTER -> Protect
+                         default: CANARegs.PackSate = 0; break;   // 그외(RESET 테스트값 등) -> None
                      }
                      if(SysRegs.PackStateReg.bit.SysPrtct)       { CANARegs.PackProtetSate = 3; }   // Protect   // TODOS : [검증] (75, 0x602 Protect_Status 단계)
                      else if(SysRegs.PackStateReg.bit.SysFault)  { CANARegs.PackProtetSate = 2; }   // Fault
@@ -574,8 +745,10 @@ interrupt void cpu_timer0_isr(void)
                if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                {
                   // TODOS : [완료] (07, 0x500 BPA_Module 모듈별 밸런스/보호 상태)
-                  CANARegs.PackID =0X500|(SysRegs.PackID+0x0010);
-                  CANATX(CANARegs.PackID,8,0X00,0X00,CANARegs.PackTemperatureAVG,CANARegs.PackBalanVolt);
+                  CANARegs.PackID = 0X500 | (SysRegs.PackID + 0x0010);
+                  CANARegs.PackBalanVolt = CANARegs.SysCellMinV;
+                  CANARegs.PackTemperatureAVG = CANARegs.SysCellAgvT;
+                  CANATX(CANARegs.PackID, 8, 0X00, 0X00, CANARegs.PackTemperatureAVG, CANARegs.PackBalanVolt);
                }
        break;
        case 5:
@@ -587,7 +760,7 @@ interrupt void cpu_timer0_isr(void)
                 SysRegs.PackModuleRegs[4].all = ModRegs.MDstatusbit[4];
                 SysRegs.PackModuleRegs[5].all = ModRegs.MDstatusbit[5];
                 SysRegs.PackModuleRegs[6].all = ModRegs.MDstatusbit[6];
-                SysUnitBMSStatus(&SysRegs);
+                SysUnitBMSStatus(&SysRegs);   // 260709 : 삭제되지 말 것 - PackModuleAllRegs(집계) 계산이 여기서만 일어남
        break;
        case 10:
                if(SysRegs.PackStateReg.bit.INITOK==1)
@@ -681,10 +854,11 @@ interrupt void cpu_timer0_isr(void)
        case 17:
                 if(SysRegs.PackStateReg.bit.CANCOMEnable==1)
                 {
-                    CANARegs.PackTemperaturelMAX    = (unsigned int)(SysRegs.PackCellMaxTemperatureF*10);
-                    CANARegs.PackTemperaturelMIN    = (unsigned int)(SysRegs.PackCellMinTemperatureF*10);
-                    CANARegs.PackTemperatureAVG     = (unsigned int)(SysRegs.PackCellAgvTemperatureF*10);
-                    CANARegs.PackTemperatureDiv     = (unsigned int)(SysRegs.PackCellDivTemperatureF*10);
+                    //20260715 unsigned 에서 signed로 변경
+                    CANARegs.PackTemperaturelMAX    = (int)(SysRegs.PackCellMaxTemperatureF*10);
+                    CANARegs.PackTemperaturelMIN    = (int)(SysRegs.PackCellMinTemperatureF*10);
+                    CANARegs.PackTemperatureAVG     = (int)(SysRegs.PackCellAgvTemperatureF*10);
+                    CANARegs.PackTemperatureDiv     = (int)(SysRegs.PackCellDivTemperatureF*10);
                     // TODOS : [완료] (12, 0x606 BPA_Cell_Tcalc (셀온도 Max/Min/Avg/Div 각 ×10))
                     CANARegs.PackID =0X606|SysRegs.PackID;
                     CANATX(CANARegs.PackID,8,CANARegs.PackTemperaturelMAX,CANARegs.PackTemperaturelMIN,CANARegs.PackTemperatureAVG,CANARegs.PackTemperatureDiv);
@@ -1301,11 +1475,15 @@ interrupt void ISR_CANRXINTA(void)
             SysRegs.MasterRxCount=0;
             if(CANARegs.MailBox2RxCount>200) {CANARegs.MailBox2RxCount=0;}
             CANARegs.PMSCMDRegs.all = ComBine(ECanaMboxes.MBOX30.MDL.byte.BYTE1,ECanaMboxes.MBOX30.MDL.byte.BYTE0);
+
+            /* 260714 : R61 0x700 MAS1_Cell_MinV(bit32-47)/MAS1_Cell_AGVT(bit48-63) 추출 - 기존엔 MDH를 안 읽어서 버려지고 있었음 */
+            CANARegs.SysCellMinV  = ComBine(ECanaMboxes.MBOX30.MDH.byte.BYTE5, ECanaMboxes.MBOX30.MDH.byte.BYTE4);
+            CANARegs.SysCellAgvT  = ComBine(ECanaMboxes.MBOX30.MDH.byte.BYTE7, ECanaMboxes.MBOX30.MDH.byte.BYTE6);
+
             if(CANARegs.PMSCMDRegs.bit.PrtctReset01==1)
             {
                 CANARegs.PMSCMDRegs.bit.RUNStatus01=0;
             }
-
             ECanaShadow.CANRMP.all = 0;
             ECanaShadow.CANRMP.bit.RMP30 = 1;
             ECanaRegs.CANRMP.all = ECanaShadow.CANRMP.all;   // RMP30만 클리어
